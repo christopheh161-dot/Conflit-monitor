@@ -174,9 +174,9 @@ footer{height:30px;background:#0d1117;border-top:1px solid #1a2535;display:flex;
     <div class="iframe-header">
       <span class="iframe-title air">✈ AIR TRAFFIC TRACKER</span>
       <span class="iframe-badge air">LIVE</span>
-      <span class="iframe-info">Source: ADS-B Exchange — Vols militaires mondiaux</span>
+      <span class="iframe-info">Source: OpenSky Network — Vols mondiaux</span>
     </div>
-    <iframe class="tracker" src="https://globe.adsbexchange.com/?mil=1&zoom=3" allowfullscreen></iframe>
+    <iframe class="tracker" src="https://opensky-network.org/network/explorer" allowfullscreen></iframe>
   </div>
 </div>
 <div class="panel" id="panel-naval" style="flex-direction:column;">
@@ -184,9 +184,9 @@ footer{height:30px;background:#0d1117;border-top:1px solid #1a2535;display:flex;
     <div class="iframe-header">
       <span class="iframe-title naval">⚓ NAVAL TRAFFIC TRACKER</span>
       <span class="iframe-badge naval">LIVE</span>
-      <span class="iframe-info">Source: VesselFinder — Navires militaires mondiaux</span>
+      <span class="iframe-info">Source: MarineTraffic — Navires mondiaux</span>
     </div>
-    <iframe class="tracker" src="https://www.vesselfinder.com/?zoom=3" allowfullscreen></iframe>
+    <iframe class="tracker" src="https://www.marinetraffic.com/en/ais/embed/zoom:3/centery:20/centerx:10/maptype:4/shownames:false/mmsi:0/shipid:0/fleet:/fleet_id:/type:1/nadded:0/sent:false" allowfullscreen></iframe>
   </div>
 </div>
 <div class="dov" id="dov">
@@ -265,7 +265,7 @@ setInterval(function(){
   document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
 },1000);
 document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
-  function showD(x){
+function showD(x){
   document.getElementById('dtitle').textContent=x.n.toUpperCase();
   var vc=x.l==='high'?'dv vh':x.l==='medium'?'dv vm':'dv vl';
   var q=encodeURIComponent(x.q);
@@ -300,7 +300,10 @@ var sources=[
   {name:'Courrier',url:'https://www.courrierinternational.com/feed/all/rss.xml',flag:'FR'},
   {name:'Bellingcat',url:'https://www.bellingcat.com/feed/',flag:'EN'},
   {name:'Reuters',url:'https://feeds.reuters.com/reuters/worldNews',flag:'EN'},
-  {name:'BBC',url:'https://feeds.bbci.co.uk/news/world/rss.xml',flag:'EN'}
+  {name:'BBC',url:'https://feeds.bbci.co.uk/news/world/rss.xml',flag:'EN'},
+  {name:'ONU',url:'https://news.un.org/feed/subscribe/fr/news/all/rss.xml',flag:'ONU'},
+  {name:'Def.FR',url:'https://www.defense.gouv.fr/rss/actualites.xml',flag:'FR'},
+  {name:'Pentagon',url:'https://www.defense.gov/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=945&max=10',flag:'US'}
 ];
 function addNews(time,text,hot,url){
   var f=document.getElementById('nfeed');
@@ -360,4 +363,4 @@ setTimeout(fetchAll,1000);
 setInterval(fetchAll,15*60*1000);
 </script>
 </body>
-</html>
+</html>  
