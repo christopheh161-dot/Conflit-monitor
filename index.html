@@ -3,152 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <title>Global Conflict Monitor</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080c10">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="GCM">
-<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{width:100%;height:100%;background:#080c10;color:#a8b8c8;font-family:'Rajdhani',sans-serif;overflow:hidden;}
+html,body{width:100%;height:100%;background:#080c10;color:#a8b8c8;font-family:'Rajdhani',sans-serif;}
 body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,0.012) 2px,rgba(0,212,255,0.012) 4px);pointer-events:none;z-index:9999;}
-
-/* HEADER */
-header{display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:46px;background:#0d1117;border-bottom:1px solid #1a2535;position:relative;z-index:100;flex-shrink:0;}
-.hl{display:flex;align-items:center;gap:8px;}
-.dot{width:7px;height:7px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:blink 1.5s infinite;}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:50px;background:#0d1117;border-bottom:1px solid #1a2535;position:relative;z-index:100;flex-shrink:0;}
+.hl{display:flex;align-items:center;gap:12px;}
+.dot{width:8px;height:8px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:blink 1.5s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
-.logo{font-family:'Share Tech Mono',monospace;color:#00d4ff;font-size:14px;}
-.title{font-size:12px;font-weight:700;letter-spacing:3px;color:#e0eaf4;text-transform:uppercase;}
-.hc{display:flex;align-items:center;gap:10px;}
-#defcon{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;border:1px solid #ff2d2d;color:#ff2d2d;background:rgba(255,45,45,0.08);letter-spacing:2px;animation:dp 2s infinite;}
+.logo{font-family:'Share Tech Mono',monospace;color:#00d4ff;font-size:16px;}
+.title{font-size:14px;font-weight:700;letter-spacing:4px;color:#e0eaf4;text-transform:uppercase;}
+.hc{display:flex;align-items:center;gap:16px;}
+#defcon{font-family:'Share Tech Mono',monospace;font-size:12px;padding:4px 12px;border:1px solid #ff2d2d;color:#ff2d2d;background:rgba(255,45,45,0.08);letter-spacing:2px;animation:dp 2s infinite;}
 @keyframes dp{0%,100%{box-shadow:0 0 10px rgba(255,45,45,0.2);}50%{box-shadow:0 0 20px rgba(255,45,45,0.5);}}
-.tbar{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:9px;}
-.ttrack{width:60px;height:4px;background:#1a2535;border-radius:3px;overflow:hidden;}
+.tbar{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:10px;}
+.ttrack{width:80px;height:5px;background:#1a2535;border-radius:3px;overflow:hidden;}
 .tfill{height:100%;background:linear-gradient(90deg,#00ff88,#ff8c00,#ff2d2d);transition:width 1s;}
-#clock{font-family:'Share Tech Mono',monospace;font-size:9px;color:#00d4ff;}
-
-/* LAYOUT */
-.app{display:flex;flex-direction:column;height:calc(100vh - 46px);}
-.screens{flex:1;position:relative;overflow:hidden;}
-.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;}
-.screen.active{display:flex;}
-
-/* BOTTOM NAV */
-.bnav{display:flex;background:#0d1117;border-top:1px solid #1a2535;height:56px;flex-shrink:0;z-index:100;}
-.bntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;color:#a8b8c8;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;padding:6px 2px;transition:all 0.2s;border-top:2px solid transparent;}
-.bntab.active{color:#00d4ff;border-top-color:#00d4ff;}
-.bntab.active.air{color:#ff8c00;border-top-color:#ff8c00;}
-.bntab.active.naval{color:#00ff88;border-top-color:#00ff88;}
-.bntab.active.news{color:#00d4ff;border-top-color:#00d4ff;}
-.bntab.active.osint{color:#a855f7;border-top-color:#a855f7;}
-.bnicon{font-size:18px;line-height:1;}
-
-/* MAP SCREEN */
-#map{flex:1;min-height:0;}
-.leaflet-container{background:#080c10 !important;}
-.leaflet-popup-content-wrapper{background:#0d1117 !important;border:1px solid #00d4ff !important;border-radius:0 !important;color:#e0eaf4 !important;font-family:'Rajdhani',sans-serif !important;font-size:12px !important;}
-.leaflet-popup-tip{background:#0d1117 !important;}
-.map-stats{display:flex;gap:6px;padding:6px 8px;background:#0d1117;border-bottom:1px solid #1a2535;flex-shrink:0;}
-.ms{flex:1;background:#080c10;border:1px solid #1a2535;padding:5px 6px;text-align:center;}
-.msv{font-family:'Share Tech Mono',monospace;font-size:16px;font-weight:700;line-height:1;}
-.msl{font-size:8px;letter-spacing:1px;color:#a8b8c8;margin-top:1px;}
-
-/* CONFLICT LIST */
-.clist-screen{overflow-y:auto;padding:6px;}
-.clist-screen::-webkit-scrollbar{width:3px;}
-.clist-screen::-webkit-scrollbar-thumb{background:#1a2535;}
-.ci{padding:10px 12px;margin-bottom:5px;background:#0d1117;border-left:3px solid transparent;cursor:pointer;border-radius:0 4px 4px 0;}
+#clock{font-family:'Share Tech Mono',monospace;font-size:11px;color:#00d4ff;}
+.tabs{display:flex;background:#0d1117;border-bottom:1px solid #1a2535;flex-shrink:0;z-index:99;}
+.tab{padding:8px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:#a8b8c8;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+.tab:hover{color:#00d4ff;}
+.tab.active{color:#00d4ff;border-bottom:2px solid #00d4ff;background:rgba(0,212,255,0.05);}
+.tab.air.active{color:#ff8c00;border-bottom-color:#ff8c00;}
+.tab.naval.active{color:#00ff88;border-bottom-color:#00ff88;}
+.panel{display:none;flex:1;overflow:hidden;}
+.panel.active{display:flex;}
+.lpanel{width:250px;flex-shrink:0;background:#0d1117;border-right:1px solid #1a2535;display:flex;flex-direction:column;overflow:hidden;}
+#map{flex:1;min-width:0;min-height:0;}
+.rpanel{width:270px;flex-shrink:0;background:#0d1117;border-left:1px solid #1a2535;display:flex;flex-direction:column;overflow:hidden;}
+.ph{padding:8px 12px;border-bottom:1px solid #1a2535;font-size:10px;font-weight:700;letter-spacing:3px;color:#00d4ff;font-family:'Share Tech Mono',monospace;}
+.ph::before{content:'> ';}
+.ph.air{color:#ff8c00;}
+.ph.naval{color:#00ff88;}
+.osrch{padding:10px;border-bottom:1px solid #1a2535;}
+.slbl{font-size:9px;letter-spacing:2px;color:#a8b8c8;margin-bottom:5px;font-family:'Share Tech Mono',monospace;}
+.srow{display:flex;gap:5px;margin-bottom:5px;}
+.sinp{flex:1;background:#080c10;border:1px solid #1a2535;color:#e0eaf4;padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;}
+.sinp:focus{border-color:#00d4ff;}
+.sinp::placeholder{color:#3a4a5a;}
+.sbtn{background:rgba(0,212,255,0.1);border:1px solid #00d4ff;color:#00d4ff;padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;}
+.olinks{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+.olink{display:block;background:#080c10;border:1px solid #1a2535;color:#a8b8c8;padding:4px 6px;font-size:9px;font-family:'Share Tech Mono',monospace;text-decoration:none;text-align:center;transition:all 0.2s;}
+.olink:hover{border-color:#00d4ff;color:#00d4ff;}
+.cscroll{flex:1;overflow-y:auto;padding:6px;}
+.cscroll::-webkit-scrollbar{width:3px;}
+.cscroll::-webkit-scrollbar-thumb{background:#1a2535;}
+.ci{padding:7px 9px;margin-bottom:4px;background:#080c10;border-left:3px solid transparent;cursor:pointer;transition:background 0.2s;}
 .ci:hover{background:#111c26;}
 .ci.high{border-left-color:#ff2d2d;}
 .ci.medium{border-left-color:#ff8c00;}
 .ci.low{border-left-color:#00ff88;}
-.cin{font-size:13px;font-weight:600;color:#e0eaf4;}
-.cim{display:flex;justify-content:space-between;margin-top:3px;}
-.cir{font-size:10px;color:#a8b8c8;font-family:'Share Tech Mono',monospace;}
-.cil{font-size:10px;font-family:'Share Tech Mono',monospace;}
+.cin{font-size:11px;font-weight:600;color:#e0eaf4;}
+.cim{display:flex;justify-content:space-between;margin-top:2px;}
+.cir{font-size:9px;color:#a8b8c8;font-family:'Share Tech Mono',monospace;}
+.cil{font-size:9px;font-family:'Share Tech Mono',monospace;}
 .ci.high .cil{color:#ff2d2d;}
 .ci.medium .cil{color:#ff8c00;}
 .ci.low .cil{color:#00ff88;}
-
-/* NEWS SCREEN */
+.leaflet-container{background:#080c10 !important;}
+.leaflet-popup-content-wrapper{background:#0d1117 !important;border:1px solid #00d4ff !important;border-radius:0 !important;color:#e0eaf4 !important;font-family:'Rajdhani',sans-serif !important;}
+.leaflet-popup-tip{background:#0d1117 !important;}
+.igrid{padding:8px 12px;border-bottom:1px solid #1a2535;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.icard{background:#080c10;border:1px solid #1a2535;padding:7px 8px;text-align:center;}
+.ival{font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:700;line-height:1;}
+.ilbl{font-size:8px;letter-spacing:1.5px;color:#a8b8c8;margin-top:2px;}
 .nfeed{flex:1;overflow-y:auto;padding:6px;}
 .nfeed::-webkit-scrollbar{width:3px;}
 .nfeed::-webkit-scrollbar-thumb{background:#1a2535;}
-.ni{padding:10px 12px;margin-bottom:6px;background:#0d1117;border:1px solid #1a2535;border-top:2px solid #00d4ff;cursor:pointer;border-radius:0 4px 4px 0;}
+.ni{padding:7px 9px;margin-bottom:5px;background:#080c10;border:1px solid #1a2535;border-top:2px solid #00d4ff;cursor:pointer;}
 .ni:hover{background:#111c26;}
-.nt{font-family:'Share Tech Mono',monospace;font-size:9px;color:#00d4ff;margin-bottom:3px;}
-.nx{font-size:12px;color:#e0eaf4;line-height:1.5;}
-.ntag{display:inline-block;margin-top:4px;padding:2px 6px;font-size:9px;font-family:'Share Tech Mono',monospace;border:1px solid;}
+.nt{font-family:'Share Tech Mono',monospace;font-size:8px;color:#00d4ff;margin-bottom:2px;}
+.nx{font-size:10px;color:#a8b8c8;line-height:1.4;}
+.ntag{display:inline-block;margin-top:3px;padding:1px 5px;font-size:8px;font-family:'Share Tech Mono',monospace;border:1px solid;}
 .th{color:#ff2d2d;border-color:#ff2d2d;background:rgba(255,45,45,0.08);}
 .tm{color:#ff8c00;border-color:#ff8c00;background:rgba(255,140,0,0.08);}
-
-/* OSINT SCREEN */
-.osint-screen{overflow-y:auto;padding:10px;}
-.osrch{padding:10px;background:#0d1117;border:1px solid #1a2535;margin-bottom:10px;}
-.slbl{font-size:9px;letter-spacing:2px;color:#a8b8c8;margin-bottom:6px;font-family:'Share Tech Mono',monospace;}
-.srow{display:flex;gap:6px;margin-bottom:8px;}
-.sinp{flex:1;background:#080c10;border:1px solid #1a2535;color:#e0eaf4;padding:8px 10px;font-family:'Share Tech Mono',monospace;font-size:12px;outline:none;}
-.sinp:focus{border-color:#00d4ff;}
-.sinp::placeholder{color:#3a4a5a;}
-.sbtn{background:rgba(0,212,255,0.1);border:1px solid #00d4ff;color:#00d4ff;padding:8px 12px;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;}
-.olinks{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
-.olink{display:block;background:#0d1117;border:1px solid #1a2535;color:#a8b8c8;padding:10px 8px;font-size:11px;font-family:'Share Tech Mono',monospace;text-decoration:none;text-align:center;transition:all 0.2s;}
-.olink:hover{border-color:#a855f7;color:#a855f7;}
-
-/* TRACKER SCREEN */
-.tracker-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;}
-.tracker-icon{font-size:50px;}
-.tracker-title{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;color:#ff8c00;text-align:center;}
-.tracker-title.naval{color:#00ff88;}
-.tracker-desc{font-size:12px;color:#a8b8c8;text-align:center;max-width:300px;line-height:1.6;}
-.tracker-links{display:flex;flex-direction:column;gap:8px;width:100%;max-width:300px;}
-.tracker-btn{padding:12px 20px;background:rgba(255,140,0,0.1);border:1px solid #ff8c00;color:#ff8c00;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;text-decoration:none;display:block;text-align:center;transition:all 0.2s;}
+.tracker-page{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:30px;}
+.tracker-icon{font-size:60px;animation:blink 2s infinite;}
+.tracker-title{font-family:'Share Tech Mono',monospace;font-size:18px;letter-spacing:4px;color:#ff8c00;}
+.tracker-desc{font-size:12px;color:#a8b8c8;text-align:center;max-width:400px;line-height:1.6;}
+.tracker-btn{padding:12px 30px;background:rgba(255,140,0,0.1);border:1px solid #ff8c00;color:#ff8c00;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:all 0.2s;}
 .tracker-btn:hover{background:rgba(255,140,0,0.25);}
 .tracker-btn.naval{border-color:#00ff88;color:#00ff88;background:rgba(0,255,136,0.1);}
-
-/* DETAIL OVERLAY */
-.dov{position:fixed;bottom:56px;left:0;right:0;background:#0d1117;border:1px solid #00d4ff;box-shadow:0 0 25px rgba(0,212,255,0.2);z-index:1000;display:none;max-height:70vh;overflow-y:auto;}
-.dh{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #1a2535;position:sticky;top:0;background:#0d1117;}
-.dt{font-size:13px;font-weight:700;color:#e0eaf4;letter-spacing:1px;}
-.dc{background:none;border:none;color:#a8b8c8;cursor:pointer;font-size:16px;padding:4px;}
-.db{padding:10px 14px;}
-.dr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(26,37,53,0.5);font-size:12px;font-family:'Share Tech Mono',monospace;}
+.tracker-btn.naval:hover{background:rgba(0,255,136,0.25);}
+.tracker-links{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.dov{position:fixed;bottom:30px;left:260px;width:300px;background:#0d1117;border:1px solid #00d4ff;box-shadow:0 0 25px rgba(0,212,255,0.2);z-index:1000;display:none;}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid #1a2535;}
+.dt{font-size:12px;font-weight:700;color:#e0eaf4;letter-spacing:1px;}
+.dc{background:none;border:none;color:#a8b8c8;cursor:pointer;font-size:13px;}
+.db{padding:10px 12px;}
+.dr{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(26,37,53,0.5);font-size:11px;font-family:'Share Tech Mono',monospace;}
 .dk{color:#a8b8c8;}
 .dv{color:#e0eaf4;font-weight:600;}
 .vh{color:#ff2d2d;}
 .vm{color:#ff8c00;}
 .vl{color:#00ff88;}
-.dlt{font-size:9px;letter-spacing:2px;color:#00d4ff;margin:10px 0 6px;}
-.dlg{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
-.dl{display:block;padding:8px;background:#080c10;border:1px solid #1a2535;color:#a8b8c8;text-decoration:none;font-size:10px;font-family:'Share Tech Mono',monospace;text-align:center;}
+.dlt{font-size:9px;letter-spacing:2px;color:#00d4ff;margin:8px 0 5px;}
+.dlg{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.dl{display:block;padding:4px 7px;background:#080c10;border:1px solid #1a2535;color:#a8b8c8;text-decoration:none;font-size:9px;font-family:'Share Tech Mono',monospace;text-align:center;transition:all 0.2s;}
 .dl:hover{border-color:#00d4ff;color:#00d4ff;}
-
-/* SCREEN HEADER */
-.sh{padding:8px 12px;background:#0d1117;border-bottom:1px solid #1a2535;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:#00d4ff;flex-shrink:0;}
-.sh::before{content:'> ';}
-.sh.air{color:#ff8c00;}
-.sh.naval{color:#00ff88;}
-.sh.osint{color:#a855f7;}
-.sh.news{color:#00d4ff;}
-
-/* TICKER */
-.ticker{height:24px;background:#0d1117;border-top:1px solid #1a2535;display:flex;align-items:center;overflow:hidden;flex-shrink:0;}
-.tlbl{padding:0 8px;font-family:'Share Tech Mono',monospace;font-size:8px;color:#00d4ff;white-space:nowrap;border-right:1px solid #1a2535;}
+footer{height:30px;background:#0d1117;border-top:1px solid #1a2535;display:flex;align-items:center;overflow:hidden;flex-shrink:0;}
+.tlbl{padding:0 10px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#00d4ff;white-space:nowrap;border-right:1px solid #1a2535;letter-spacing:2px;}
 .twrap{flex:1;overflow:hidden;}
-.tinn{white-space:nowrap;font-family:'Share Tech Mono',monospace;font-size:9px;color:#a8b8c8;display:inline-block;animation:scroll 60s linear infinite;}
+.tinn{white-space:nowrap;font-family:'Share Tech Mono',monospace;font-size:10px;color:#a8b8c8;display:inline-block;animation:scroll 60s linear infinite;}
 @keyframes scroll{0%{transform:translateX(100vw);}100%{transform:translateX(-200%);}}
-
-/* DESKTOP */
-@media(min-width:768px){
-  .bnav{display:none;}
-  .dov{bottom:30px;left:260px;right:auto;width:320px;}
-  .app{flex-direction:row;}
-  .screens{flex:1;}
-}
 </style>
 </head>
 <body>
@@ -168,43 +132,20 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
   </div>
   <div id="clock"></div>
 </header>
-<div class="app">
-  <div class="screens">
-
-    <!-- CARTE -->
-    <div class="screen active" id="screen-map">
-      <div class="map-stats" id="gidx"></div>
-      <div id="map"></div>
-      <div class="ticker">
-        <div class="tlbl">INTEL</div>
-        <div class="twrap"><div class="tinn" id="ticker">...</div></div>
-      </div>
-    </div>
-
-    <!-- CONFLITS LIST -->
-    <div class="screen" id="screen-conflicts">
-      <div class="sh">ACTIVE THEATERS</div>
-      <div class="clist-screen" id="clist"></div>
-    </div>
-
-    <!-- NEWS -->
-    <div class="screen" id="screen-news">
-      <div class="sh news">LIVE INTEL FEED</div>
-      <div class="nfeed" id="nfeed">
-        <div style="padding:20px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#00d4ff;text-align:center;">CONNECTING TO FEEDS...</div>
-      </div>
-    </div>
-
-    <!-- OSINT -->
-    <div class="screen" id="screen-osint">
-      <div class="sh osint">OSINT TOOLS</div>
-      <div class="osint-screen">
-        <div class="osrch">
-          <div class="slbl">TARGET / QUERY</div>
-          <div class="srow">
-            <input type="text" class="sinp" id="oi" placeholder="IP, domain, person...">
-            <button class="sbtn" id="ob">GO</button>
-          </div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('conflicts')">⚔ CONFLICTS</div>
+  <div class="tab air" onclick="showTab('air')">✈ AIR TRACKER</div>
+  <div class="tab naval" onclick="showTab('naval')">⚓ NAVAL TRACKER</div>
+</div>
+<div class="panel active" id="panel-conflicts">
+  <div style="display:flex;flex-direction:row;width:100%;height:100%;">
+    <div class="lpanel">
+      <div class="ph">OSINT SEARCH</div>
+      <div class="osrch">
+        <div class="slbl">TARGET / QUERY</div>
+        <div class="srow">
+          <input type="text" class="sinp" id="oi" placeholder="IP, domain, person...">
+          <button class="sbtn" id="ob">GO</button>
         </div>
         <div class="olinks">
           <a class="olink" href="https://osintframework.com" target="_blank">OSINT FW</a>
@@ -217,84 +158,66 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
           <a class="olink" href="https://hunter.io" target="_blank">HUNTER</a>
           <a class="olink" href="https://web.archive.org" target="_blank">WAYBACK</a>
           <a class="olink" href="https://www.maltego.com" target="_blank">MALTEGO</a>
-          <a class="olink" href="https://www.bellingcat.com" target="_blank">BELLINGCAT</a>
-          <a class="olink" href="https://reliefweb.int" target="_blank">RELIEFWEB</a>
         </div>
       </div>
+      <div class="ph">ACTIVE THEATERS</div>
+      <div class="cscroll" id="clist"></div>
     </div>
-
-    <!-- AIR -->
-    <div class="screen" id="screen-air">
-      <div class="sh air">AIR TRACKER</div>
-      <div class="tracker-screen">
-        <div class="tracker-icon">✈</div>
-        <div class="tracker-title">AIR TRAFFIC TRACKER</div>
-        <div class="tracker-desc">Surveillance des vols militaires mondiaux en temps réel via ADS-B Exchange.</div>
-        <div class="tracker-links">
-          <a class="tracker-btn" href="https://globe.adsbexchange.com/?mil=1" target="_blank">✈ VOLS MILITAIRES</a>
-          <a class="tracker-btn" href="https://globe.adsbexchange.com/" target="_blank">✈ TOUS LES VOLS</a>
-          <a class="tracker-btn" href="https://www.flightradar24.com" target="_blank">✈ FLIGHTRADAR24</a>
-        </div>
-      </div>
+    <div id="map"></div>
+    <div class="rpanel">
+      <div class="ph">GLOBAL INDEX</div>
+      <div class="igrid" id="gidx"></div>
+      <div class="ph">LIVE INTEL FEED</div>
+      <div class="nfeed" id="nfeed"><div style="padding:15px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#00d4ff;text-align:center;">CONNECTING TO FEEDS...</div></div>
     </div>
-
-    <!-- NAVAL -->
-    <div class="screen" id="screen-naval">
-      <div class="sh naval">NAVAL TRACKER</div>
-      <div class="tracker-screen">
-        <div class="tracker-icon">⚓</div>
-        <div class="tracker-title naval">NAVAL TRAFFIC TRACKER</div>
-        <div class="tracker-desc">Surveillance des navires militaires mondiaux en temps réel.</div>
-        <div class="tracker-links">
-          <a class="tracker-btn naval" href="https://www.marinetraffic.com/en/ais/home/centerx:0/centery:20/zoom:3" target="_blank">⚓ MARINETRAFFIC</a>
-          <a class="tracker-btn naval" href="https://www.vesselfinder.com" target="_blank">⚓ VESSELFINDER</a>
-          <a class="tracker-btn naval" href="https://www.chiefship.com" target="_blank">⚓ CHIEFSHIP</a>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- BOTTOM NAV -->
-  <div class="bnav">
-    <button class="bntab active" onclick="showScreen('map')">
-      <span class="bnicon">🗺</span>CARTE
-    </button>
-    <button class="bntab" onclick="showScreen('conflicts')">
-      <span class="bnicon">⚔</span>CONFLITS
-    </button>
-    <button class="bntab news" onclick="showScreen('news')">
-      <span class="bnicon">📡</span>FEED
-    </button>
-    <button class="bntab osint" onclick="showScreen('osint')">
-      <span class="bnicon">🔍</span>OSINT
-    </button>
-    <button class="bntab air" onclick="showScreen('air')">
-      <span class="bnicon">✈</span>AIR
-    </button>
-    <button class="bntab naval" onclick="showScreen('naval')">
-      <span class="bnicon">⚓</span>NAVAL
-    </button>
   </div>
 </div>
-
+<div class="panel" id="panel-air">
+  <div class="tracker-page">
+    <div class="tracker-icon">✈</div>
+    <div class="tracker-title">AIR TRAFFIC TRACKER</div>
+    <div class="tracker-desc">Surveillance des vols militaires mondiaux en temps réel via ADS-B Exchange — la plus grande base de données de vols non filtrée au monde.</div>
+    <div class="tracker-links">
+      <a class="tracker-btn" href="https://globe.adsbexchange.com/?mil=1" target="_blank">✈ VOLS MILITAIRES</a>
+      <a class="tracker-btn" href="https://globe.adsbexchange.com/" target="_blank">✈ TOUS LES VOLS</a>
+      <a class="tracker-btn" href="https://www.flightradar24.com" target="_blank">✈ FLIGHTRADAR24</a>
+    </div>
+  </div>
+</div>
+<div class="panel" id="panel-naval">
+  <div class="tracker-page">
+    <div class="tracker-icon" style="color:#00ff88">⚓</div>
+    <div class="tracker-title" style="color:#00ff88">NAVAL TRAFFIC TRACKER</div>
+    <div class="tracker-desc">Surveillance des navires militaires mondiaux en temps réel via MarineTraffic et VesselFinder.</div>
+    <div class="tracker-links">
+      <a class="tracker-btn naval" href="https://www.marinetraffic.com/en/ais/home/centerx:0/centery:20/zoom:3" target="_blank">⚓ MARINETRAFFIC</a>
+      <a class="tracker-btn naval" href="https://www.vesselfinder.com" target="_blank">⚓ VESSELFINDER</a>
+      <a class="tracker-btn naval" href="https://www.chiefship.com" target="_blank">⚓ CHIEFSHIP</a>
+    </div>
+  </div>
+</div>
 <div class="dov" id="dov">
   <div class="dh">
     <div class="dt" id="dtitle"></div>
-    <button class="dc" onclick="document.getElementById('dov').style.display='none'">✕</button>
+    <button class="dc" onclick="document.getElementById('dov').style.display='none'">X</button>
   </div>
   <div class="db" id="dbody"></div>
 </div>
+<footer>
+  <div class="tlbl">INTEL</div>
+  <div class="twrap"><div class="tinn" id="ticker">Loading...</div></div>
+</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-function showScreen(name){
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  document.querySelectorAll('.bntab').forEach(function(t){t.classList.remove('active');});
-  document.getElementById('screen-'+name).classList.add('active');
-  var tabs=document.querySelectorAll('.bntab');
-  var idx={map:0,conflicts:1,news:2,osint:3,air:4,naval:5};
-  if(idx[name]!==undefined)tabs[idx[name]].classList.add('active');
-  if(name==='map'){setTimeout(function(){map.invalidateSize();},100);}
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  var tabs=document.querySelectorAll('.tab');
+  if(name==='conflicts')tabs[0].classList.add('active');
+  else if(name==='air')tabs[1].classList.add('active');
+  else if(name==='naval')tabs[2].classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='conflicts'){setTimeout(function(){map.invalidateSize();},100);}
 }
 var C=[
   {n:"Ukraine War",r:"Eastern Europe",c:[48.38,31.17],l:"high",k:"~500K+",s:"2022",a:"Russia/Ukraine/NATO",q:"Ukraine war"},
@@ -332,7 +255,7 @@ C.forEach(function(x){
   var el=document.createElement('div');
   el.className='ci '+x.l;
   el.innerHTML='<div class="cin">'+x.n+'</div><div class="cim"><span class="cir">'+x.r+'</span><span class="cil">'+x.l.toUpperCase()+'</span></div>';
-  el.onclick=function(){showScreen('map');map.flyTo(x.c,5,{duration:1.2});showD(x);};
+  el.onclick=function(){map.flyTo(x.c,5,{duration:1.2});showD(x);};
   document.getElementById('clist').appendChild(el);
 });
 var pct=Math.round((sc/(C.length*3))*100);
@@ -340,15 +263,15 @@ document.getElementById('tf').style.width=pct+'%';
 document.getElementById('tp').textContent=pct+'%';
 document.getElementById('defcon').textContent=sc>=36?'DEFCON 2':sc>=28?'DEFCON 3':'DEFCON 4';
 document.getElementById('gidx').innerHTML=
-  '<div class="ms"><div class="msv" style="color:#ff2d2d">'+hi+'</div><div class="msl">HIGH</div></div>'+
-  '<div class="ms"><div class="msv" style="color:#ff8c00">'+mi+'</div><div class="msl">MEDIUM</div></div>'+
-  '<div class="ms"><div class="msv" style="color:#00ff88">'+li+'</div><div class="msl">LOW</div></div>'+
-  '<div class="ms"><div class="msv" style="color:#00d4ff">'+sc+'</div><div class="msl">SCORE</div></div>';
-document.getElementById('ticker').textContent=C.map(function(x){return '['+x.l.toUpperCase()+'] '+x.n+' — '+x.r;}).join('   |   ');
+  '<div class="icard"><div class="ival" style="color:#ff2d2d">'+hi+'</div><div class="ilbl">HIGH RISK</div></div>'+
+  '<div class="icard"><div class="ival" style="color:#ff8c00">'+mi+'</div><div class="ilbl">MEDIUM</div></div>'+
+  '<div class="icard"><div class="ival" style="color:#00ff88">'+li+'</div><div class="ilbl">LOW RISK</div></div>'+
+  '<div class="icard"><div class="ival" style="color:#00d4ff">'+sc+'</div><div class="ilbl">INSTABILITY</div></div>';
+document.getElementById('ticker').textContent=C.map(function(x){return '['+x.l.toUpperCase()+'] '+x.n+' - '+x.r;}).join('   |   ');
 setInterval(function(){
-  document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' Paris';
+  document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
 },1000);
-document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' Paris';
+document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
 function showD(x){
   document.getElementById('dtitle').textContent=x.n.toUpperCase();
   var vc=x.l==='high'?'dv vh':x.l==='medium'?'dv vm':'dv vl';
@@ -396,7 +319,7 @@ function addNews(time,text,hot,url){
   var el=document.createElement('div');
   el.className='ni';
   if(url)el.onclick=function(){window.open(url,'_blank');};
-  el.innerHTML='<div class="nt">'+time+'</div><div class="nx">'+text+'</div><span class="ntag '+(hot?'th':'tm')+'">'+(hot?'HOT':'INFO')+(url?' ↗':'')+'</span>';
+  el.innerHTML='<div class="nt">'+time+'</div><div class="nx">'+text+'</div><span class="ntag '+(hot?'th':'tm')+'">'+(hot?'HIGH':'INFO')+(url?' ↗':'')+'</span>';
   f.insertBefore(el,f.firstChild);
   while(f.children.length>40)f.removeChild(f.lastChild);
 }
@@ -447,4 +370,4 @@ setTimeout(fetchAll,1000);
 setInterval(fetchAll,15*60*1000);
 </script>
 </body>
-</html> 
+</html>  
