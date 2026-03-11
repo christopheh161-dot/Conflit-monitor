@@ -2,21 +2,21 @@
   "name": "Global Conflict Monitor",
   "short_name": "GCM",
   "description": "OSINT Dashboard - Surveillance des conflits mondiaux",
-  "start_url": "/Conflit-monitor/",
+  "start_url": "/Conflit-monitor/mobile.html",
   "scope": "/Conflit-monitor/",
   "display": "standalone",
-"orientation": "portrait",
+  "orientation": "landscape",
   "background_color": "#080c10",
   "theme_color": "#00d4ff",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/google/material-design-icons/master/png/action/explore/materialicons/48dp/2x/baseline_explore_black_48dp.png",
+      "src": "https://raw.githubusercontent.com/google/material-design-icons/master/png/action/gps_fixed/materialicons/48dp/2x/baseline_gps_fixed_black_48dp.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://raw.githubusercontent.com/google/material-design-icons/master/png/action/explore/materialicons/48dp/2x/baseline_explore_black_48dp.png",
+      "src": "https://raw.githubusercontent.com/google/material-design-icons/master/png/action/gps_fixed/materialicons/48dp/2x/baseline_gps_fixed_black_48dp.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
