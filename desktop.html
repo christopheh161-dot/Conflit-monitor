@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Global Conflict Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080c10">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;background:#080c10;color:#a8b8c8;font-family:'Rajdhani',sans-serif;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,0.012) 2px,rgba(0,212,255,0.012) 4px);pointer-events:none;z-index:9999;}
+body{display:flex;flex-direction:column;}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:50px;background:#0d1117;border-bottom:1px solid #1a2535;position:relative;z-index:100;flex-shrink:0;}
+.hl{display:flex;align-items:center;gap:12px;}
+.dot{width:8px;height:8px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+.logo{font-family:'Share Tech Mono',monospace;color:#00d4ff;font-size:16px;}
+.title{font-size:14px;font-weight:700;letter-spacing:4px;color:#e0eaf4;text-transform:uppercase;}
+.hc{display:flex;align-items:center;gap:16px;}
+#defcon{font-family:'Share Tech Mono',monospace;font-size:12px;padding:4px 12px;border:1px solid #ff2d2d;color:#ff2d2d;background:rgba(255,45,45,0.08);letter-spacing:2px;animation:dp 2s infinite;}
+@keyframes dp{0%,100%{box-shadow:0 0 10px rgba(255,45,45,0.2);}50%{box-shadow:0 0 20px rgba(255,45,45,0.5);}}
+.tbar{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:10px;}
+.ttrack{width:80px;height:5px;background:#1a2535;border-radius:3px;overflow:hidden;}
+.tfill{height:100%;background:linear-gradient(90deg,#00ff88,#ff8c00,#ff2d2d);transition:width 1s;}
+#clock{font-family:'Share Tech Mono',monospace;font-size:11px;color:#00d4ff;}
+.tabs{display:flex;background:#0d1117;border-bottom:1px solid #1a2535;flex-shrink:0;z-index:99;}
+.tab{padding:8px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:#a8b8c8;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+.tab:hover{color:#00d4ff;}
+.tab.active{color:#00d4ff;border-bottom:2px solid #00d4ff;background:rgba(0,212,255,0.05);}
+.tab.air.active{color:#ff8c00;border-bottom-color:#ff8c00;}
+.tab.naval.active{color:#00ff88;border-bottom-color:#00ff88;}
+.panel{display:none;flex:1;overflow:hidden;}
+.panel.active{display:flex;}
+.lpanel{width:250px;flex-shrink:0;background:#0d1117;border-right:1px solid #1a2535;display:flex;flex-direction:column;overflow:hidden;}
+#map{flex:1;min-width:0;min-height:0;}
+.rpanel{width:270px;flex-shrink:0;background:#0d1117;border-left:1px solid #1a2535;display:flex;flex-direction:column;overflow:hidden;}
+.ph{padding:8px 12px;border-bottom:1px solid #1a2535;font-size:10px;font-weight:700;letter-spacing:3px;color:#00d4ff;font-family:'Share Tech Mono',monospace;}
+.ph::before{content:'> ';}
+.ph.air{color:#ff8c00;}
+.ph.naval{color:#00ff88;}
+.osrch{padding:10px;border-bottom:1px solid #1a2535;}
+.slbl{font-size:9px;letter-spacing:2px;color:#a8b8c8;margin-bottom:5px;font-family:'Share Tech Mono',monospace;}
+.srow{display:flex;gap:5px;margin-bottom:5px;}
+.sinp{flex:1;background:#080c10;border:1px solid #1a2535;color:#e0eaf4;padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;}
+.sinp:focus{border-color:#00d4ff;}
+.sinp::placeholder{color:#3a4a5a;}
+.sbtn{background:rgba(0,212,255,0.1);border:1px solid #00d4ff;color:#00d4ff;padding:5px 8px;font-family:'Share Tech Mono',monospace;font-size:10px;cursor:pointer;}
+.olinks{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+.olink{display:block;background:#080c10;border:1px solid #1a2535;color:#a8b8c8;padding:4px 6px;font-size:9px;font-family:'Share Tech Mono',monospace;text-decoration:none;text-align:center;transition:all 0.2s;}
+.olink:hover{border-color:#00d4ff;color:#00d4ff;}
+.cscroll{flex:1;overflow-y:auto;padding:6px;}
+.cscroll::-webkit-scrollbar{width:3px;}
+.cscroll::-webkit-scrollbar-thumb{background:#1a2535;}
+.ci{padding:7px 9px;margin-bottom:4px;background:#080c10;border-left:3px solid transparent;cursor:pointer;transition:background 0.2s;}
+.ci:hover{background:#111c26;}
+.ci.high{border-left-color:#ff2d2d;}
+.ci.medium{border-left-color:#ff8c00;}
+.ci.low{border-left-color:#00ff88;}
+.cin{font-size:11px;font-weight:600;color:#e0eaf4;}
+.cim{display:flex;justify-content:space-between;margin-top:2px;}
+.cir{font-size:9px;color:#a8b8c8;font-family:'Share Tech Mono',monospace;}
+.cil{font-size:9px;font-family:'Share Tech Mono',monospace;}
+.ci.high .cil{color:#ff2d2d;}
+.ci.medium .cil{color:#ff8c00;}
+.ci.low .cil{color:#00ff88;}
+.leaflet-container{background:#080c10 !important;}
+.leaflet-popup-content-wrapper{background:#0d1117 !important;border:1px solid #00d4ff !important;border-radius:0 !important;color:#e0eaf4 !important;font-family:'Rajdhani',sans-serif !important;}
+.leaflet-popup-tip{background:#0d1117 !important;}
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(255,45,45,0.2) !important;}
+.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{background:rgba(255,45,45,0.5) !important;color:#fff !important;font-family:'Share Tech Mono',monospace !important;}
+.igrid{padding:8px 12px;border-bottom:1px solid #1a2535;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.icard{background:#080c10;border:1px solid #1a2535;padding:7px 8px;text-align:center;}
+.ival{font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:700;line-height:1;}
+.ilbl{font-size:8px;letter-spacing:1.5px;color:#a8b8c8;margin-top:2px;}
+.filter-bar{display:flex;gap:5px;padding:6px 8px;border-bottom:1px solid #1a2535;flex-shrink:0;}
+.fbtn{padding:3px 8px;font-family:'Share Tech Mono',monospace;font-size:9px;border:1px solid #1a2535;background:#080c10;color:#a8b8c8;cursor:pointer;transition:all 0.2s;}
+.fbtn.active{border-color:#00d4ff;color:#00d4ff;background:rgba(0,212,255,0.08);}
+.fbtn.high.active{border-color:#ff2d2d;color:#ff2d2d;background:rgba(255,45,45,0.08);}
+.fbtn.medium.active{border-color:#ff8c00;color:#ff8c00;background:rgba(255,140,0,0.08);}
+.fbtn.low.active{border-color:#00ff88;color:#00ff88;background:rgba(0,255,136,0.08);}
+.region-bar{display:flex;gap:4px;padding:5px 8px;border-bottom:1px solid #1a2535;flex-wrap:wrap;}
+.rbtn{padding:2px 7px;font-family:'Share Tech Mono',monospace;font-size:8px;border:1px solid #1a2535;background:transparent;color:#a8b8c8;cursor:pointer;transition:all 0.2s;}
+.rbtn:hover{border-color:#00d4ff;color:#00d4ff;}
+.nfeed{flex:1;overflow-y:auto;padding:6px;}
+.nfeed::-webkit-scrollbar{width:3px;}
+.nfeed::-webkit-scrollbar-thumb{background:#1a2535;}
+.ni{padding:7px 9px;margin-bottom:5px;background:#080c10;border:1px solid #1a2535;border-top:2px solid #00d4ff;cursor:pointer;}
+.ni:hover{background:#111c26;}
+.nt{font-family:'Share Tech Mono',monospace;font-size:8px;color:#00d4ff;margin-bottom:2px;}
+.nx{font-size:10px;color:#a8b8c8;line-height:1.4;}
+.ntag{display:inline-block;margin-top:3px;padding:1px 5px;font-size:8px;font-family:'Share Tech Mono',monospace;border:1px solid;}
+.th{color:#ff2d2d;border-color:#ff2d2d;background:rgba(255,45,45,0.08);}
+.tm{color:#ff8c00;border-color:#ff8c00;background:rgba(255,140,0,0.08);}
+.notif-bar{display:none;padding:6px 12px;background:rgba(255,45,45,0.1);border-bottom:1px solid #ff2d2d;font-family:'Share Tech Mono',monospace;font-size:10px;color:#ff2d2d;align-items:center;gap:8px;}
+.notif-bar.show{display:flex;}
+.notif-close{margin-left:auto;cursor:pointer;}
+.tracker-page{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:30px;}
+.tracker-icon{font-size:60px;animation:blink 2s infinite;}
+.tracker-title{font-family:'Share Tech Mono',monospace;font-size:18px;letter-spacing:4px;color:#ff8c00;}
+.tracker-title.naval{color:#00ff88;}
+.tracker-desc{font-size:12px;color:#a8b8c8;text-align:center;max-width:400px;line-height:1.6;}
+.tracker-links{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.tracker-btn{padding:12px 30px;background:rgba(255,140,0,0.1);border:1px solid #ff8c00;color:#ff8c00;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:3px;cursor:pointer;text-decoration:none;display:inline-block;transition:all 0.2s;}
+.tracker-btn:hover{background:rgba(255,140,0,0.25);}
+.tracker-btn.naval{border-color:#00ff88;color:#00ff88;background:rgba(0,255,136,0.1);}
+.tracker-btn.naval:hover{background:rgba(0,255,136,0.25);}
+.dov{position:fixed;bottom:30px;left:260px;width:300px;background:#0d1117;border:1px solid #00d4ff;box-shadow:0 0 25px rgba(0,212,255,0.2);z-index:1000;display:none;}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid #1a2535;}
+.dt{font-size:12px;font-weight:700;color:#e0eaf4;letter-spacing:1px;}
+.dc{background:none;border:none;color:#a8b8c8;cursor:pointer;font-size:13px;}
+.db{padding:10px 12px;}
+.dr{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(26,37,53,0.5);font-size:11px;font-family:'Share Tech Mono',monospace;}
+.dk{color:#a8b8c8;}.dv{color:#e0eaf4;font-weight:600;}
+.vh{color:#ff2d2d;}.vm{color:#ff8c00;}.vl{color:#00ff88;}
+.dlt{font-size:9px;letter-spacing:2px;color:#00d4ff;margin:8px 0 5px;}
+.dlg{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.dl{display:block;padding:4px 7px;background:#080c10;border:1px solid #1a2535;color:#a8b8c8;text-decoration:none;font-size:9px;font-family:'Share Tech Mono',monospace;text-align:center;transition:all 0.2s;}
+.dl:hover{border-color:#00d4ff;color:#00d4ff;}
+footer{height:30px;background:#0d1117;border-top:1px solid #1a2535;display:flex;align-items:center;overflow:hidden;flex-shrink:0;}
+.tlbl{padding:0 10px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#00d4ff;white-space:nowrap;border-right:1px solid #1a2535;letter-spacing:2px;}
+.twrap{flex:1;overflow:hidden;}
+.tinn{white-space:nowrap;font-family:'Share Tech Mono',monospace;font-size:10px;color:#a8b8c8;display:inline-block;animation:scroll 60s linear infinite;}
+@keyframes scroll{0%{transform:translateX(100vw);}100%{transform:translateX(-200%);}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hl">
+    <div class="dot"></div>
+    <div class="logo">[GCM]</div>
+    <div class="title">Global Conflict Monitor</div>
+  </div>
+  <div class="hc">
+    <div id="defcon">DEFCON 4</div>
+    <div class="tbar">
+      <span>THREAT</span>
+      <div class="ttrack"><div class="tfill" id="tf" style="width:0%"></div></div>
+      <span id="tp">0%</span>
+    </div>
+  </div>
+  <div id="clock"></div>
+</header>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('conflicts')">⚔ CONFLICTS</div>
+  <div class="tab air" onclick="showTab('air')">✈ AIR TRACKER</div>
+  <div class="tab naval" onclick="showTab('naval')">⚓ NAVAL TRACKER</div>
+</div>
+<div class="panel active" id="panel-conflicts">
+  <div style="display:flex;flex-direction:row;width:100%;height:100%;">
+    <div class="lpanel">
+      <div class="ph">OSINT SEARCH</div>
+      <div class="osrch">
+        <div class="slbl">TARGET / QUERY</div>
+        <div class="srow">
+          <input type="text" class="sinp" id="oi" placeholder="IP, domain, person...">
+          <button class="sbtn" id="ob">GO</button>
+        </div>
+        <div class="olinks">
+          <a class="olink" href="https://osintframework.com" target="_blank">OSINT FW</a>
+          <a class="olink" href="https://shodan.io" target="_blank">SHODAN</a>
+          <a class="olink" href="https://www.virustotal.com" target="_blank">VIRUSTOTAL</a>
+          <a class="olink" href="https://censys.io" target="_blank">CENSYS</a>
+          <a class="olink" href="https://urlscan.io" target="_blank">URLSCAN</a>
+          <a class="olink" href="https://intelx.io" target="_blank">INTEL X</a>
+          <a class="olink" href="https://www.whois.com" target="_blank">WHOIS</a>
+          <a class="olink" href="https://hunter.io" target="_blank">HUNTER</a>
+          <a class="olink" href="https://web.archive.org" target="_blank">WAYBACK</a>
+          <a class="olink" href="https://www.maltego.com" target="_blank">MALTEGO</a>
+        </div>
+      </div>
+      <div class="ph">ACTIVE THEATERS</div>
+      <div class="filter-bar">
+        <button class="fbtn active" onclick="filterMap('all',this)">ALL</button>
+        <button class="fbtn high" onclick="filterMap('high',this)">🔴 HIGH</button>
+        <button class="fbtn medium" onclick="filterMap('medium',this)">🟠 MED</button>
+        <button class="fbtn low" onclick="filterMap('low',this)">🟢 LOW</button>
+      </div>
+      <div class="cscroll" id="clist"></div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+      <div class="region-bar">
+        <button class="rbtn" onclick="zoomRegion('world')">🌍 MONDE</button>
+        <button class="rbtn" onclick="zoomRegion('europe')">🇪🇺 EUROPE</button>
+        <button class="rbtn" onclick="zoomRegion('middleeast')">🕌 M.ORIENT</button>
+        <button class="rbtn" onclick="zoomRegion('africa')">🌍 AFRIQUE</button>
+        <button class="rbtn" onclick="zoomRegion('asia')">🌏 ASIE</button>
+        <button class="rbtn" onclick="zoomRegion('americas')">🌎 AMÉRIQUES</button>
+      </div>
+      <div class="notif-bar" id="notif-bar">
+        <span id="notif-text">🚨 ALERTE</span>
+        <span class="notif-close" onclick="document.getElementById('notif-bar').classList.remove('show')">✕</span>
+      </div>
+      <div id="map"></div>
+    </div>
+    <div class="rpanel">
+      <div class="ph">GLOBAL INDEX</div>
+      <div class="igrid" id="gidx"></div>
+      <div class="ph">LIVE INTEL FEED</div>
+      <div class="nfeed" id="nfeed"><div style="padding:15px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#00d4ff;text-align:center;">CONNECTING TO FEEDS...</div></div>
+    </div>
+  </div>
+</div>
+<div class="panel" id="panel-air">
+  <div class="tracker-page">
+    <div class="tracker-icon">✈</div>
+    <div class="tracker-title">AIR TRAFFIC TRACKER</div>
+    <div class="tracker-desc">Surveillance des vols militaires mondiaux en temps réel via ADS-B Exchange.</div>
+    <div class="tracker-links">
+      <a class="tracker-btn" href="https://globe.adsbexchange.com/?mil=1" target="_blank">✈ VOLS MILITAIRES</a>
+      <a class="tracker-btn" href="https://globe.adsbexchange.com/" target="_blank">✈ TOUS LES VOLS</a>
+      <a class="tracker-btn" href="https://www.flightradar24.com" target="_blank">✈ FLIGHTRADAR24</a>
+    </div>
+  </div>
+</div>
+<div class="panel" id="panel-naval">
+  <div class="tracker-page">
+    <div class="tracker-icon" style="color:#00ff88">⚓</div>
+    <div class="tracker-title naval">NAVAL TRAFFIC TRACKER</div>
+    <div class="tracker-desc">Surveillance des navires militaires mondiaux en temps réel.</div>
+    <div class="tracker-links">
+      <a class="tracker-btn naval" href="https://www.marinetraffic.com/en/ais/home/centerx:0/centery:20/zoom:3" target="_blank">⚓ MARINETRAFFIC</a>
+      <a class="tracker-btn naval" href="https://www.vesselfinder.com" target="_blank">⚓ VESSELFINDER</a>
+      <a class="tracker-btn naval" href="https://www.chiefship.com" target="_blank">⚓ CHIEFSHIP</a>
+    </div>
+  </div>
+</div>
+<div class="dov" id="dov">
+  <div class="dh">
+    <div class="dt" id="dtitle"></div>
+    <button class="dc" onclick="document.getElementById('dov').style.display='none'">X</button>
+  </div>
+  <div class="db" id="dbody"></div>
+</div>
+<footer>
+  <div class="tlbl">INTEL</div>
+  <div class="twrap"><div class="tinn" id="ticker">Loading...</div></div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<script>
+var clusterGroup;
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  var tabs=document.querySelectorAll('.tab');
+  if(name==='conflicts')tabs[0].classList.add('active');
+  else if(name==='air')tabs[1].classList.add('active');
+  else if(name==='naval')tabs[2].classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='conflicts'){setTimeout(function(){map.invalidateSize();},100);}
+}
+function filterMap(level,btn){
+  document.querySelectorAll('.filter-bar .fbtn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  clusterGroup.clearLayers();
+  C.forEach(function(x){
+    if(level==='all'||x.l===level){addMarker(x);}
+  });
+  var list=document.getElementById('clist');
+  list.querySelectorAll('.ci').forEach(function(el){
+    el.style.display=(level==='all'||el.dataset.level===level)?'':'none';
+  });
+}
+function zoomRegion(r){
+  var regions={
+    world:[25,10,2],europe:[52,15,4],
+    middleeast:[28,42,4],africa:[5,20,3],
+    asia:[30,100,3],americas:[15,-80,3]
+  };
+  var z=regions[r];
+  if(z)map.flyTo([z[0],z[1]],z[2],{duration:1.5});
+}
+var C=[
+  {n:"Ukraine War",r:"Eastern Europe",c:[48.38,31.17],l:"high",k:"~500K+",s:"2022",a:"Russia/Ukraine/NATO",q:"Ukraine war",t:"War"},
+  {n:"Israel-Gaza",r:"Middle East",c:[31.05,34.85],l:"high",k:"~40K+",s:"2023",a:"Israel/Hamas",q:"Gaza conflict",t:"War"},
+  {n:"Sudan Civil War",r:"Africa",c:[15.50,32.56],l:"high",k:"~15K+",s:"2023",a:"SAF/RSF",q:"Sudan war",t:"Civil War"},
+  {n:"Iran Tension",r:"Middle East",c:[35.69,51.39],l:"medium",k:"unknown",s:"Ongoing",a:"Iran/Israel/USA",q:"Iran tensions",t:"Tension"},
+  {n:"Yemen Conflict",r:"Middle East",c:[15.55,48.52],l:"medium",k:"~150K+",s:"2014",a:"Houthis/Saudi/UAE",q:"Yemen war",t:"War"},
+  {n:"Taiwan Strait",r:"East Asia",c:[23.70,120.96],l:"medium",k:"none",s:"Ongoing",a:"China/Taiwan/USA",q:"Taiwan strait",t:"Tension"},
+  {n:"Sahel",r:"West Africa",c:[17.57,-3.99],l:"low",k:"~10K+",s:"2012",a:"Jihadists/ECOWAS",q:"Sahel crisis",t:"Insurgency"},
+  {n:"Myanmar War",r:"Southeast Asia",c:[19.76,96.08],l:"high",k:"~50K+",s:"2021",a:"Junta/Resistance",q:"Myanmar war",t:"Civil War"},
+  {n:"DR Congo",r:"Central Africa",c:[-4.04,21.76],l:"high",k:"~7M displaced",s:"1996",a:"M23/FARDC/Rwanda",q:"Congo conflict",t:"Civil War"},
+  {n:"Afghanistan",r:"Central Asia",c:[33.94,67.71],l:"medium",k:"unknown",s:"2021",a:"Taliban/IS-K",q:"Afghanistan",t:"Insurgency"},
+  {n:"South China Sea",r:"East Asia",c:[15.00,114.00],l:"medium",k:"none",s:"Ongoing",a:"China/Philippines/USA",q:"South China Sea",t:"Tension"},
+  {n:"North Korea",r:"East Asia",c:[40.34,127.51],l:"medium",k:"none",s:"Ongoing",a:"DPRK/USA/S.Korea",q:"North Korea missile",t:"Tension"},
+  {n:"Ethiopia",r:"East Africa",c:[14.03,38.32],l:"low",k:"~500K+",s:"2020",a:"Ethiopian Forces/TPLF",q:"Ethiopia Tigray",t:"Civil War"},
+  {n:"Haiti Crisis",r:"Caribbean",c:[18.97,-72.29],l:"medium",k:"unknown",s:"2021",a:"Gangs/UN Mission",q:"Haiti crisis",t:"Crisis"},
+  {n:"Kosovo",r:"Balkans",c:[42.60,20.90],l:"low",k:"none",s:"Ongoing",a:"Serbia/Kosovo/NATO",q:"Kosovo Serbia",t:"Tension"}
+];
+var map=L.map('map',{zoomControl:false,worldCopyJump:true}).setView([25,35],2);
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:18,subdomains:'abcd'}).addTo(map);
+clusterGroup=L.markerClusterGroup({
+  maxClusterRadius:60,
+  iconCreateFunction:function(cluster){
+    var count=cluster.getChildCount();
+    return L.divIcon({html:'<div style="background:rgba(255,45,45,0.7);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Share Tech Mono,monospace;font-size:12px;border:2px solid #ff2d2d;">'+count+'</div>',className:'',iconSize:[36,36]});
+  }
+});
+map.addLayer(clusterGroup);
+function addMarker(x){
+  var col=x.l==='high'?'#ff2d2d':x.l==='medium'?'#ff8c00':'#00ff88';
+  var icon=L.divIcon({html:'<div style="width:14px;height:14px;border-radius:50%;background:'+col+';border:2px solid #fff;box-shadow:0 0 8px '+col+'"></div>',className:'',iconSize:[14,14],iconAnchor:[7,7]});
+  var marker=L.marker(x.c,{icon:icon});
+  marker.on('click',function(){showD(x);});
+  clusterGroup.addLayer(marker);
+}
+window.addEventListener('load',function(){
+  setTimeout(function(){map.invalidateSize();},200);
+  setTimeout(function(){map.invalidateSize();},800);
+});
+var sc=0,hi=0,mi=0,li=0;
+C.forEach(function(x){
+  var pts=x.l==='high'?3:x.l==='medium'?2:1;
+  if(x.l==='high')hi++;else if(x.l==='medium')mi++;else li++;
+  sc+=pts;
+  addMarker(x);
+  var el=document.createElement('div');
+  el.className='ci '+x.l;
+  el.dataset.level=x.l;
+  el.innerHTML='<div class="cin">'+x.n+'</div><div class="cim"><span class="cir">'+x.r+'</span><span class="cil">'+x.l.toUpperCase()+'</span></div>';
+  el.onclick=function(){map.flyTo(x.c,5,{duration:1.2});showD(x);};
+  document.getElementById('clist').appendChild(el);
+});
+var pct=Math.round((sc/(C.length*3))*100);
+document.getElementById('tf').style.width=pct+'%';
+document.getElementById('tp').textContent=pct+'%';
+document.getElementById('defcon').textContent=sc>=36?'DEFCON 2':sc>=28?'DEFCON 3':'DEFCON 4';
+document.getElementById('gidx').innerHTML=
+  '<div class="icard"><div class="ival" style="color:#ff2d2d">'+hi+'</div><div class="ilbl">HIGH RISK</div></div>'+
+  '<div class="icard"><div class="ival" style="color:#ff8c00">'+mi+'</div><div class="ilbl">MEDIUM</div></div>'+
+  '<div class="icard"><div class="ival" style="color:#00ff88">'+li+'</div><div class="ilbl">LOW RISK</div></div>'+
+  '<div class="icard"><div class="ival" style="color:#00d4ff">'+sc+'</div><div class="ilbl">INSTABILITY</div></div>';
+document.getElementById('ticker').textContent=C.map(function(x){return '['+x.l.toUpperCase()+'] '+x.n+' - '+x.r;}).join('   |   ');
+setInterval(function(){
+  document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
+},1000);
+document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
+function showD(x){
+  document.getElementById('dtitle').textContent=x.n.toUpperCase();
+  var vc=x.l==='high'?'dv vh':x.l==='medium'?'dv vm':'dv vl';
+  var q=encodeURIComponent(x.q);
+  document.getElementById('dbody').innerHTML=
+    '<div class="dr"><span class="dk">REGION</span><span class="dv">'+x.r+'</span></div>'+
+    '<div class="dr"><span class="dk">TYPE</span><span class="dv">'+x.t+'</span></div>'+
+    '<div class="dr"><span class="dk">THREAT</span><span class="'+vc+'">'+x.l.toUpperCase()+'</span></div>'+
+    '<div class="dr"><span class="dk">CASUALTIES</span><span class="dv">'+x.k+'</span></div>'+
+    '<div class="dr"><span class="dk">SINCE</span><span class="dv">'+x.s+'</span></div>'+
+    '<div class="dr"><span class="dk">ACTORS</span><span class="dv">'+x.a+'</span></div>'+
+    '<div class="dlt">OPEN SOURCE RESEARCH</div>'+
+    '<div class="dlg">'+
+    '<a class="dl" href="https://www.google.com/search?q='+q+'" target="_blank">GOOGLE</a>'+
+    '<a class="dl" href="https://twitter.com/search?q='+q+'" target="_blank">X/TWITTER</a>'+
+    '<a class="dl" href="https://en.wikipedia.org/wiki/Special:Search?search='+q+'" target="_blank">WIKIPEDIA</a>'+
+    '<a class="dl" href="https://www.bellingcat.com/?s='+q+'" target="_blank">BELLINGCAT</a>'+
+    '<a class="dl" href="https://reliefweb.int/search?search='+q+'" target="_blank">RELIEFWEB</a>'+
+    '<a class="dl" href="https://www.google.com/maps/search/'+q+'" target="_blank">MAPS</a>'+
+    '</div>';
+  document.getElementById('dov').style.display='block';
+}
+document.getElementById('ob').onclick=function(){
+  var q=document.getElementById('oi').value.trim();
+  if(q)window.open('https://www.google.com/search?q='+encodeURIComponent(q+' osint'),'_blank');
+};
+document.getElementById('oi').onkeydown=function(e){if(e.key==='Enter')document.getElementById('ob').click();};
+function checkHotNews(title){
+  var hot=!!(title.match(/war|guerre|conflit|conflict|attack|attaque|militaire|military|mort|killed|missile|bomb|strike|frappe|Ukraine|Gaza|Russia|Russie|Sudan|Myanmar|Congo|escalade|nuclear/i));
+  if(hot){
+    var bar=document.getElementById('notif-bar');
+    document.getElementById('notif-text').textContent='🚨 '+title.substring(0,100);
+    bar.classList.add('show');
+    setTimeout(function(){bar.classList.remove('show');},8000);
+  }
+  return hot;     
+}
+var sources=[
+  {name:'France24',url:'https://www.france24.com/fr/rss',flag:'FR'},
+  {name:'RFI',url:'https://www.rfi.fr/fr/rss-actualite-internationale',flag:'FR'},
+  {name:'LeMonde',url:'https://www.lemonde.fr/rss/une.xml',flag:'FR'},
+  {name:'BFMTV',url:'https://www.bfmtv.com/rss/news-24-7/',flag:'FR'},
+  {name:'Figaro',url:'https://www.lefigaro.fr/rss/figaro_actualites.xml',flag:'FR'},
+  {name:'Courrier',url:'https://www.courrierinternational.com/feed/all/rss.xml',flag:'FR'},
+  {name:'Bellingcat',url:'https://www.bellingcat.com/feed/',flag:'EN'},
+  {name:'Reuters',url:'https://feeds.reuters.com/reuters/worldNews',flag:'EN'},
+  {name:'BBC',url:'https://feeds.bbci.co.uk/news/world/rss.xml',flag:'EN'},
+  {name:'ONU',url:'https://news.un.org/feed/subscribe/fr/news/all/rss.xml',flag:'ONU'},
+  {name:'Def.FR',url:'https://www.defense.gouv.fr/rss/actualites.xml',flag:'FR'},
+  {name:'Pentagon',url:'https://www.defense.gov/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=945&max=10',flag:'US'}
+];
+function addNews(time,text,hot,url){
+  var f=document.getElementById('nfeed');
+  var first=f.firstChild;
+  if(first&&first.style&&first.style.textAlign==='center')f.innerHTML='';
+  var el=document.createElement('div');
+  el.className='ni';
+  if(url)el.onclick=function(){window.open(url,'_blank');};
+  el.innerHTML='<div class="nt">'+time+'</div><div class="nx">'+text+'</div><span class="ntag '+(hot?'th':'tm')+'">'+(hot?'🚨 HOT':'ℹ INFO')+(url?' ↗':'')+'</span>';
+  f.insertBefore(el,f.firstChild);
+  while(f.children.length>40)f.removeChild(f.lastChild);
+}
+function fetchFeed(src){
+  fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(src.url))
+  .then(function(r){if(!r.ok)throw 0;return r.text();})
+  .then(function(txt){
+    var xml=new DOMParser().parseFromString(txt,'text/xml');
+    var items=xml.querySelectorAll('item');
+    var n=0;
+    items.forEach(function(item){
+      if(n>=3)return;
+      var title=(item.querySelector('title')||{textContent:''}).textContent.trim();
+      var link=(item.querySelector('link')||{textContent:''}).textContent.trim();
+      var pub=(item.querySelector('pubDate')||{textContent:''}).textContent;
+      if(!title||title.length<5)return;
+      var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
+      var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
+      var hot=checkHotNews(title);
+      addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
+      n++;
+    });
+  })
+  .catch(function(){
+    fetch('https://corsproxy.io/?'+encodeURIComponent(src.url))
+    .then(function(r){if(!r.ok)throw 0;return r.text();})
+    .then(function(txt){
+      var xml=new DOMParser().parseFromString(txt,'text/xml');
+      var items=xml.querySelectorAll('item');
+      var n=0;
+      items.forEach(function(item){
+        if(n>=3)return;
+        var title=(item.querySelector('title')||{textContent:''}).textContent.trim();
+        var link=(item.querySelector('link')||{textContent:''}).textContent.trim();
+        var pub=(item.querySelector('pubDate')||{textContent:''}).textContent;
+        if(!title||title.length<5)return;
+        var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
+        var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
+        var hot=checkHotNews(title);
+        addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
+        n++;
+      });
+    }).catch(function(){});
+  });
+}
+function fetchAll(){sources.forEach(function(s){fetchFeed(s);});}
+setTimeout(fetchAll,1000);
+setInterval(fetchAll,15*60*1000);
+</script>
+</body>
+</html>  
