@@ -10,7 +10,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GCM">
 <meta name="description" content="Global Conflict Monitor - Surveillance des conflits mondiaux en temps reel">
-<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -164,6 +163,7 @@ footer{height:30px;background:#0d1117;border-top:1px solid #1a2535;display:flex;
   <div class="tlbl">INTEL</div>
   <div class="twrap"><div class="tinn" id="ticker">Loading...</div></div>
 </footer>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 var C=[
@@ -187,7 +187,10 @@ var C=[
 var map=L.map('map',{zoomControl:false,worldCopyJump:true}).setView([25,35],2);
 L.control.zoom({position:'bottomright'}).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:18,subdomains:'abcd'}).addTo(map);
-window.addEventListener('load',function(){setTimeout(function(){map.invalidateSize();},200);setTimeout(function(){map.invalidateSize();},800);});
+window.addEventListener('load',function(){
+  setTimeout(function(){map.invalidateSize();},200);
+  setTimeout(function(){map.invalidateSize();},800);
+});
 
 var sc=0,hi=0,mi=0,li=0;
 C.forEach(function(x){
@@ -217,9 +220,9 @@ document.getElementById('gidx').innerHTML=
 document.getElementById('ticker').textContent=C.map(function(x){return '['+x.l.toUpperCase()+'] '+x.n+' - '+x.r;}).join('   |   ');
 
 setInterval(function(){
-  document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
+  document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
 },1000);
-document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
+document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (Paris)';
 
 function showD(x){
   document.getElementById('dtitle').textContent=x.n.toUpperCase();
@@ -249,33 +252,34 @@ document.getElementById('ob').onclick=function(){
 };
 document.getElementById('oi').onkeydown=function(e){if(e.key==='Enter')document.getElementById('ob').click();};
 
-// LIVE NEWS FEED
 var feed=document.getElementById('nfeed');
 var sources=[
-  {name:'France24', url:'https://www.france24.com/fr/rss', flag:'FR'},
-  {name:'RFI',      url:'https://www.rfi.fr/fr/rss-actualite-internationale', flag:'FR'},
-  {name:'LeMonde',  url:'https://www.lemonde.fr/rss/une.xml', flag:'FR'},
-  {name:'BFMTV',    url:'https://www.bfmtv.com/rss/news-24-7/', flag:'FR'},
-  {name:'Figaro',   url:'https://www.lefigaro.fr/rss/figaro_actualites.xml', flag:'FR'},
-  {name:'Courrier', url:'https://www.courrierinternational.com/feed/all/rss.xml', flag:'FR'},
-  {name:'Bellingcat',url:'https://www.bellingcat.com/feed/', flag:'EN'},
-  {name:'Reuters',  url:'https://feeds.reuters.com/reuters/worldNews', flag:'EN'},
-  {name:'BBC',      url:'https://feeds.bbci.co.uk/news/world/rss.xml', flag:'EN'}
+  {name:'France24',url:'https://www.france24.com/fr/rss',flag:'FR'},
+  {name:'RFI',url:'https://www.rfi.fr/fr/rss-actualite-internationale',flag:'FR'},
+  {name:'LeMonde',url:'https://www.lemonde.fr/rss/une.xml',flag:'FR'},
+  {name:'BFMTV',url:'https://www.bfmtv.com/rss/news-24-7/',flag:'FR'},
+  {name:'Figaro',url:'https://www.lefigaro.fr/rss/figaro_actualites.xml',flag:'FR'},
+  {name:'Courrier',url:'https://www.courrierinternational.com/feed/all/rss.xml',flag:'FR'},
+  {name:'Bellingcat',url:'https://www.bellingcat.com/feed/',flag:'EN'},
+  {name:'Reuters',url:'https://feeds.reuters.com/reuters/worldNews',flag:'EN'},
+  {name:'BBC',url:'https://feeds.bbci.co.uk/news/world/rss.xml',flag:'EN'}
 ];
 
 function addNews(time,text,hot,url){
+  var f=document.getElementById('nfeed');
+  var first=f.firstChild;
+  if(first&&first.style&&first.style.textAlign==='center')f.innerHTML='';
   var el=document.createElement('div');
   el.className='ni';
-  if(url){el.onclick=function(){window.open(url,'_blank');};}
-  el.innerHTML='<div class="nt">'+time+'</div><div class="nx">'+text+'</div><span class="ntag '+(hot?'th':'tm')+'">'+(hot?'HIGH':'INFO')+' '+(url?'↗':'')+'</span>';
-  if(feed.firstChild&&feed.firstChild.style&&feed.firstChild.style.textAlign==='center')feed.innerHTML='';
-  feed.insertBefore(el,feed.firstChild);
-  while(feed.children.length>40)feed.removeChild(feed.lastChild);
+  if(url)el.onclick=function(){window.open(url,'_blank');};
+  el.innerHTML='<div class="nt">'+time+'</div><div class="nx">'+text+'</div><span class="ntag '+(hot?'th':'tm')+'">'+(hot?'HIGH':'INFO')+(url?' ↗':'')+'</span>';
+  f.insertBefore(el,f.firstChild);
+  while(f.children.length>40)f.removeChild(f.lastChild);
 }
 
 function fetchFeed(src){
   fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(src.url))
-  .then(function(r){return r.ok?r.text():Promise.reject();})
+  .then(function(r){if(!r.ok)throw 0;return r.text();})
   .then(function(txt){
     var xml=new DOMParser().parseFromString(txt,'text/xml');
     var items=xml.querySelectorAll('item');
@@ -295,26 +299,6 @@ function fetchFeed(src){
   })
   .catch(function(){
     fetch('https://corsproxy.io/?'+encodeURIComponent(src.url))
-    .then(function(r){return r.ok?r.text():Promise.reject();})
-    .then(function(txt){
-      var xml=new DOMParser().parseFromString(txt,'text/xml');
-      var items=xml.querySelectorAll('item');
-      var n=0;
-      items.forEach(function(item){
-        if(n>=3)return;
-        var title=(item.querySelector('title')||{textContent:''}).textContent.trim();
-        var link=(item.querySelector('link')||{textContent:''}).textContent.trim();
-        var pub=(item.querySelector('pubDate')||{textContent:''}).textContent;
-        if(!title||title.length<5)return;
-        var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
-        var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
-        var hot=!!(title.match(/war|guerre|conflit|conflict|attack|attaque|
-addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
-      n++;
-    });
-  })
-  .catch(function(){
-    fetch('https://corsproxy.io/?'+encodeURIComponent(src.url))
     .then(function(r){if(!r.ok)throw 0;return r.text();})
     .then(function(txt){
       var xml=new DOMParser().parseFromString(txt,'text/xml');
@@ -329,6 +313,7 @@ addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
         var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
         var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
         var hot=!!(title.match(/war|guerre|conflit|conflict|attack|attaque|militaire|military|mort|killed|missile|bomb|strike|frappe|Ukraine|Gaza|Russia|Russie|Sudan|Myanmar|Congo/i));
+  ));
         addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
         n++;
       });
@@ -339,3 +324,6 @@ addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
 function fetchAll(){sources.forEach(function(s){fetchFeed(s);});}
 setTimeout(fetchAll,1000);
 setInterval(fetchAll,15*60*1000);
+</script>
+</body>
+</html>
