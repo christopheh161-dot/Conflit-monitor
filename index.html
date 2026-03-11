@@ -309,3 +309,33 @@ function fetchFeed(src){
         var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
         var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
         var hot=!!(title.match(/war|guerre|conflit|conflict|attack|attaque|
+addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
+      n++;
+    });
+  })
+  .catch(function(){
+    fetch('https://corsproxy.io/?'+encodeURIComponent(src.url))
+    .then(function(r){if(!r.ok)throw 0;return r.text();})
+    .then(function(txt){
+      var xml=new DOMParser().parseFromString(txt,'text/xml');
+      var items=xml.querySelectorAll('item');
+      var n=0;
+      items.forEach(function(item){
+        if(n>=3)return;
+        var title=(item.querySelector('title')||{textContent:''}).textContent.trim();
+        var link=(item.querySelector('link')||{textContent:''}).textContent.trim();
+        var pub=(item.querySelector('pubDate')||{textContent:''}).textContent;
+        if(!title||title.length<5)return;
+        var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
+        var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
+        var hot=!!(title.match(/war|guerre|conflit|conflict|attack|attaque|militaire|military|mort|killed|missile|bomb|strike|frappe|Ukraine|Gaza|Russia|Russie|Sudan|Myanmar|Congo/i));
+        addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
+        n++;
+      });
+    }).catch(function(){});
+  });
+}
+
+function fetchAll(){sources.forEach(function(s){fetchFeed(s);});}
+setTimeout(fetchAll,1000);
+setInterval(fetchAll,15*60*1000);
