@@ -5,7 +5,7 @@
   "start_url": "/Conflit-monitor/",
   "scope": "/Conflit-monitor/",
   "display": "standalone",
-  "orientation": "landscape",
+"orientation": "portrait",
   "background_color": "#080c10",
   "theme_color": "#00d4ff",
   "icons": [
