@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>GCM — Global Conflict Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#080c10;color:#a8b8c8;font-family:'Rajdhani',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,0.012) 2px,rgba(0,212,255,0.012) 4px);pointer-events:none;}
+.logo{font-family:'Share Tech Mono',monospace;color:#00d4ff;font-size:28px;margin-bottom:8px;text-align:center;}
+.title{font-size:18px;font-weight:700;letter-spacing:6px;color:#e0eaf4;text-transform:uppercase;text-align:center;margin-bottom:6px;}
+.sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:#a8b8c8;letter-spacing:2px;text-align:center;margin-bottom:40px;}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:blink 1.5s infinite;margin-right:8px;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+.cards{display:flex;flex-direction:column;gap:16px;width:100%;max-width:400px;}
+.card{background:#0d1117;border:1px solid #1a2535;padding:20px;text-decoration:none;transition:all 0.2s;display:block;}
+.card:hover{border-color:#00d4ff;box-shadow:0 0 20px rgba(0,212,255,0.1);}
+.card.air:hover{border-color:#ff8c00;box-shadow:0 0 20px rgba(255,140,0,0.1);}
+.card.apk:hover{border-color:#00ff88;box-shadow:0 0 20px rgba(0,255,136,0.1);}
+.card-icon{font-size:32px;margin-bottom:10px;}
+.card-title{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:3px;color:#00d4ff;margin-bottom:6px;}
+.card.air .card-title{color:#ff8c00;}
+.card.apk .card-title{color:#00ff88;}
+.card-desc{font-size:12px;color:#a8b8c8;line-height:1.6;}
+.card-btn{display:inline-block;margin-top:12px;padding:6px 16px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;border:1px solid #00d4ff;color:#00d4ff;background:rgba(0,212,255,0.08);}
+.card.air .card-btn{border-color:#ff8c00;color:#ff8c00;background:rgba(255,140,0,0.08);}
+.card.apk .card-btn{border-color:#00ff88;color:#00ff88;background:rgba(0,255,136,0.08);}
+footer{margin-top:40px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a4a5a;text-align:center;letter-spacing:2px;}
+</style>
+</head>
+<body>
+<div class="logo">[GCM]</div>
+<div class="title">Global Conflict Monitor</div>
+<div class="sub"><span class="dot"></span>OSINT DASHBOARD — SURVEILLANCE MONDIALE</div>
+<div class="cards">
+  <a class="card" href="desktop.html">
+    <div class="card-icon">💻</div>
+    <div class="card-title">SITE DESKTOP</div>
+    <div class="card-desc">Dashboard complet avec carte interactive, feed intel en temps réel, outils OSINT et trackers Air/Naval.</div>
+    <div class="card-btn">ACCÉDER →</div>
+  </a>
+  <a class="card air" href="index.html">
+    <div class="card-icon">📱</div>
+    <div class="card-title">VERSION MOBILE</div>
+    <div class="card-desc">Interface optimisée mobile avec navigation par onglets, filtres et notifications PWA.</div>
+    <div class="card-btn">ACCÉDER →</div>
+  </a>
+  <a class="card apk" href="Global Conflict Monitor.apk">
+    <div class="card-icon">⬇</div>
+    <div class="card-title">TÉLÉCHARGER L'APK</div>
+    <div class="card-desc">Installer l'application Android directement sur votre téléphone sans passer par le Play Store.</div>
+    <div class="card-btn">TÉLÉCHARGER →</div>
+  </a>
+</div>
+<footer>GCM v2.0 — CHRISTOPHE H. — 2025</footer>
+</body>
+</html>
