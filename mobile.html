@@ -120,6 +120,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .baction{padding:6px 12px;font-family:'Share Tech Mono',monospace;font-size:9px;border:1px solid;cursor:pointer;background:transparent;letter-spacing:1px;}
 .baction.pdf{border-color:#ff2d2d;color:#ff2d2d;}
 .baction.csv{border-color:#00d4ff;color:#00d4ff;}
+.baction.json{border-color:#00ff88;color:#00ff88;}
 .export-bar{display:flex;gap:5px;padding:8px;background:#0d1117;border-bottom:1px solid #1a2535;flex-shrink:0;flex-wrap:wrap;}
 .expbtn{padding:5px 10px;font-family:'Share Tech Mono',monospace;font-size:9px;border:1px solid;cursor:pointer;background:transparent;letter-spacing:1px;flex-shrink:0;}
 .expbtn.pdf{border-color:#ff2d2d;color:#ff2d2d;}
@@ -362,9 +363,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
 <script>
+// OFFLINE DETECTION
 window.addEventListener('online',function(){document.getElementById('offline-bar').classList.remove('show');addLog('ok','Connexion rétablie');});
 window.addEventListener('offline',function(){document.getElementById('offline-bar').classList.add('show');addLog('warn','Mode hors ligne activé');});
 
+// LOGS
 function addLog(type,msg){
   var el=document.createElement('div');
   el.className='log-entry '+type;
@@ -374,6 +377,7 @@ function addLog(type,msg){
   while(ls.children.length>50)ls.removeChild(ls.lastChild);
 }
 
+// NAVIGATION
 var currentScreen='map';
 function showScreen(name){
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
@@ -387,6 +391,7 @@ function showScreen(name){
   if(name==='brief'){generateBrief();}
 }
 
+// FILTER MAP
 var clusterGroup;
 var currentFilter='all';
 function filterMap(level,btn){
@@ -397,6 +402,7 @@ function filterMap(level,btn){
   C.forEach(function(x){if(level==='all'||x.l===level)addMarker(x);});
 }
 
+// FILTER LIST
 function filterList(level,btn){
   document.querySelectorAll('#screen-conflicts .filter-bar .fbtn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
@@ -405,12 +411,14 @@ function filterList(level,btn){
   });
 }
 
+// ZOOM REGION
 function zoomRegion(r){
   var regions={world:[25,10,2],europe:[52,15,4],middleeast:[28,42,4],africa:[5,20,3],asia:[30,100,3],americas:[15,-80,3]};
   var z=regions[r];
   if(z)map.flyTo([z[0],z[1]],z[2],{duration:1.5});
 }
 
+// CONFLICT DATA
 var C=[
   {n:"Ukraine War",r:"Eastern Europe",c:[48.38,31.17],l:"high",k:"~500K+",s:"2022",a:"Russia/Ukraine/NATO",q:"Ukraine war",t:"War"},
   {n:"Israel-Gaza",r:"Middle East",c:[31.05,34.85],l:"high",k:"~40K+",s:"2023",a:"Israel/Hamas",q:"Gaza conflict",t:"War"},
@@ -429,6 +437,7 @@ var C=[
   {n:"Kosovo",r:"Balkans",c:[42.60,20.90],l:"low",k:"none",s:"Ongoing",a:"Serbia/Kosovo/NATO",q:"Kosovo Serbia",t:"Tension"}
 ];
 
+// MAP INIT
 var map=L.map('map',{zoomControl:false,worldCopyJump:true}).setView([25,35],2);
 L.control.zoom({position:'bottomright'}).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:18,subdomains:'abcd'}).addTo(map);
@@ -454,6 +463,7 @@ window.addEventListener('load',function(){
   setTimeout(function(){map.invalidateSize();},800);
 });
 
+// STATS
 var sc=0,hi=0,mi=0,li=0;
 C.forEach(function(x){
   var pts=x.l==='high'?3:x.l==='medium'?2:1;
@@ -479,66 +489,12 @@ document.getElementById('gidx').innerHTML=
   '<div class="ms"><div class="msv" style="color:#00d4ff">'+sc+'</div><div class="msl">SCORE</div></div>';
 document.getElementById('ticker').textContent=C.map(function(x){return '['+x.l.toUpperCase()+'] '+x.n+' — '+x.r;}).join('   |   ');
 
+// CLOCK
 setInterval(function(){
   document.getElementById('clock').textContent=new Date().toLocaleTimeString('fr-FR',{timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit',second:'2-digit'});
 },1000);
-
 addLog('ok','GCM initialisé — '+C.length+' théâtres chargés');
 addLog('warn','ACLED API — En attente de clé API');
-
-// GDELT INTEGRATION
-var gdeltMarkers=L.layerGroup();
-map.addLayer(gdeltMarkers);
-
-function fetchGDELT(){
-  var url='https://api.allorigins.win/raw?url='+encodeURIComponent('https://api.gdeltproject.org/api/v2/geo/geo?query=war+conflict+attack+explosion&mode=pointdata&maxrecords=50&format=json');
-  fetch(url)
-  .then(function(r){if(!r.ok)throw 0;return r.json();})
-  .then(function(data){
-    gdeltMarkers.clearLayers();
-    if(!data||!data.features)return;
-    data.features.forEach(function(f){
-      if(!f.geometry||!f.geometry.coordinates)return;
-      var lon=f.geometry.coordinates[0];
-      var lat=f.geometry.coordinates[1];
-      var title=f.properties&&f.properties.name?f.properties.name:'Incident';
-      var icon=L.divIcon({
-        html:'<div style="width:8px;height:8px;border-radius:50%;background:#ff8c00;border:1px solid #fff;box-shadow:0 0 6px #ff8c00;opacity:0.8;"></div>',
-        className:'',iconSize:[8,8],iconAnchor:[4,4]
-      });
-      var marker=L.marker([lat,lon],{icon:icon});
-      marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:#e0eaf4;background:#0d1117;padding:5px;">🟠 GDELT<br>'+title+'</div>');
-      gdeltMarkers.addLayer(marker);
-    });
-    addLog('ok','GDELT — '+(data.features?data.features.length:0)+' incidents chargés');
-  })
-  .catch(function(){
-    fetch('https://corsproxy.io/?'+encodeURIComponent('https://api.gdeltproject.org/api/v2/geo/geo?query=war+conflict+attack&mode=pointdata&maxrecords=50&format=json'))
-    .then(function(r){if(!r.ok)throw 0;return r.json();})
-    .then(function(data){
-      gdeltMarkers.clearLayers();
-      if(!data||!data.features)return;
-      data.features.forEach(function(f){
-        if(!f.geometry||!f.geometry.coordinates)return;
-        var lon=f.geometry.coordinates[0];
-        var lat=f.geometry.coordinates[1];
-        var title=f.properties&&f.properties.name?f.properties.name:'Incident';
-        var icon=L.divIcon({
-          html:'<div style="width:8px;height:8px;border-radius:50%;background:#ff8c00;border:1px solid #fff;box-shadow:0 0 6px #ff8c00;opacity:0.8;"></div>',
-          className:'',iconSize:[8,8],iconAnchor:[4,4]
-        });
-        var marker=L.marker([lat,lon],{icon:icon});
-        marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:#e0eaf4;background:#0d1117;padding:5px;">🟠 GDELT<br>'+title+'</div>');
-        gdeltMarkers.addLayer(marker);
-      });
-      addLog('ok','GDELT proxy2 — '+(data.features?data.features.length:0)+' incidents');
-    })
-    .catch(function(){addLog('err','GDELT inaccessible');});
-  });
-}
-
-fetchGDELT();
-setInterval(fetchGDELT,15*60*1000);
 </script>
 <script>
 function showD(x){
@@ -570,13 +526,15 @@ document.getElementById('ob').onclick=function(){
 };
 document.getElementById('oi').onkeydown=function(e){if(e.key==='Enter')document.getElementById('ob').click();};
 
+// EXPORT CSV
 function exportCSV(){
-  var rows=[['HEURE','TEXTE','HOT']];
-  document.querySelectorAll('#nfeed .ni').forEach(function(item){
+  var rows=[['HEURE','SOURCE','TITRE','TYPE']];
+  var items=document.querySelectorAll('#nfeed .ni');
+  items.forEach(function(item){
     var time=item.querySelector('.nt')?item.querySelector('.nt').textContent:'';
     var text=item.querySelector('.nx')?item.querySelector('.nx').textContent:'';
-    var hot=item.querySelector('.th')?'OUI':'NON';
-    rows.push([time,text,hot]);
+    var tag=item.querySelector('.ntag')?item.querySelector('.ntag').textContent:'';
+    rows.push([time,text,tag]);
   });
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
   var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
@@ -584,12 +542,14 @@ function exportCSV(){
   var a=document.createElement('a');
   a.href=url;a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.csv';
   a.click();
-  addLog('ok','Export CSV généré');
+  addLog('ok','Export CSV généré — '+items.length+' entrées');
 }
 
+// EXPORT JSON
 function exportJSON(){
   var data=[];
-  document.querySelectorAll('#nfeed .ni').forEach(function(item){
+  var items=document.querySelectorAll('#nfeed .ni');
+  items.forEach(function(item){
     data.push({
       time:item.querySelector('.nt')?item.querySelector('.nt').textContent:'',
       text:item.querySelector('.nx')?item.querySelector('.nx').textContent:'',
@@ -604,6 +564,7 @@ function exportJSON(){
   addLog('ok','Export JSON généré — '+data.length+' entrées');
 }
 
+// EXPORT PDF FEED
 function exportPDF(){
   try{
     var doc=new window.jspdf.jsPDF();
@@ -642,19 +603,27 @@ function exportPDF(){
   }catch(e){addLog('err','Erreur PDF: '+e.message);}
 }
 
+// FILTER NEWS
 var showHotOnly=false;
 function filterNews(type){
   showHotOnly=(type==='hot');
   document.querySelectorAll('#nfeed .ni').forEach(function(item){
-    item.style.display=showHotOnly?(item.querySelector('.th')?'':'none'):'';
+    if(showHotOnly){
+      item.style.display=item.querySelector('.th')?'':'none';
+    }else{
+      item.style.display='';
+    }
   });
 }
 </script>
 <script>
+// BRIEFING AUTOMATIQUE
 function generateBrief(){
   var now=new Date();
   var dateStr=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   var timeStr=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  // Briefing quotidien
   var highList=C.filter(function(x){return x.l==='high';});
   var medList=C.filter(function(x){return x.l==='medium';});
   var lowList=C.filter(function(x){return x.l==='low';});
@@ -670,24 +639,29 @@ function generateBrief(){
     '🛡 NIVEAU : '+document.getElementById('defcon').textContent;
   document.getElementById('brief-daily').style.whiteSpace='pre-line';
   document.getElementById('brief-daily').textContent=briefText;
+
+  // Résumé conflits terrestres uniquement
   var terrestres=C.filter(function(x){return x.t==='War'||x.t==='Civil War'||x.t==='Insurgency'||x.t==='Crisis';});
   var terText='CONFLITS TERRESTRES ACTIFS ('+terrestres.length+') :\n\n'+
     terrestres.map(function(x){
       return '▶ '+x.n+'\n  Type: '+x.t+' | Région: '+x.r+'\n  Victimes: '+x.k+' | Depuis: '+x.s+'\n  Acteurs: '+x.a;
     }).join('\n\n')+
-    '\n\n⚠ Note: Trackers Air et Naval disponibles dans les onglets dédiés.'+
-    '\n⏳ ACLED API: En attente de clé.'+
-    '\n✅ GDELT: Incidents en temps réel actifs sur la carte.';
+    '\n\n⚠ Note: Trackers Air (FlightRadar) et Naval (MarineTraffic) disponibles dans les onglets dédiés.'+
+    '\n⏳ ACLED API: En attente de clé — données temps réel non disponibles.';
   document.getElementById('brief-conflicts').style.whiteSpace='pre-line';
   document.getElementById('brief-conflicts').textContent=terText;
+
+  // HIGH risk uniquement
   var highText=highList.map(function(x){
     return '🔴 '+x.n.toUpperCase()+'\n  Région: '+x.r+'\n  Type: '+x.t+'\n  Victimes: '+x.k+'\n  Depuis: '+x.s+'\n  Acteurs: '+x.a;
   }).join('\n\n');
   document.getElementById('brief-high').style.whiteSpace='pre-line';
   document.getElementById('brief-high').textContent=highText;
+
   addLog('ok','Briefing généré — '+now.toLocaleTimeString('fr-FR'));
 }
 
+// EXPORT BRIEFING PDF
 function exportBriefPDF(type){
   try{
     var doc=new window.jspdf.jsPDF();
@@ -726,26 +700,30 @@ function exportBriefPDF(type){
     doc.text('GCM — Global Conflict Monitor — OSINT Dashboard',105,290,{align:'center'});
     doc.save('gcm-briefing-'+type+'-'+new Date().toISOString().slice(0,10)+'.pdf');
     addLog('ok','Briefing PDF exporté');
-  }catch(e){addLog('err','Erreur PDF: '+e.message);}
+  }catch(e){addLog('err','Erreur PDF briefing: '+e.message);}
 }
 
+// EXPORT BRIEFING CSV
 function exportBriefCSV(){
   var rows=[['NOM','REGION','TYPE','NIVEAU','VICTIMES','DEPUIS','ACTEURS']];
-  C.forEach(function(x){rows.push([x.n,x.r,x.t,x.l,x.k,x.s,x.a]);});
+  C.forEach(function(x){
+    rows.push([x.n,x.r,x.t,x.l,x.k,x.s,x.a]);
+  });
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
   var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
   a.href=url;a.download='gcm-conflits-'+new Date().toISOString().slice(0,10)+'.csv';
   a.click();
-  addLog('ok','CSV conflits exporté');
+  addLog('ok','CSV conflits exporté — '+C.length+' entrées');
 }
 
+// NOTIFICATIONS PWA
 var notifEnabled=false;
 function requestNotif(){
   if(!('Notification' in window)){
     document.getElementById('notif-req').innerHTML='<span style="color:#ff2d2d;font-family:Share Tech Mono,monospace;font-size:10px;">Notifications non supportées</span>';
-    addLog('err','Notifications non supportées');
+    addLog('err','Notifications non supportées par ce navigateur');
     return;
   }
   Notification.requestPermission().then(function(perm){
@@ -780,6 +758,7 @@ function checkHotNews(title){
   return hot;
 }
 
+// BRIEFING AUTOMATIQUE QUOTIDIEN
 var lastBriefDate='';
 function checkDailyBrief(){
   var today=new Date().toLocaleDateString('fr-FR');
@@ -787,7 +766,7 @@ function checkDailyBrief(){
     lastBriefDate=today;
     addLog('ok','Briefing quotidien automatique déclenché');
     if(notifEnabled&&Notification.permission==='granted'){
-      new Notification('📋 GCM — Briefing Quotidien',{body:'Votre résumé quotidien est disponible.',icon:'https://raw.githubusercontent.com/google/material-design-icons/master/png/action/gps_fixed/materialicons/48dp/2x/baseline_gps_fixed_black_48dp.png'});
+      new Notification('📋 GCM — Briefing Quotidien',{body:'Votre résumé quotidien des conflits mondiaux est disponible.',icon:'https://raw.githubusercontent.com/google/material-design-icons/master/png/action/gps_fixed/materialicons/48dp/2x/baseline_gps_fixed_black_48dp.png'});
     }
   }
 }
@@ -795,9 +774,10 @@ setInterval(checkDailyBrief,60000);
 checkDailyBrief();
 </script>
 <script>
+// SERVICE WORKER PWA
 if('serviceWorker' in navigator){
   var swCode=`
-const CACHE='gcm-v3';
+const CACHE='gcm-v2';
 const ASSETS=[
   '/Conflit-monitor/mobile.html',
   '/Conflit-monitor/manifest.json',
@@ -847,16 +827,20 @@ self.addEventListener('push',function(e){
     });
   })
   .catch(function(err){
-    addLog('warn','Service Worker: '+err.message);
+    addLog('warn','Service Worker limité sur GitHub Pages: '+err.message);
   });
+
   navigator.serviceWorker.addEventListener('controllerchange',function(){
     addLog('ok','PWA mise à jour automatiquement');
     window.location.reload();
   });
 }
+
+// MISE A JOUR AUTOMATIQUE PWA
 setInterval(function(){
   if(navigator.serviceWorker.controller){
     navigator.serviceWorker.controller.postMessage('CHECK_UPDATE');
+    addLog('ok','Vérification mise à jour PWA...');
   }
 },30*60*1000);
 </script>
@@ -930,7 +914,7 @@ function fetchFeed(src){
         addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
         n++;
       });
-      addLog('ok','Feed '+src.name+' via proxy2');
+      addLog('ok','Feed '+src.name+' chargé via proxy2');
     })
     .catch(function(){
       addLog('err','Feed '+src.name+' inaccessible');
@@ -938,7 +922,10 @@ function fetchFeed(src){
   });
 }
 
-function fetchAll(){sources.forEach(function(s){fetchFeed(s);});}
+function fetchAll(){
+  sources.forEach(function(s){fetchFeed(s);});
+}
+
 setTimeout(fetchAll,1000);
 setInterval(fetchAll,15*60*1000);
 </script>
