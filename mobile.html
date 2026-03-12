@@ -291,4 +291,122 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
     <div class="tracker-title">AIR TRACKER</div>
     <div class="tracker-desc">Vols militaires mondiaux en temps réel via ADS-B Exchange.</div>
     <div class="tracker-links">
-      <a class="
+      <a class="tracker-btn" href="https://globe.adsbexchange.com/?mil=1" target="_blank">ACCÉDER AU TRACKER</a>
+    </div>
+  </div>
+</div>
+
+<!-- NAVAL -->
+<div class="tab-page" id="page-naval">
+  <div class="tracker-page">
+    <div class="tracker-icon naval">🚢</div>
+    <div class="tracker-title naval">NAVAL TRACKER</div>
+    <div class="tracker-desc">Position des navires mondiaux en temps réel via Vesselfinder.</div>
+    <div class="tracker-links">
+      <a class="tracker-btn naval" href="https://www.vesselfinder.com/fr/ships_webcam" target="_blank">ACCÉDER AU TRACKER</a>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCE -->
+<div class="tab-page" id="page-finance">
+  <div class="finance-page">
+    <div class="fsection">INDICES</div>
+    <div class="fgrid">
+      <div class="fcard">
+        <div class="fname">DOW JONES</div>
+        <div class="fprice">38,500.00</div>
+        <div class="fchange up">+0.50%</div>
+        <div class="fupdate">Mis à jour il y a 1 min</div>
+      </div>
+      <div class="fcard">
+        <div class="fname">NASDAQ</div>
+        <div class="fprice">15,800.00</div>
+        <div class="fchange down">-0.25%</div>
+        <div class="fupdate">Mis à jour il y a 1 min</div>
+      </div>
+      <div class="fcard">
+        <div class="fname">S&P 500</div>
+        <div class="fprice">5,000.00</div>
+        <div class="fchange flat">0.00%</div>
+        <div class="fupdate">Mis à jour il y a 1 min</div>
+      </div>
+      <div class="fcard">
+        <div class="fname">FTSE 100</div>
+        <div class="fprice">7,800.00</div>
+        <div class="fchange up">+0.10%</div>
+        <div class="fupdate">Mis à jour il y a 1 min</div>
+      </div>
+    </div>
+    <div class="fsection">CRYPTO</div>
+    <div class="fgrid">
+      <div class="fcard">
+        <div class="fname">BITCOIN</div>
+        <div class="fprice">65,000.00</div>
+        <div class="fchange up">+2.00%</div>
+        <div class="fupdate">Mis à jour il y a 1 min</div>
+      </div>
+      <div class="fcard">
+        <div class="fname">ETHEREUM</div>
+        <div class="fprice">3,200.00</div>
+        <div class="fchange down">-1.50%</div>
+        <div class="fupdate">Mis à jour il y a 1 min</div>
+      </div>
+    </div>
+    <div class="fsection">MATIÈRES PREMIÈRES</div>
+    <div class="fgrid">
+      <div class="fcard">
+        <div class="fname">OR</div>
+        <div class="fprice">2,300.00</div>
+        <div class="fchange up">+0.80%</div>
+        <div class="fupdate">Mis à jour il y a 1 min</div>
+      </div>
+      <div class="fcard">
+        <div class="fname">PÉTROLE (WTI)</div>
+        <div class="fprice">80.00</div>
+        <div class="fchange down">-0.40%</div>
+        <div class="fupdate">Mis à jour il y a 1 min</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="bottom-nav">
+  <button class="bnav active" onclick="showPage('page-map')">
+    <div class="bnav-icon">🗺️</div>
+    MAP
+  </button>
+  <button class="bnav" onclick="showPage('page-conflicts')">
+    <div class="bnav-icon">💥</div>
+    CONFLICTS
+  </button>
+  <button class="bnav" onclick="showPage('page-feed')">
+    <div class="bnav-icon">📰</div>
+    FEED
+  </button>
+  <button class="bnav" onclick="showPage('page-brief')">
+    <div class="bnav-icon">📋</div>
+    BRIEF
+  </button>
+  <button class="bnav" onclick="showPage('page-osint')">
+    <div class="bnav-icon">🔎</div>
+    OSINT
+  </button>
+  <button class="bnav" onclick="showPage('page-air')">
+    <div class="bnav-icon">✈️</div>
+    AIR
+  </button>
+  <button class="bnav" onclick="showPage('page-naval')">
+    <div class="bnav-icon">🚢</div>
+    NAVAL
+  </button>
+  <button class="bnav" onclick="showPage('page-finance')">
+    <div class="bnav-icon">💰</div>
+    FINANCE
+  </button>
+</div>
+
+</body>
+</html>
