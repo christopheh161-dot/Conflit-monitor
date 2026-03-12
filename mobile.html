@@ -632,33 +632,35 @@ function fetchQuote(item){
     return;
   }
   // INDICES & MATIERES via Stooq + multi-proxy fallback
-  var stooqMap={
-    SPX:'^spx',DJI:'^dji',NDX:'^ndx',CAC:'^cac',DAX:'^dax',NKY:'^nky',
-    SILVER:'xagusd',WTI:'cl.f',BRENT:'lcousd',GAS:'ng.f',COPPER:'hgusd',PLAT:'xptusd',PALL:'xpdusd'
+var cgMap={
+    SILVER:'silver',WTI:'crude-oil',BRENT:'brent-oil',
+    GAS:'natural-gas',COPPER:'copper',PLAT:'platinum',PALL:'palladium'
   };
-  if(stooqMap[item.sym]){
-    var stooqUrl='https://stooq.com/q/l/?s='+stooqMap[item.sym]+'&f=sd2t2ohlcv&h&e=csv';
-    var proxies=['https://corsproxy.io/?','https://api.allorigins.win/raw?url=','https://api.codetabs.com/v1/proxy?quest='];
-    var idx=0;
-    function tryProxy(){
-      if(idx>=proxies.length){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';return;}
-      var u=proxies[idx]+encodeURIComponent(stooqUrl);idx++;
-      fetch(u,{signal:AbortSignal.timeout(5000)})
-      .then(function(r){if(!r.ok)throw 0;return r.text();})
-      .then(function(txt){
-        var lines=txt.trim().split('\n');
-        if(lines.length<2||txt.indexOf('No data')>-1)throw 0;
-        var cols=lines[1].split(',');
-        var price=parseFloat(cols[4]);
-        var open=parseFloat(cols[2]);
-        if(isNaN(price)||price<=0)throw 0;
-        var chg=open>0?((price-open)/open*100):0;
-        setPrice(item.s,price,chg);
-      }).catch(function(){tryProxy();});
-    }
-    tryProxy();
+  if(cgMap[item.sym]){
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids='+cgMap[item.sym]+'&vs_currencies=usd&include_24hr_change=true')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var obj=d[cgMap[item.sym]];
+      if(obj)setPrice(item.s,obj.usd,obj.usd_24h_change);
+      else if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
+    }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
+  // Indices boursiers via CoinGecko ETF proxy
+  var idxMap={
+    SPX:'sp-500-index',DJI:'dow-jones',NDX:'nasdaq-100',
+    CAC:'cac-40',DAX:'dax',NKY:'nikkei-225'
+  };
+  if(idxMap[item.sym]){
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids='+idxMap[item.sym]+'&vs_currencies=usd&include_24hr_change=true')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var obj=d[idxMap[item.sym]];
+      if(obj)setPrice(item.s,obj.usd,obj.usd_24h_change);
+      else if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
+    }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
+    return;
+  } 
   if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
 }
 
