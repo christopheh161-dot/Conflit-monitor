@@ -589,78 +589,47 @@ function setPrice(id,price,change){
 }
 
 function fetchQuote(item){
-  // CRYPTO via Binance — fiable Android
+  var TD_KEY='4b1034e2ecd744a6b3faa2ee34cb5858';
+  // CRYPTO via Binance
   if(item.sym==='BTC'||item.sym==='ETH'){
-    var pair=item.sym+'USDT';
-    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol='+pair)
+    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol='+item.sym+'USDT')
     .then(function(r){return r.json();})
     .then(function(d){setPrice(item.s,d.lastPrice,d.priceChangePercent);})
     .catch(function(){
-      // fallback CoinGecko
       var cid=item.sym==='BTC'?'bitcoin':'ethereum';
       fetch('https://api.coingecko.com/api/v3/simple/price?ids='+cid+'&vs_currencies=usd&include_24hr_change=true')
       .then(function(r){return r.json();})
-      .then(function(d){
-        var obj=d[cid];
-        setPrice(item.s,obj.usd,obj.usd_24h_change);
-      }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
+      .then(function(d){setPrice(item.s,d[cid].usd,d[cid].usd_24h_change);})
+      .catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     });
     return;
   }
-  // DEVISES via Frankfurter — direct, pas de proxy
-  var forexMap={
-    EURUSD:['EUR','USD'],GBPUSD:['GBP','USD'],
-    USDJPY:['USD','JPY'],USDCHF:['USD','CHF'],
-    USDCNY:['USD','CNY'],USDRUB:['USD','RUB']
-  };
+  // DEVISES via Frankfurter
+  var forexMap={EURUSD:['EUR','USD'],GBPUSD:['GBP','USD'],USDJPY:['USD','JPY'],USDCHF:['USD','CHF'],USDCNY:['USD','CNY'],USDRUB:['USD','RUB']};
   if(forexMap[item.sym]){
-    var base=forexMap[item.sym][0],target=forexMap[item.sym][1];
-    fetch('https://api.frankfurter.app/latest?from='+base+'&to='+target)
+    fetch('https://api.frankfurter.app/latest?from='+forexMap[item.sym][0]+'&to='+forexMap[item.sym][1])
     .then(function(r){return r.json();})
-    .then(function(d){setPrice(item.s,d.rates[target],null);})
+    .then(function(d){setPrice(item.s,d.rates[forexMap[item.sym][1]],null);})
     .catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
-  // OR via CoinGecko (XAU approx via gold token)
-  if(item.sym==='GOLD'){
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=usd&include_24hr_change=true')
+  // TOUT LE RESTE via Twelve Data
+  var tdMap={
+    SPX:'SPY',DJI:'DIA',NDX:'QQQ',CAC:'EWQ',DAX:'EWG',NKY:'EWJ',
+    GOLD:'GLD',SILVER:'SLV',WTI:'USO',BRENT:'BNO',
+    GAS:'UNG',COPPER:'CPER',PLAT:'PPLT',PALL:'PALL'
+  };
+  if(tdMap[item.sym]){
+    fetch('https://api.twelvedata.com/quote?symbol='+tdMap[item.sym]+'&apikey='+TD_KEY)
     .then(function(r){return r.json();})
     .then(function(d){
-      if(d['tether-gold'])setPrice(item.s,d['tether-gold'].usd,d['tether-gold'].usd_24h_change);
-      else if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
+      if(!d.close||d.status==='error')throw 0;
+      var price=parseFloat(d.close);
+      var chg=parseFloat(d.percent_change);
+      setPrice(item.s,price,chg);
     }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
-  // INDICES & MATIERES via Stooq + multi-proxy fallback
-var cgMap={
-    SILVER:'silver',WTI:'crude-oil',BRENT:'brent-oil',
-    GAS:'natural-gas',COPPER:'copper',PLAT:'platinum',PALL:'palladium'
-  };
-  if(cgMap[item.sym]){
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids='+cgMap[item.sym]+'&vs_currencies=usd&include_24hr_change=true')
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var obj=d[cgMap[item.sym]];
-      if(obj)setPrice(item.s,obj.usd,obj.usd_24h_change);
-      else if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
-    }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
-    return;
-  }
-  // Indices boursiers via CoinGecko ETF proxy
-  var idxMap={
-    SPX:'sp-500-index',DJI:'dow-jones',NDX:'nasdaq-100',
-    CAC:'cac-40',DAX:'dax',NKY:'nikkei-225'
-  };
-  if(idxMap[item.sym]){
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids='+idxMap[item.sym]+'&vs_currencies=usd&include_24hr_change=true')
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var obj=d[idxMap[item.sym]];
-      if(obj)setPrice(item.s,obj.usd,obj.usd_24h_change);
-      else if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
-    }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
-    return;
-  } 
   if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
 }
 
@@ -670,7 +639,7 @@ function fetchFinance(){
   addLog('ok','Marchés refresh');
 }
 fetchFinance();
-setInterval(fetchFinance,60*1000);
+setInterval(fetchFinance,25*60*1000);
 
 // ========== DETAIL OVERLAY ==========
 function showD(x){
