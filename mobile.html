@@ -581,8 +581,60 @@ function buildFinanceUI(){
 buildFinanceUI();
 
 function fetchQuote(item){
-  var url='https://query1.finance.yahoo.com/v8/finance/chart/'+item.s+'?interval=1m&range=1d';
-  var proxies=['https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest='];
+  var now=new Date().toLocaleTimeString('fr-FR');
+  // CRYPTO via Coinbase (sans proxy, sans clé)
+  if(item.sym==='BTC'||item.sym==='ETH'){
+    var coin=item.sym+'-USD';
+    fetch('https://api.coinbase.com/v2/prices/'+coin+'/spot')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var price=parseFloat(d.data.amount);
+      if(document.getElementById('fp-'+item.s))document.getElementById('fp-'+item.s).textContent=price.toFixed(2);
+      var fc=document.getElementById('fc2-'+item.s);
+      if(fc){fc.textContent='● LIVE';fc.className='fchange up';}
+      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent=now;
+    }).catch(function(){
+      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
+    });
+    return;
+  }
+  // DEVISES via Frankfurter (sans proxy, sans clé)
+  if(item.sym==='EURUSD'||item.sym==='GBPUSD'||item.sym==='USDCHF'||item.sym==='USDCNY'||item.sym==='USDJPY'){
+    var pairs={EURUSD:'EUR/USD',GBPUSD:'GBP/USD',USDCHF:'CHF',USDCNY:'CNY',USDJPY:'JPY'};
+    var base=item.sym==='EURUSD'?'EUR':item.sym==='GBPUSD'?'GBP':'USD';
+    var target=item.sym==='EURUSD'?'USD':item.sym==='GBPUSD'?'USD':item.sym==='USDJPY'?'JPY':item.sym==='USDCHF'?'CHF':'CNY';
+    fetch('https://api.frankfurter.app/latest?from='+base+'&to='+target)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var price=d.rates[target];
+      if(document.getElementById('fp-'+item.s))document.getElementById('fp-'+item.s).textContent=price.toFixed(4);
+      var fc=document.getElementById('fc2-'+item.s);
+      if(fc){fc.textContent='● LIVE';fc.className='fchange up';}
+      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent=now;
+    }).catch(function(){
+      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
+    });
+    return;
+  }
+  // OR & ARGENT via metals.live (sans clé)
+  if(item.sym==='GOLD'||item.sym==='SILVER'){
+    fetch('https://metals.live/api/v1/spot')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var metal=item.sym==='GOLD'?'gold':'silver';
+      var price=d[0][metal];
+      if(document.getElementById('fp-'+item.s))document.getElementById('fp-'+item.s).textContent=parseFloat(price).toFixed(2);
+      var fc=document.getElementById('fc2-'+item.s);
+      if(fc){fc.textContent='● LIVE';fc.className='fchange up';}
+      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent=now;
+    }).catch(function(){
+      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
+    });
+    return;
+  }
+  // RESTE (indices, pétrole etc) via Yahoo + proxies
+  var url='https://query2.finance.yahoo.com/v8/finance/chart/'+item.s+'?interval=1m&range=1d';
+  var proxies=['https://api.allorigins.win/raw?url=','https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest='];
   var idx=0;
   function tryNext(){
     if(idx>=proxies.length){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';return;}
@@ -607,7 +659,7 @@ function fetchQuote(item){
   }
   tryNext();
 }
-
+  
 function fetchFinance(){
   var all=financeData.stocks.concat(financeData.commodities).concat(financeData.forex);
   all.forEach(function(item,i){setTimeout(function(){fetchQuote(item);},i*250);});
