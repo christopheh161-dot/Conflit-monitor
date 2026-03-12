@@ -538,29 +538,24 @@ addLog('ok','GCM initialisé — '+C.length+' zones chargées');
 var gdeltMarkers=L.layerGroup();
 map.addLayer(gdeltMarkers);
 function fetchGDELT(){
-  var gdeltUrl='https://api.gdeltproject.org/api/v2/geo/geo?query=war+conflict+attack+explosion&mode=pointdata&maxrecords=50&format=json';
-  var proxies=['https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest=','https://thingproxy.freeboard.io/fetch/'];
-  var idx=0;
-  function tryNext(){
-    if(idx>=proxies.length){addLog('err','GDELT — tous proxies inaccessibles');return;}
-    var url=proxies[idx]+encodeURIComponent(gdeltUrl);idx++;
-    fetch(url).then(function(r){if(!r.ok)throw 0;return r.json();})
-    .then(function(data){
-      gdeltMarkers.clearLayers();
-      if(!data||!data.features){tryNext();return;}
-      data.features.forEach(function(f){
-        if(!f.geometry||!f.geometry.coordinates)return;
-        var lon=f.geometry.coordinates[0],lat=f.geometry.coordinates[1];
-        var title=f.properties&&f.properties.name?f.properties.name:'Incident';
-        var icon=L.divIcon({html:'<div style="width:8px;height:8px;border-radius:50%;background:#ff8c00;border:1px solid #fff;box-shadow:0 0 6px #ff8c00;opacity:0.8;"></div>',className:'',iconSize:[8,8],iconAnchor:[4,4]});
-        var marker=L.marker([lat,lon],{icon:icon});
-        marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:#e0eaf4;background:#0d1117;padding:5px;">🟠 GDELT<br>'+title+'</div>');
-        gdeltMarkers.addLayer(marker);
-      });
-      addLog('ok','GDELT — '+data.features.length+' incidents chargés');
-    }).catch(function(){tryNext();});
-  }
-  tryNext();
+  var url='https://api.gdeltproject.org/api/v2/geo/geo?query=war+conflict+attack+explosion&mode=pointdata&maxrecords=50&format=json';
+  fetch(url)
+  .then(function(r){if(!r.ok)throw 0;return r.json();})
+  .then(function(data){
+    gdeltMarkers.clearLayers();
+    if(!data||!data.features){addLog('warn','GDELT — pas de données');return;}
+    data.features.forEach(function(f){
+      if(!f.geometry||!f.geometry.coordinates)return;
+      var lon=f.geometry.coordinates[0],lat=f.geometry.coordinates[1];
+      var title=f.properties&&f.properties.name?f.properties.name:'Incident';
+      var icon=L.divIcon({html:'<div style="width:8px;height:8px;border-radius:50%;background:#ff8c00;border:1px solid #fff;box-shadow:0 0 6px #ff8c00;opacity:0.8;"></div>',className:'',iconSize:[8,8],iconAnchor:[4,4]});
+      var marker=L.marker([lat,lon],{icon:icon});
+      marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:#e0eaf4;background:#0d1117;padding:5px;">🟠 GDELT<br>'+title+'</div>');
+      gdeltMarkers.addLayer(marker);
+    });
+    addLog('ok','GDELT — '+data.features.length+' incidents chargés');
+  })
+  .catch(function(){addLog('err','GDELT inaccessible — API down');});
 }
 fetchGDELT();
 setInterval(fetchGDELT,15*60*1000);
