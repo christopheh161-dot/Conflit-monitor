@@ -8,11 +8,15 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
+<!-- Inclusion des librairies Leaflet -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
+<!-- Polices -->
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Librairie pour PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 /* Reset et styles généraux */
 * {
@@ -159,7 +163,7 @@ header {
     min-height: 0; /* Nécessaire pour le bon fonctionnement de flex */
     display: flex;
     flex-direction: column;
-    /* margin-bottom: 52px; */ /* Supprimé car la barre de navigation est gérée par le body */
+    /* La marge bottom a été retirée car la barre de navigation est fixed */
 }
 
 /* Pages de contenu (Map, Conflicts, Feed, etc.) */
@@ -169,7 +173,6 @@ header {
     overflow: hidden;
     flex: 1; /* Prend tout l'espace disponible dans .content */
     min-height: 0;
-    /* max-height: calc(100vh - 96px); */ /* Ajusté pour tenir compte du header et de la bottom-nav */
 }
 .tab-page.active { display: flex; } /* Affiché quand actif */
 
@@ -179,6 +182,7 @@ header {
     flex: 1; /* La carte prend tout l'espace disponible dans sa page */
     min-height: 0;
     height: 100%; /* Assure que la carte prend toute la hauteur */
+    background: #080c10; /* Fond par défaut en attendant le rendu Leaflet */
 }
 .map-controls {
     display: flex;
@@ -642,7 +646,7 @@ header {
     background: #0d1117;
     border-top: 1px solid #1a2535;
     height: 52px; /* Hauteur fixe pour la barre */
-    z-index: 9000;
+    z-index: 9000; /* Assure qu'elle est au-dessus des autres éléments */
     position: fixed; /* Fixée en bas */
     bottom: 0;
     left: 0;
@@ -737,7 +741,8 @@ header {
     <button class="rbtn" onclick="zoomRegion('asia')">🌏 AS</button>
     <button class="rbtn" onclick="zoomRegion('americas')">🌎 AM</button>
   </div>
-  <div id="map"></div> <!-- La carte sera rendue ici -->
+  <!-- C'est ici que la carte Leaflet sera rendue par le JavaScript -->
+  <div id="map"></div>
 </div>
 
 <!-- CONFLITS -->
@@ -943,10 +948,223 @@ header {
     NAVAL
   </button>
   <button class="bnav" onclick="showPage('page-finance')">
-   <div class="bnav-icon">💰</div>
+    <div class="bnav-icon">💰</div>
     FINANCE
   </button>
 </div>
 
+<!-- *** SECTION JAVASCRIPT (ESSENTIELLE POUR LA FONCTIONNALITÉ) *** -->
+<script>
+// Variable globale pour la carte Leaflet
+let map;
+let isHeatmapActive = false; // Pour suivre l'état de la heatmap
+
+// --- Fonctions pour gérer l'affichage des pages ---
+function showPage(pageId) {
+    // Désactiver tous les boutons de navigation
+    document.querySelectorAll('.bnav').forEach(btn => btn.classList.remove('active'));
+    // Activer le bouton cliqué
+    const clickedButton = document.querySelector(`.bnav[onclick="showPage('${pageId}')"]`);
+    if (clickedButton) {
+        clickedButton.classList.add('active');
+        // Gérer les classes spécifiques pour les icônes (air, naval)
+        if (pageId === 'page-air') {
+            clickedButton.classList.add('air');
+            clickedButton.classList.remove('naval'); // S'assurer qu'on enlève l'autre si besoin
+        } else if (pageId === 'page-naval') {
+            clickedButton.classList.add('naval');
+            clickedButton.classList.remove('air'); // S'assurer qu'on enlève l'autre si besoin
+        } else {
+            clickedButton.classList.remove('air', 'naval');
+        }
+    }
+
+    // Cacher toutes les pages
+    document.querySelectorAll('.tab-page').forEach(page => page.classList.remove('active'));
+    // Afficher la page demandée
+    document.getElementById(pageId).classList.add('active');
+
+    // Si la page est la carte, s'assurer qu'elle est redimensionnée
+    if (pageId === 'page-map' && map) {
+        // Petit délai pour s'assurer que le DOM est prêt et que la carte peut être redimensionnée correctement
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 100);
+    }
+}
+
+// --- Initialisation de la carte Leaflet ---
+function initMap() {
+    const mapElement = document.getElementById('map');
+    if (!mapElement) {
+        console.error("L'élément #map n'a pas été trouvé.");
+        return;
+    }
+
+    // Initialiser la carte Leaflet
+    // Coordonnées initiales (centre du monde) et niveau de zoom
+    map = L.map('map').setView([20, 0], 2);
+
+    // Ajouter une couche de tuiles (OpenStreetMap par défaut)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // --- Exemple d'ajout de marqueurs (à remplacer par vos données réelles) ---
+    // L.marker([51.5, -0.09]).addTo(map)
+    //     .bindPopup('<b>Londres</b><br>Conflit de niveau moyen.')
+    //     .openPopup();
+    // L.marker([34.0522, -118.2437]).addTo(map)
+    //     .bindPopup('<b>Los Angeles</b><br>Aucun conflit.')
+    //     .openPopup();
+    // L.marker([31.5, 74.35]).addTo(map) // Lahore
+    //     .bindPopup('<b>Lahore</b><br>Conflit de niveau élevé.')
+    //     .openPopup();
+
+    // --- Gestion des clusters de marqueurs (si vous avez beaucoup de points) ---
+    // let markers = L.markerClusterGroup();
+    // markers.addLayer(L.marker([51.5, -0.09]));
+    // markers.addLayer(L.marker([34.0522, -118.2437]));
+    // markers.addLayer(L.marker([31.5, 74.35]));
+    // map.addLayer(markers);
+
+    // Assurez-vous que la carte est visible après son initialisation
+    // La fonction invalidateSize est appelée dans showPage pour s'assurer que la carte prend la bonne taille
+}
+
+// --- Fonctions pour les filtres de carte (exemples) ---
+function filterMap(level, button) {
+    document.querySelectorAll('.mcbtn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    console.log(`Filtrage de la carte sur : ${level}`);
+    // Ici, vous ajouteriez la logique pour filtrer les marqueurs sur la carte
+    // Par exemple, masquer/afficher des couches ou des marqueurs spécifiques.
+}
+
+function toggleHeatmap() {
+    isHeatmapActive = !isHeatmapActive; // Inverse l'état de la heatmap
+    const button = document.querySelector('.mcbtn.heat');
+    if (isHeatmapActive) {
+        button.classList.add('active'); // Ou une autre classe pour indiquer l'activation
+        console.log("Heatmap activée.");
+        // --- Logique pour ajouter la heatmap à la carte ---
+        // Ceci est un exemple et nécessite une librairie comme Leaflet.heat
+        // Si vous avez des données de points, vous pourriez les collecter et les passer à Leaflet.heat
+        // Exemple :
+        // if (typeof heatLayer !== 'undefined') map.removeLayer(heatLayer); // Supprimer l'ancienne si elle existe
+        // const points = [[lat1, lon1, intensity1], [lat2, lon2, intensity2], ...]; // Vos données
+        // heatLayer = L.heatLayer(points).addTo(map);
+    } else {
+        button.classList.remove('active');
+        console.log("Heatmap désactivée.");
+        // --- Logique pour retirer la heatmap de la carte ---
+        // if (typeof heatLayer !== 'undefined') map.removeLayer(heatLayer);
+    }
+}
+
+// --- Fonctions pour les filtres de liste (exemples) ---
+function filterList(level, button) {
+    document.querySelectorAll('.fbtn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    console.log(`Filtrage de la liste sur : ${level}`);
+    // Logique pour filtrer la liste des conflits affichée dans #clist
+}
+
+// --- Fonctions pour le feed (exemples) ---
+function filterNews(type) {
+    console.log(`Filtrage des news sur : ${type}`);
+    // Logique pour filtrer les news affichées dans #nfeed
+}
+function exportCSV() { console.log("Export CSV"); }
+function exportJSON() { console.log("Export JSON"); }
+function exportPDF() { console.log("Export PDF"); }
+
+// --- Fonctions pour le briefing (exemples) ---
+function exportBriefPDF(type) { console.log(`Export PDF Briefing: ${type}`); }
+function exportBriefCSV() { console.log("Export CSV Briefing"); }
+
+// --- Fonctions pour OSINT (exemples) ---
+document.getElementById('ob').addEventListener('click', function() {
+    const query = document.getElementById('oi').value;
+    console.log(`OSINT Search for: ${query}`);
+    // Logique de recherche OSINT ici
+});
+
+// --- Fonctions pour zoomer sur une région (exemples) ---
+function zoomRegion(region) {
+    console.log(`Zoom sur la région : ${region}`);
+    if (!map) return; // Ne rien faire si la carte n'est pas initialisée
+
+    let center, zoom;
+    switch(region) {
+        case 'world':
+            center = [20, 0];
+            zoom = 2;
+            break;
+        case 'europe':
+            center = [54.5, 15];
+            zoom = 4;
+            break;
+        case 'middleeast':
+            center = [25, 45];
+            zoom = 5;
+            break;
+        case 'africa':
+            center = [0, 20];
+            zoom = 3;
+            break;
+        case 'asia':
+            center = [40, 105];
+            zoom = 3;
+            break;
+        case 'americas':
+            center = [30, -95]; // Centre approximatif pour Amérique du Nord et du Sud
+            zoom = 2;
+            break;
+        default:
+            return; // Région inconnue
+    }
+    map.setView(center, zoom, { animate: true });
+}
+
+// --- Initialisation au chargement de la page ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Afficher la page par défaut (MAP)
+    showPage('page-map');
+
+    // Initialiser la carte SEULEMENT si l'élément existe et si Leaflet est chargé
+    if (document.getElementById('map') && typeof L !== 'undefined') {
+        initMap();
+    } else if (!document.getElementById('map')) {
+        console.error("L'élément #map n'a pas été trouvé pour initialiser Leaflet.");
+    } else {
+        console.error("La librairie Leaflet (L) n'est pas chargée.");
+        // Afficher un message d'erreur à l'utilisateur si Leaflet n'est pas disponible
+        const mapContainer = document.getElementById('page-map');
+        if (mapContainer) {
+            mapContainer.innerHTML = '<div style="padding:20px;font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#ff2d2d;text-align:center;">Erreur: La librairie de carte n\'a pas pu être chargée.</div>';
+        }
+    }
+
+    // Mettre à jour l'heure
+    updateClock();
+    setInterval(updateClock, 1000);
+});
+
+// --- Fonction pour mettre à jour l'horloge ---
+function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const clockElement = document.getElementById('clock');
+    if (clockElement) {
+        clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+}
+
+</script>
+<!-- *** FIN DE LA SECTION JAVASCRIPT *** -->
 </body>
 </html>
