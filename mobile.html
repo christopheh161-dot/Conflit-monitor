@@ -40,10 +40,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .notif-bar{display:none;padding:5px 10px;background:rgba(255,45,45,0.1);border-bottom:1px solid #ff2d2d;font-family:'Share Tech Mono',monospace;font-size:9px;color:#ff2d2d;align-items:center;gap:6px;flex-shrink:0;}
 .notif-bar.show{display:flex;}
 .notif-close{margin-left:auto;cursor:pointer;font-size:12px;}
-.content{flex:1;overflow:hidden;position:relative;min-height:0;}
+.content{flex:1;overflow:hidden;position:relative;min-height:0;padding-bottom:52px
 .tab-page{display:none;position:absolute;inset:0;flex-direction:column;overflow:hidden;}
 .tab-page.active{display:flex;}
-#map{width:100%;flex:1;min-height:0;}
+#map{width:100%;flex:1;min-height:0;max-height:calc(100vh - 200px);}
 .map-controls{display:flex;gap:4px;padding:5px 6px;background:#0d1117;border-bottom:1px solid #1a2535;flex-wrap:wrap;flex-shrink:0;}
 .mcbtn{padding:3px 7px;font-family:'Share Tech Mono',monospace;font-size:8px;border:1px solid #1a2535;background:#080c10;color:#a8b8c8;cursor:pointer;}
 .mcbtn.active{border-color:#00d4ff;color:#00d4ff;}
@@ -147,7 +147,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .dlt{font-size:8px;letter-spacing:2px;color:#00d4ff;margin:7px 0 4px;}
 .dlg{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
 .dl{display:block;padding:4px 6px;background:#080c10;border:1px solid #1a2535;color:#a8b8c8;text-decoration:none;font-size:8px;font-family:'Share Tech Mono',monospace;text-align:center;}
-.bottom-nav{display:flex;background:#0d1117;border-top:1px solid #1a2535;flex-shrink:0;height:52px;z-index:100;}
+.bottom-nav{display:flex;background:#0d1117;border-top:1px
 .bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;border:none;background:transparent;color:#a8b8c8;font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:0.5px;padding:4px 2px;border-top:2px solid transparent;transition:all 0.2s;}
 .bnav.active{color:#00d4ff;border-top-color:#00d4ff;background:rgba(0,212,255,0.05);}
 .bnav.active.air{color:#ff8c00;border-top-color:#ff8c00;}
