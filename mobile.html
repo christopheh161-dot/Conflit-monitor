@@ -40,7 +40,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .notif-bar{display:none;padding:5px 10px;background:rgba(255,45,45,0.1);border-bottom:1px solid #ff2d2d;font-family:'Share Tech Mono',monospace;font-size:9px;color:#ff2d2d;align-items:center;gap:6px;flex-shrink:0;}
 .notif-bar.show{display:flex;}
 .notif-close{margin-left:auto;cursor:pointer;font-size:12px;}
-.content{flex:1;overflow:hidden;position:relative;min-height:0;display:flex;flex-direction:column;}
+.content{flex:1;overflow:hidden;position:relative;min-height:0;display:flex;flex-direction:column;margin-bottom:52px;}
 .tab-page{display:none;flex-direction:column;overflow:hidden;flex:1;min-height:0;}
 .tab-page.active{display:flex;}
 #map{width:100%;flex:1;min-height:0;}
@@ -62,7 +62,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .ci.high{border-left-color:#ff2d2d;}
 .ci.medium{border-left-color:#ff8c00;}
 .ci.low{border-left-color:#00ff88;}
-.cin{font-size:12px;font-weight:600;color:#e0eaf4;}
+cin{font-size:12px;font-weight:600;color:#e0eaf4;}
 .cim{display:flex;justify-content:space-between;margin-top:2px;}
 .cir{font-size:9px;color:#a8b8c8;font-family:'Share Tech Mono',monospace;}
 .cil{font-size:9px;font-family:'Share Tech Mono',monospace;}
@@ -136,7 +136,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .fchange.up{color:#00ff88;}.fchange.down{color:#ff2d2d;}.fchange.flat{color:#ff8c00;}
 .fupdate{font-size:7px;color:#3a4a5a;font-family:'Share Tech Mono',monospace;margin-top:2px;}
 .fname2{font-size:9px;color:#a8b8c8;margin-top:1px;}
-.dov{position:fixed;bottom:60px;left:8px;right:8px;background:#0d1117;border:1px solid #00d4ff;box-shadow:0 0 20px rgba(0,212,255,0.2);z-index:1000;display:none;max-height:70vh;overflow-y:auto;border-radius:2px;}
+.dov{position:fixed;bottom:60px;left:8px;right:8px;background:#0d1117;border:1px solid #00d4ff;box-shadow:0 0 20px rgba(0,212,255,0.2);z-index:8000;display:none;max-height:70vh;overflow-y:auto;border-radius:2px;}
 .dh{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid #1a2535;position:sticky;top:0;background:#0d1117;}
 .dt{font-size:11px;font-weight:700;color:#e0eaf4;letter-spacing:1px;}
 .dc{background:none;border:none;color:#a8b8c8;cursor:pointer;font-size:16px;padding:2px 6px;}
@@ -147,14 +147,12 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .dlt{font-size:8px;letter-spacing:2px;color:#00d4ff;margin:7px 0 4px;}
 .dlg{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
 .dl{display:block;padding:4px 6px;background:#080c10;border:1px solid #1a2535;color:#a8b8c8;text-decoration:none;font-size:8px;font-family:'Share Tech Mono',monospace;text-align:center;}
-.bottom-nav{display:flex;background:#0d1117;border-top:1px solid #1a2535;flex-shrink:0;height:52px;z-index:1000;position:fixed;bottom:0;left:0;right:0;padding:0;margin:0;}
-.bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;border:none;background:transparent;color:#a8b8c8;font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:0.5px;padding:4px 2px;border-top:2px solid transparent;transition:all 0.2s;outline:2px solid transparent;outline-offset:2px;min-width:0;}
-.bnav:focus{outline:2px solid #00d4ff;outline-offset:0;z-index:1;}
+.bottom-nav{display:flex;background:#0d1117;border-top:1px solid #1a2535;height:52px;z-index:9000;position:fixed;bottom:0;left:0;right:0;}
+.bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;border:none;background:transparent;color:#a8b8c8;font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:0.5px;padding:4px 2px;border-top:2px solid transparent;transition:all 0.2s;min-width:0;}
 .bnav.active{color:#00d4ff;border-top-color:#00d4ff;background:rgba(0,212,255,0.05);}
 .bnav.active.air{color:#ff8c00;border-top-color:#ff8c00;}
 .bnav.active.naval{color:#00ff88;border-top-color:#00ff88;}
-.bnav-icon{font-size:18px;line-height:1;display:block;margin-bottom:2px;}
-.bnav-label{font-size:7px;letter-spacing:0.5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.bnav-icon{font-size:18px;line-height:1;display:block;}
 .leaflet-container{background:#080c10!important;}
 .leaflet-popup-content-wrapper{background:#0d1117!important;border:1px solid #00d4ff!important;border-radius:0!important;color:#e0eaf4!important;font-family:'Rajdhani',sans-serif!important;}
 .leaflet-popup-tip{background:#0d1117!important;}
@@ -184,6 +182,26 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 <div class="content">
 
 <!-- CARTE -->
+<div class="tab-page active" id="page-map">
+  <div class="map-controls">
+    <button class="mcbtn active" onclick="filterMap('all',this)">ALL</button>
+    <button class="mcbtn high" onclick="filterMap('high',this)">🔴 HIGH</button>
+    <button class="mcbtn medium" onclick="filterMap('medium',this)">🟠 MED</button>
+    <button class="mcbtn low" onclick="filterMap('low',this)">🟢 LOW</button>
+    <button class="mcbtn heat" onclick="toggleHeatmap()">🌡 HEAT</button>
+  </div>
+  <div class="region-row">
+    <button class="rbtn" onclick="zoomRegion('world')">🌍 MONDE</button>
+    <button class="rbtn" onclick="zoomRegion('europe')">🇪🇺 EU</button>
+    <button class="rbtn" onclick="zoomRegion('middleeast')">🕌 ME</button>
+    <button class="rbtn" onclick="zoomRegion('africa')">🌍 AF</button>
+    <button class="rbtn" onclick="zoomRegion('asia')">🌏 AS</button>
+    <button class="rbtn" onclick="zoomRegion('americas')">🌎 AM</button>
+  </div>
+  <div id="map"></div>
+</div>
+
+<!-- CONFLITS -->
 <div class="tab-page" id="page-conflicts">
   <div class="igrid" id="igrid"></div>
   <div class="filter-row">
@@ -307,7 +325,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
   </div>
 </div>
 
-</div>
+</div><!-- fin .content -->
 
 <div class="dov" id="dov">
   <div class="dh">
@@ -317,39 +335,15 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
   <div class="db" id="dbody"></div>
 </div>
 
-<nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
-  <button class="bnav active" id="bnav-map" onclick="showPage('map')" aria-label="Carte des conflits">
-    <span class="bnav-icon">🗺</span>
-    <span class="bnav-label">CARTE</span>
-  </button>
-  <button class="bnav" id="bnav-conflicts" onclick="showPage('conflicts')" aria-label="Liste des conflits">
-    <span class="bnav-icon">⚔</span>
-    <span class="bnav-label">CONFLITS</span>
-  </button>
-  <button class="bnav" id="bnav-feed" onclick="showPage('feed')" aria-label="Flux d'actualités">
-    <span class="bnav-icon">📡</span>
-    <span class="bnav-label">FEED</span>
-  </button>
-  <button class="bnav" id="bnav-brief" onclick="showPage('brief')" aria-label="Résumé quotidien">
-    <span class="bnav-icon">📋</span>
-    <span class="bnav-label">BRIEF</span>
-  </button>
-  <button class="bnav" id="bnav-finance" onclick="showPage('finance')" aria-label="Marchés financiers">
-    <span class="bnav-icon">📈</span>
-    <span class="bnav-label">MARCHÉS</span>
-  </button>
-  <button class="bnav air" id="bnav-osint" onclick="showPage('osint')" aria-label="Recherche OSINT">
-    <span class="bnav-icon">🔍</span>
-    <span class="bnav-label">OSINT</span>
-  </button>
-  <button class="bnav air" id="bnav-air" onclick="showPage('air')" aria-label="Suivi aérien">
-    <span class="bnav-icon">✈</span>
-    <span class="bnav-label">AIR</span>
-  </button>
-  <button class="bnav naval" id="bnav-naval" onclick="showPage('naval')" aria-label="Suivi naval">
-    <span class="bnav-icon">⚓</span>
-    <span class="bnav-label">NAVAL</span>
-  </button>
+<nav class="bottom-nav">
+  <button class="bnav active" id="bnav-map" onclick="showPage('map')"><span class="bnav-icon">🗺</span>CARTE</button>
+  <button class="bnav" id="bnav-conflicts" onclick="showPage('conflicts')"><span class="bnav-icon">⚔</span>CONFLITS</button>
+  <button class="bnav" id="bnav-feed" onclick="showPage('feed')"><span class="bnav-icon">📡</span>FEED</button>
+  <button class="bnav" id="bnav-brief" onclick="showPage('brief')"><span class="bnav-icon">📋</span>BRIEF</button>
+  <button class="bnav" id="bnav-finance" onclick="showPage('finance')"><span class="bnav-icon">📈</span>MARCHÉS</button>
+  <button class="bnav air" id="bnav-osint" onclick="showPage('osint')"><span class="bnav-icon">🔍</span>OSINT</button>
+  <button class="bnav air" id="bnav-air" onclick="showPage('air')"><span class="bnav-icon">✈</span>AIR</button>
+  <button class="bnav naval" id="bnav-naval" onclick="showPage('naval')"><span class="bnav-icon">⚓</span>NAVAL</button>
 </nav>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
@@ -532,7 +526,7 @@ var crises=[
   {n:"Burkina Faso",c:[12.30,-1.50]},{n:"Somalia Shabaab",c:[2.04,45.34]},
   {n:"Haiti Gangs",c:[18.54,-72.34]},{n:"Afghanistan ISIS-K",c:[34.52,69.17]},
   {n:"Nigeria Boko Haram",c:[11.85,13.16]},{n:"Lebanon Tension",c:[33.55,35.37]},
-    {n:"Taiwan Strait",c:[24.50,122.00]},{n:"Sahel Border",c:[16.00,1.00]},
+  {n:"Taiwan Strait",c:[24.50,122.00]},{n:"Sahel Border",c:[16.00,1.00]},
   {n:"Ethiopia Amhara",c:[11.59,37.37]},{n:"Mozambique North",c:[-12.30,40.47]},
   {n:"Kosovo Border",c:[42.66,21.17]},{n:"Iran Nuclear",c:[32.43,53.69]}
 ];
@@ -613,6 +607,12 @@ function fetchQuote(item){
   }
   tryNext();
 }
+
+function fetchFinance(){
+  var all=financeData.stocks.concat(financeData.commodities).concat(financeData.forex);
+  all.forEach(function(item,i){setTimeout(function(){fetchQuote(item);},i*250);});
+  addLog('ok','Marchés mis à jour');
+}
 fetchFinance();
 setInterval(fetchFinance,60*1000);
 
@@ -680,12 +680,6 @@ function exportJSON(){
 }
 function exportPDF(){
   try{
-    // Correction pour le système d'export PDF
-    if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
-      addLog('err','PDF: JS PDF non disponible');
-      return;
-    }
-    
     var doc=new window.jspdf.jsPDF();
     doc.setFillColor(8,12,16);doc.rect(0,0,210,297,'F');
     doc.setTextColor(0,212,255);doc.setFontSize(16);doc.text('GLOBAL CONFLICT MONITOR',105,20,{align:'center'});
@@ -729,12 +723,6 @@ generateBrief();
 
 function exportBriefPDF(type){
   try{
-    // Correction pour le système d'export PDF
-    if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
-      addLog('err','PDF: JS PDF non disponible');
-      return;
-    }
-    
     var doc=new window.jspdf.jsPDF();
     doc.setFillColor(8,12,16);doc.rect(0,0,210,297,'F');
     doc.setTextColor(0,212,255);doc.setFontSize(16);doc.text('GLOBAL CONFLICT MONITOR',105,18,{align:'center'});
@@ -837,55 +825,6 @@ function fetchFeed(src){
 function fetchAll(){sources.forEach(function(s,i){setTimeout(function(){fetchFeed(s);},i*300);});}
 setTimeout(fetchAll,1000);
 setInterval(fetchAll,15*60*1000);
-
-// Ajout de la fonctionnalité d'accessibilité pour le clavier
-document.addEventListener('keydown', function(e) {
-  const navButtons = document.querySelectorAll('.bnav');
-  const currentIndex = Array.from(navButtons).indexOf(document.activeElement);
-  
-  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-    e.preventDefault();
-    let newIndex;
-    if (e.key === 'ArrowRight') {
-      newIndex = (currentIndex + 1) % navButtons.length;
-    } else {
-      newIndex = (currentIndex - 1 + navButtons.length) % navButtons.length;
-    }
-    navButtons[newIndex].focus();
-  }
-  
-  // Permettre d'utiliser la touche Entrée pour activer le bouton
-  if (e.key === 'Enter' || e.key === ' ') {
-    if (document.activeElement.classList.contains('bnav')) {
-      e.preventDefault();
-      document.activeElement.click();
-    }
-  }
-});
-
-// Mise à jour du rôle ARIA pour l'état actif
-function updateNavAccessibility() {
-  const activeButton = document.querySelector('.bnav.active');
-  if (activeButton) {
-    activeButton.setAttribute('aria-current', 'page');
-  }
-  
-  document.querySelectorAll('.bnav').forEach(button => {
-    if (button !== activeButton) {
-      button.removeAttribute('aria-current');
-    }
-  });
-}
-
-// Ajout de l'événement de focus sur les boutons de navigation
-document.querySelectorAll('.bnav').forEach(button => {
-  button.addEventListener('focus', function() {
-    this.setAttribute('aria-current', 'page');
-  });
-  button.addEventListener('blur', function() {
-    this.removeAttribute('aria-current');
-  });
-});
 </script>
 </body>
 </html>
