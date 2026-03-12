@@ -582,82 +582,51 @@ buildFinanceUI();
 
 function fetchQuote(item){
   var now=new Date().toLocaleTimeString('fr-FR');
-  // CRYPTO via Coinbase (sans proxy, sans clé)
-  if(item.sym==='BTC'||item.sym==='ETH'){
-    var coin=item.sym+'-USD';
-    fetch('https://api.coinbase.com/v2/prices/'+coin+'/spot')
+  function setPrice(id,price,change){
+    var dec=price>100?2:price>1?4:6;
+    if(document.getElementById('fp-'+id))document.getElementById('fp-'+id).textContent=parseFloat(price).toFixed(dec);
+    var fc=document.getElementById('fc2-'+id);
+    if(fc){
+      if(change!==null){var arrow=change>=0?'▲':'▼';var cls=change>0?'up':change<0?'down':'flat';fc.textContent=arrow+' '+parseFloat(change).toFixed(2)+'%';fc.className='fchange '+cls;}
+      else{fc.textContent='● LIVE';fc.className='fchange up';}
+    }
+    if(document.getElementById('fu-'+id))document.getElementById('fu-'+id).textContent=now;
+  }
+  // CRYPTO via Binance (fiable Android)
+  var binance={BTC:'BTCUSDT',ETH:'ETHUSDT'};
+  if(binance[item.sym]){
+    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol='+binance[item.sym])
     .then(function(r){return r.json();})
-    .then(function(d){
-      var price=parseFloat(d.data.amount);
-      if(document.getElementById('fp-'+item.s))document.getElementById('fp-'+item.s).textContent=price.toFixed(2);
-      var fc=document.getElementById('fc2-'+item.s);
-      if(fc){fc.textContent='● LIVE';fc.className='fchange up';}
-      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent=now;
-    }).catch(function(){
-      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
-    });
+    .then(function(d){setPrice(item.s,d.lastPrice,d.priceChangePercent);})
+    .catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
-  // DEVISES via Frankfurter (sans proxy, sans clé)
-  if(item.sym==='EURUSD'||item.sym==='GBPUSD'||item.sym==='USDCHF'||item.sym==='USDCNY'||item.sym==='USDJPY'){
-    var pairs={EURUSD:'EUR/USD',GBPUSD:'GBP/USD',USDCHF:'CHF',USDCNY:'CNY',USDJPY:'JPY'};
-    var base=item.sym==='EURUSD'?'EUR':item.sym==='GBPUSD'?'GBP':'USD';
-    var target=item.sym==='EURUSD'?'USD':item.sym==='GBPUSD'?'USD':item.sym==='USDJPY'?'JPY':item.sym==='USDCHF'?'CHF':'CNY';
-    fetch('https://api.frankfurter.app/latest?from='+base+'&to='+target)
+  // DEVISES via Frankfurter
+  var forex={EURUSD:['EUR','USD'],GBPUSD:['GBP','USD'],USDJPY:['USD','JPY'],USDCHF:['USD','CHF'],USDCNY:['USD','CNY'],USDRUB:['USD','RUB']};
+  if(forex[item.sym]){
+    fetch('https://api.frankfurter.app/latest?from='+forex[item.sym][0]+'&to='+forex[item.sym][1])
     .then(function(r){return r.json();})
-    .then(function(d){
-      var price=d.rates[target];
-      if(document.getElementById('fp-'+item.s))document.getElementById('fp-'+item.s).textContent=price.toFixed(4);
-      var fc=document.getElementById('fc2-'+item.s);
-      if(fc){fc.textContent='● LIVE';fc.className='fchange up';}
-      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent=now;
-    }).catch(function(){
-      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
-    });
+    .then(function(d){setPrice(item.s,d.rates[forex[item.sym][1]],null);})
+    .catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
-  // OR & ARGENT via metals.live (sans clé)
-  if(item.sym==='GOLD'||item.sym==='SILVER'){
-    fetch('https://metals.live/api/v1/spot')
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var metal=item.sym==='GOLD'?'gold':'silver';
-      var price=d[0][metal];
-      if(document.getElementById('fp-'+item.s))document.getElementById('fp-'+item.s).textContent=parseFloat(price).toFixed(2);
-      var fc=document.getElementById('fc2-'+item.s);
-      if(fc){fc.textContent='● LIVE';fc.className='fchange up';}
-      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent=now;
-    }).catch(function(){
-      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
-    });
+  // INDICES & MATIERES via Stooq CSV
+  var stooq={SPX:'^spx',DJI:'^dji',NDX:'^ndx',CAC:'^cac',DAX:'^dax',NKY:'^nky',GOLD:'xauusd',SILVER:'xagusd',WTI:'cl.f',BRENT:'lcousd',GAS:'ng.f',COPPER:'hgusd',PLAT:'xptusd',PALL:'xpdusd'};
+  if(stooq[item.sym]){
+    fetch('https://stooq.com/q/l/?s='+stooq[item.sym]+'&f=sd2t2ohlcv&h&e=csv')
+    .then(function(r){return r.text();})
+    .then(function(txt){
+      var lines=txt.trim().split('\n');
+      if(lines.length<2)throw 0;
+      var cols=lines[1].split(',');
+      var price=parseFloat(cols[4]);
+      var open=parseFloat(cols[2]);
+      var chg=open>0?((price-open)/open*100):0;
+      setPrice(item.s,price,chg);
+    }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
-  // RESTE (indices, pétrole etc) via Yahoo + proxies
-  var url='https://query2.finance.yahoo.com/v8/finance/chart/'+item.s+'?interval=1m&range=1d';
-  var proxies=['https://api.allorigins.win/raw?url=','https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest='];
-  var idx=0;
-  function tryNext(){
-    if(idx>=proxies.length){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';return;}
-    var u=proxies[idx]+encodeURIComponent(url);idx++;
-    fetch(u).then(function(r){if(!r.ok)throw 0;return r.json();})
-    .then(function(data){
-      var res=data&&data.chart&&data.chart.result&&data.chart.result[0];
-      if(!res){tryNext();return;}
-      var meta=res.meta;
-      var price=meta.regularMarketPrice||0;
-      var prev=meta.chartPreviousClose||meta.previousClose||price;
-      var change=price-prev;
-      var pct2=prev?((change/prev)*100).toFixed(2):0;
-      var arrow=change>=0?'▲':'▼';
-      var cls=change>0?'up':change<0?'down':'flat';
-      var dec=price>100?2:price>1?4:6;
-      if(document.getElementById('fp-'+item.s))document.getElementById('fp-'+item.s).textContent=price.toFixed(dec);
-      var fc=document.getElementById('fc2-'+item.s);
-      if(fc){fc.textContent=arrow+' '+pct2+'%';fc.className='fchange '+cls;}
-      if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent=new Date().toLocaleTimeString('fr-FR');
-    }).catch(function(){tryNext();});
-  }
-  tryNext();
+  if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
 }
   
 function fetchFinance(){
