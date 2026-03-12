@@ -50,7 +50,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .mcbtn.high{border-color:#ff2d2d;color:#ff2d2d;}
 .mcbtn.medium{border-color:#ff8c00;color:#ff8c00;}
 .mcbtn.low{border-color:#00ff88;color:#00ff88;}
-.mcbtn.heat{border-color:#ff8c00;color:#ff8c00;}
 .region-row{display:flex;gap:3px;padding:4px 6px;background:#0d1117;border-bottom:1px solid #1a2535;overflow-x:auto;flex-shrink:0;}
 .region-row::-webkit-scrollbar{display:none;}
 .rbtn{padding:2px 8px;font-family:'Share Tech Mono',monospace;font-size:8px;border:1px solid #1a2535;background:transparent;color:#a8b8c8;white-space:nowrap;cursor:pointer;}
@@ -187,7 +186,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
     <button class="mcbtn high" onclick="filterMap('high',this)">🔴 HIGH</button>
     <button class="mcbtn medium" onclick="filterMap('medium',this)">🟠 MED</button>
     <button class="mcbtn low" onclick="filterMap('low',this)">🟢 LOW</button>
-    <button class="mcbtn heat" onclick="toggleHeatmap()">🌡 HEAT</button>
+    <button class="mcbtn" style="border-color:#ff8c00;color:#ff8c00;" onclick="toggleHeatmap()">🌡 HEAT</button>
   </div>
   <div class="region-row">
     <button class="rbtn" onclick="zoomRegion('world')">🌍 MONDE</button>
@@ -313,7 +312,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
     <div class="fgrid" id="commodities-grid"></div>
     <div class="fsection">💱 DEVISES & CRYPTO</div>
     <div class="fgrid" id="forex-grid"></div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:#3a4a5a;padding:8px;text-align:center;">Twelve Data • Binance • Frankfurter • CoinGecko • Prix en EUR</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:7px;color:#3a4a5a;padding:8px;text-align:center;">Twelve Data • Binance • Frankfurter • CoinGecko • Prix en EUR • Différé 15min</div>
   </div>
 </div>
 </div>
@@ -389,7 +388,7 @@ function showPage(name){
 
 var clusterGroup,heatLayer,heatEnabled=false;
 function filterMap(level,btn){
-  document.querySelectorAll('.map-controls .mcbtn').forEach(function(b){if(b.textContent!=='🌡 HEAT')b.classList.remove('active');});
+  document.querySelectorAll('.map-controls .mcbtn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
   clusterGroup.clearLayers();
   C.forEach(function(x){if(level==='all'||x.l===level)addMarker(x);});
@@ -530,7 +529,6 @@ setTimeout(function(){map.invalidateSize();},200);
 setTimeout(function(){map.invalidateSize();},800);
 updateDefcon();
 addLog('ok','GCM Mobile — '+C.length+' zones | '+crises.length+' crisis points');
-
 setInterval(function(){
   document.getElementById('clock').textContent=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 },1000);
@@ -557,7 +555,7 @@ var financeData={
   forex:[
     {s:'EURUSD',n:'EUR/USD',sym:'EURUSD'},{s:'GBPUSD',n:'GBP/USD',sym:'GBPUSD'},
     {s:'USDJPY',n:'USD/JPY',sym:'USDJPY'},{s:'USDCHF',n:'USD/CHF',sym:'USDCHF'},
-    {s:'USDCNY',n:'USD/CNY',sym:'USDCNY'},{s:'USDRUB',n:'USD/RUB',sym:'USDRUB'},
+    {s:'USDCNY',n:'USD/CNY',sym:'USDCNY'},{s:'USDTRY',n:'USD/TRY',sym:'USDTRY'},
     {s:'BTC',n:'Bitcoin (€)',sym:'BTC'},{s:'ETH',n:'Ethereum (€)',sym:'ETH'}
   ]
 };
@@ -595,16 +593,33 @@ function setPrice(id,price,change){
   if(fu)fu.textContent=new Date().toLocaleTimeString('fr-FR');
 }
 
+function setPriceRaw(id,price,change,suffix){
+  var dec=price>1000?2:price>10?3:price>1?4:6;
+  var fp=document.getElementById('fp-'+id);
+  var fc=document.getElementById('fc-'+id);
+  var fu=document.getElementById('fu-'+id);
+  if(fp)fp.textContent=parseFloat(price).toFixed(dec)+(suffix||'');
+  if(fc){
+    if(change!==null&&change!==undefined){
+      var arrow=change>=0?'▲':'▼';
+      var cls=change>0?'up':change<0?'down':'flat';
+      fc.textContent=arrow+' '+parseFloat(change).toFixed(2)+'%';
+      fc.className='fchange '+cls;
+    }else{
+      fc.textContent='● LIVE';fc.className='fchange up';
+    }
+  }
+  if(fu)fu.textContent=new Date().toLocaleTimeString('fr-FR');
+}
+
 function fetchQuote(item){
   var TD_KEY='4b1034e2ecd744a6b3faa2ee34cb5858';
-  // CRYPTO via Binance — converti en EUR
+
+  // CRYPTO via Binance → EUR
   if(item.sym==='BTC'||item.sym==='ETH'){
     fetch('https://api.binance.com/api/v3/ticker/24hr?symbol='+item.sym+'USDT')
     .then(function(r){return r.json();})
-    .then(function(d){
-      var priceEur=parseFloat(d.lastPrice)*eurUsdRate;
-      setPrice(item.s,priceEur,parseFloat(d.priceChangePercent));
-    })
+    .then(function(d){setPrice(item.s,parseFloat(d.lastPrice)*eurUsdRate,parseFloat(d.priceChangePercent));})
     .catch(function(){
       var cid=item.sym==='BTC'?'bitcoin':'ethereum';
       fetch('https://api.coingecko.com/api/v3/simple/price?ids='+cid+'&vs_currencies=eur&include_24hr_change=true')
@@ -614,15 +629,20 @@ function fetchQuote(item){
     });
     return;
   }
-  // DEVISES via Frankfurter — pas de conversion EUR
-  var forexMap={EURUSD:['EUR','USD'],GBPUSD:['GBP','USD'],USDJPY:['USD','JPY'],USDCHF:['USD','CHF'],USDCNY:['USD','CNY'],USDRUB:['USD','RUB']};
+
+  // DEVISES via Frankfurter — affichage sans €
+  var forexMap={
+    EURUSD:['EUR','USD'],GBPUSD:['GBP','USD'],
+    USDJPY:['USD','JPY'],USDCHF:['USD','CHF'],
+    USDCNY:['USD','CNY'],USDTRY:['USD','TRY']
+  };
   if(forexMap[item.sym]){
     fetch('https://api.frankfurter.app/latest?from='+forexMap[item.sym][0]+'&to='+forexMap[item.sym][1])
     .then(function(r){return r.json();})
     .then(function(d){
       var fp=document.getElementById('fp-'+item.s);
-      var fu=document.getElementById('fu-'+item.s);
       var fc=document.getElementById('fc-'+item.s);
+      var fu=document.getElementById('fu-'+item.s);
       if(fp)fp.textContent=parseFloat(d.rates[forexMap[item.sym][1]]).toFixed(4);
       if(fc){fc.textContent='● LIVE';fc.className='fchange up';}
       if(fu)fu.textContent=new Date().toLocaleTimeString('fr-FR');
@@ -630,22 +650,8 @@ function fetchQuote(item){
     .catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
-  // MATIERES PREMIERES via CoinGecko en EUR
-  var cgMap={
-    SILVER:'silver',WTI:'crude-oil',BRENT:'brent-crude-oil',
-    GAS:'natural-gas',COPPER:'copper',PLAT:'platinum',PALL:'palladium'
-  };
-  if(cgMap[item.sym]){
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids='+cgMap[item.sym]+'&vs_currencies=eur&include_24hr_change=true')
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var obj=d[cgMap[item.sym]];
-      if(obj&&obj.eur)setPrice(item.s,obj.eur,obj.eur_24h_change);
-      else if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
-    }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
-    return;
-  }
-  // OR via CoinGecko en EUR
+
+  // OR via CoinGecko → EUR
   if(item.sym==='GOLD'){
     fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=eur&include_24hr_change=true')
     .then(function(r){return r.json();})
@@ -655,18 +661,34 @@ function fetchQuote(item){
     }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
-  // INDICES via Twelve Data — converti en EUR
-  var tdMap={SPX:'SPX:INDEX',DJI:'DJIA:INDEX',NDX:'NDX:INDEX',CAC:'CAC40:INDEX',DAX:'DAX:INDEX',NKY:'NI225:INDEX'};
+
+  // MATIERES PREMIERES — prix indicatifs en USD convertis EUR
+  var staticUSD={
+    SILVER:33.20,WTI:67.50,BRENT:71.20,
+    GAS:3.82,COPPER:4.05,PLAT:980,PALL:950
+  };
+  if(staticUSD[item.sym]){
+    setPrice(item.s,staticUSD[item.sym]*eurUsdRate,null);
+    var fu=document.getElementById('fu-'+item.s);
+    if(fu)fu.textContent='indicatif';
+    return;
+  }
+
+  // INDICES via Twelve Data → converti EUR
+  var tdMap={
+    SPX:'SPX:INDEX',DJI:'DJIA:INDEX',NDX:'NDX:INDEX',
+    CAC:'CAC40:INDEX',DAX:'DAX:INDEX',NKY:'NI225:INDEX'
+  };
   if(tdMap[item.sym]){
     fetch('https://api.twelvedata.com/price?symbol='+encodeURIComponent(tdMap[item.sym])+'&apikey='+TD_KEY)
     .then(function(r){return r.json();})
     .then(function(d){
       if(!d.price||d.status==='error')throw 0;
-      var priceEur=parseFloat(d.price)*eurUsdRate;
-      setPrice(item.s,priceEur,null);
+      setPrice(item.s,parseFloat(d.price)*eurUsdRate,null);
     }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
+
   if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';
 }
 
@@ -729,18 +751,28 @@ function filterNews(type){
 function exportCSV(){
   var rows=[['HEURE','TEXTE','HOT']];
   document.querySelectorAll('#nfeed .ni').forEach(function(item){
-    rows.push([item.querySelector('.nt')?item.querySelector('.nt').textContent:'',item.querySelector('.nx')?item.querySelector('.nx').textContent:'',item.querySelector('.th')?'OUI':'NON']);
+    rows.push([
+      item.querySelector('.nt')?item.querySelector('.nt').textContent:'',
+      item.querySelector('.nx')?item.querySelector('.nx').textContent:'',
+      item.querySelector('.th')?'OUI':'NON'
+    ]);
   });
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
   a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 function exportJSON(){
   var data=[];
   document.querySelectorAll('#nfeed .ni').forEach(function(item){
-    data.push({time:item.querySelector('.nt')?item.querySelector('.nt').textContent:'',text:item.querySelector('.nx')?item.querySelector('.nx').textContent:'',hot:item.querySelector('.th')!==null});
+    data.push({
+      time:item.querySelector('.nt')?item.querySelector('.nt').textContent:'',
+      text:item.querySelector('.nx')?item.querySelector('.nx').textContent:'',
+      hot:item.querySelector('.th')!==null
+    });
   });
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({exported:new Date().toISOString(),items:data},null,2)],{type:'application/json'}));
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({exported:new Date().toISOString(),items:data},null,2)],{type:'application/json'}));
   a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.json';a.click();
 }
 function exportPDF(){
@@ -809,7 +841,8 @@ function exportBriefCSV(){
   var rows=[['NOM','REGION','TYPE','NIVEAU','VICTIMES','DEPUIS','ACTEURS']];
   C.forEach(function(x){rows.push([x.n,x.r,x.t,x.l,x.k,x.s,x.a]);});
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
   a.download='gcm-conflits-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 
