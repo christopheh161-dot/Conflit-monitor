@@ -504,28 +504,33 @@ addLog('ok','GCM Desktop initialisé — '+C.length+' zones chargées');
 var gdeltMarkers=L.layerGroup();
 map.addLayer(gdeltMarkers);
 function fetchGDELT(){
-  var url='https://api.gdeltproject.org/api/v2/geo/geo?query=war+conflict+attack+explosion&mode=pointdata&maxrecords=50&format=json';
+  var url='https://api.gdeltproject.org/api/v2/doc/doc?query=war+conflict+attack&mode=ArtList&maxrecords=25&format=json&sourcelang=english';
   fetch(url)
   .then(function(r){if(!r.ok)throw 0;return r.json();})
   .then(function(data){
     gdeltMarkers.clearLayers();
-    if(!data||!data.features){addLog('warn','GDELT — pas de données');return;}
-    data.features.forEach(function(f){
-      if(!f.geometry||!f.geometry.coordinates)return;
-      var lon=f.geometry.coordinates[0],lat=f.geometry.coordinates[1];
-      var title=f.properties&&f.properties.name?f.properties.name:'Incident';
+    if(!data||!data.articles){addLog('warn','GDELT — pas de données');return;}
+    var n=0;
+    data.articles.forEach(function(a){
+      if(!a.socialimage||n>=25)return;
+      if(!a.domain)return;
+      var lat=parseFloat(a.socialimage_lat||0);
+      var lon=parseFloat(a.socialimage_lon||0);
+      if(lat===0&&lon===0)return;
       var icon=L.divIcon({html:'<div style="width:8px;height:8px;border-radius:50%;background:#ff8c00;border:1px solid #fff;box-shadow:0 0 6px #ff8c00;opacity:0.8;"></div>',className:'',iconSize:[8,8],iconAnchor:[4,4]});
       var marker=L.marker([lat,lon],{icon:icon});
-      marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:#e0eaf4;background:#0d1117;padding:5px;">🟠 GDELT<br>'+title+'</div>');
+      marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:#e0eaf4;background:#0d1117;padding:5px;">🟠 GDELT<br>'+(a.title||'Incident').substring(0,60)+'</div>');
       gdeltMarkers.addLayer(marker);
+      n++;
     });
-    addLog('ok','GDELT — '+data.features.length+' incidents chargés');
+    addLog('ok','GDELT ArtList — '+n+' incidents cartographiés');
   })
-  .catch(function(){addLog('err','GDELT inaccessible — API down');});
+  .catch(function(){
+    addLog('err','GDELT inaccessible — API down');
+  });
 }
 fetchGDELT();
 setInterval(fetchGDELT,15*60*1000);
-
 function showD(x){
   document.getElementById('dtitle').textContent=x.n.toUpperCase();
   var vc=x.l==='high'?'dv vh':x.l==='medium'?'dv vm':'dv vl';
