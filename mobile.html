@@ -8,704 +8,70 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
-<!-- Inclusion des librairies Leaflet -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
-<!-- Polices -->
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-<!-- Librairie pour PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
-/* Reset et styles généraux */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-}
-html, body {
-    width: 100%;
-    height: 100%;
-    background: #080c10;
-    color: #a8b8c8;
-    font-family: 'Rajdhani', sans-serif;
-    overflow: hidden; /* Empêche le scroll global */
-}
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 212, 255, 0.01) 2px, rgba(0, 212, 255, 0.01) 4px);
-    pointer-events: none;
-    z-index: 9999;
-}
-body {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* Assure que le body prend toute la hauteur de la vue */
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;background:#080c10;color:#a8b8c8;font-family:'Rajdhani',sans-serif;overflow:hidden;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,0.01) 2px,rgba(0,212,255,0.01) 4px);pointer-events:none;z-index:9999;}
+body{display:flex;flex-direction:column;height:100vh;margin:0;}
+.content{flex:1 1 auto;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+.bottom-nav{display:flex;background:#0d1117;border-top:1px solid #1a2535;height:52px;flex-shrink:0;position:sticky;bottom:0;z-index:100;overflow-x:auto;}
+.bottom-nav button{flex:1 1 auto;border:none;background:none;color:#a8b8c8;font-size:10px;padding:6px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;}
+.bottom-nav button.active{color:#00d4ff;border-top:2px solid #00d4ff;}
+.bottom-nav button .bnav-icon{font-size:18px;}
 
-/* Header */
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    height: 44px;
-    background: #0d1117;
-    border-bottom: 1px solid #1a2535;
-    flex-shrink: 0; /* Empêche le header de rétrécir */
-    z-index: 100;
-}
-.dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #00ff88;
-    box-shadow: 0 0 6px #00ff88;
-    animation: blink 1.5s infinite;
-    flex-shrink: 0;
-}
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-}
-.logo {
-    font-family: 'Share Tech Mono', monospace;
-    color: #00d4ff;
-    font-size: 13px;
-    margin-left: 6px;
-}
-.title {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: #e0eaf4;
-    text-transform: uppercase;
-}
-.hright {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-#defcon {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    padding: 3px 8px;
-    border: 1px solid #ffcc00;
-    color: #ffcc00;
-    background: rgba(255, 204, 0, 0.08);
-    letter-spacing: 1px;
-    transition: all 0.5s;
-}
-.defcon1 { border-color: #ff0000 !important; color: #ff0000 !important; background: rgba(255, 0, 0, 0.2) !important; animation: dp1 0.5s infinite !important; }
-@keyframes dp1 { 0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 0, 0.8); } 50% { box-shadow: 0 0 30px rgba(255, 0, 0, 1); } }
-.defcon2 { border-color: #ff2d2d !important; color: #ff2d2d !important; background: rgba(255, 45, 45, 0.15) !important; }
-.defcon3 { border-color: #ff8c00 !important; color: #ff8c00 !important; background: rgba(255, 140, 0, 0.1) !important; }
-.defcon4 { border-color: #ffcc00 !important; color: #ffcc00 !important; background: rgba(255, 204, 0, 0.08) !important; }
-.defcon5 { border-color: #00ff88 !important; color: #00ff88 !important; background: rgba(0, 255, 136, 0.08) !important; }
-#clock {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    color: #00d4ff;
-}
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:#0d1117;border-bottom:1px solid #1a2535;flex-shrink:0;z-index:100;}
+.dot{width:7px;height:7px;border-radius:50%;background:#00ff88;box-shadow:0 0 6px #00ff88;animation:blink 1.5s infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+.logo{font-family:'Share Tech Mono',monospace;color:#00d4ff;font-size:13px;margin-left:6px;}
+.title{font-size:11px;font-weight:700;letter-spacing:2px;color:#e0eaf4;text-transform:uppercase;}
+.hright{display:flex;align-items:center;gap:8px;}
+#defcon{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;border:1px solid #ffcc00;color:#ffcc00;background:rgba(255,204,0,0.08);letter-spacing:1px;transition:all 0.5s;}
+.defcon1{border-color:#ff0000!important;color:#ff0000!important;background:rgba(255,0,0,0.2)!important;animation:dp1 0.5s infinite!important;}
+@keyframes dp1{0%,100%{box-shadow:0 0 15px rgba(255,0,0,0.8);}50%{box-shadow:0 0 30px rgba(255,0,0,1);}}
+.defcon2{border-color:#ff2d2d!important;color:#ff2d2d!important;background:rgba(255,45,45,0.15)!important;}
+.defcon3{border-color:#ff8c00!important;color:#ff8c00!important;background:rgba(255,140,0,0.1)!important;}
+.defcon4{border-color:#ffcc00!important;color:#ffcc00!important;background:rgba(255,204,0,0.08)!important;}
+.defcon5{border-color:#00ff88!important;color:#00ff88!important;background:rgba(0,255,136,0.08)!important;}
+#clock{font-family:'Share Tech Mono',monospace;font-size:9px;color:#00d4ff;}
 
-/* Barres d'état */
-.offline-bar {
-    display: none;
-    padding: 3px;
-    background: rgba(255, 140, 0, 0.1);
-    border-bottom: 1px solid #ff8c00;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    color: #ff8c00;
-    text-align: center;
-    flex-shrink: 0;
-}
-.offline-bar.show { display: block; }
-.defcon-alert {
-    position: fixed;
-    top: 44px; /* Juste en dessous du header */
-    left: 0;
-    right: 0;
-    z-index: 9998;
-    padding: 8px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    text-align: center;
-    display: none;
-    letter-spacing: 1px;
-}
-.defcon-alert.show { display: block; animation: fadeout 4s forwards; }
-@keyframes fadeout { 0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
-.notif-bar {
-    display: none;
-    padding: 5px 10px;
-    background: rgba(255, 45, 45, 0.1);
-    border-bottom: 1px solid #ff2d2d;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    color: #ff2d2d;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-.notif-bar.show { display: flex; }
-.notif-close { margin-left: auto; cursor: pointer; font-size: 12px; }
+/* OFFLINE & ALERTS */
+.offline-bar{display:none;padding:3px;background:rgba(255,140,0,0.1);border-bottom:1px solid #ff8c00;font-family:'Share Tech Mono',monospace;font-size:8px;color:#ff8c00;text-align:center;flex-shrink:0;}
+.offline-bar.show{display:block;}
+.defcon-alert{position:fixed;top:44px;left:0;right:0;z-index:9998;padding:8px;font-family:'Share Tech Mono',monospace;font-size:10px;text-align:center;display:none;letter-spacing:1px;}
+.defcon-alert.show{display:block;animation:fadeout 4s forwards;}
+@keyframes fadeout{0%{opacity:1;}80%{opacity:1;}100%{opacity:0;}}
 
-/* Contenu principal */
-.content {
-    flex: 1; /* Permet au contenu de prendre l'espace restant */
-    overflow: hidden; /* Empêche le scroll du contenu principal */
-    position: relative;
-    min-height: 0; /* Nécessaire pour le bon fonctionnement de flex */
-    display: flex;
-    flex-direction: column;
-    /* La marge bottom a été retirée car la barre de navigation est fixed */
-}
+/* TABS */
+.tab-page{display:none;flex-direction:column;overflow:hidden;flex:1;min-height:0;}
+.tab-page.active{display:flex;}
+#map{width:100%;flex:1;min-height:0;}
+.map-controls{display:flex;gap:4px;padding:5px 6px;background:#0d1117;border-bottom:1px solid #1a2535;flex-wrap:wrap;flex-shrink:0;}
+.mcbtn{padding:3px 7px;font-family:'Share Tech Mono',monospace;font-size:8px;border:1px solid #1a2535;background:#080c10;color:#a8b8c8;cursor:pointer;}
+.mcbtn.active{border-color:#00d4ff;color:#00d4ff;}
+.mcbtn.high{border-color:#ff2d2d;color:#ff2d2d;}
+.mcbtn.medium{border-color:#ff8c00;color:#ff8c00;}
+.mcbtn.low{border-color:#00ff88;color:#00ff88;}
+.mcbtn.heat{border-color:#ff8c00;color:#ff8c00;}
 
-/* Pages de contenu (Map, Conflicts, Feed, etc.) */
-.tab-page {
-    display: none; /* Caché par défaut */
-    flex-direction: column;
-    overflow: hidden;
-    flex: 1; /* Prend tout l'espace disponible dans .content */
-    min-height: 0;
-}
-.tab-page.active { display: flex; } /* Affiché quand actif */
-
-/* Carte */
-#map {
-    width: 100%;
-    flex: 1; /* La carte prend tout l'espace disponible dans sa page */
-    min-height: 0;
-    height: 100%; /* Assure que la carte prend toute la hauteur */
-    background: #080c10; /* Fond par défaut en attendant le rendu Leaflet */
-}
-.map-controls {
-    display: flex;
-    gap: 4px;
-    padding: 5px 6px;
-    background: #0d1117;
-    border-bottom: 1px solid #1a2535;
-    flex-wrap: wrap;
-    flex-shrink: 0;
-}
-.mcbtn {
-    padding: 3px 7px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    border: 1px solid #1a2535;
-    background: #080c10;
-    color: #a8b8c8;
-    cursor: pointer;
-}
-.mcbtn.active { border-color: #00d4ff; color: #00d4ff; }
-.mcbtn.high { border-color: #ff2d2d; color: #ff2d2d; }
-.mcbtn.medium { border-color: #ff8c00; color: #ff8c00; }
-.mcbtn.low { border-color: #00ff88; color: #00ff88; }
-.mcbtn.heat { border-color: #ff8c00; color: #ff8c00; }
-
-.region-row {
-    display: flex;
-    gap: 3px;
-    padding: 4px 6px;
-    background: #0d1117;
-    border-bottom: 1px solid #1a2535;
-    overflow-x: auto; /* Permet le scroll horizontal si trop de boutons */
-    flex-shrink: 0;
-}
-.region-row::-webkit-scrollbar { display: none; } /* Cache la scrollbar pour Webkit */
-.rbtn {
-    padding: 2px 8px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    border: 1px solid #1a2535;
-    background: transparent;
-    color: #a8b8c8;
-    white-space: nowrap; /* Empêche le texte de passer à la ligne */
-    cursor: pointer;
-}
-.rbtn:active { border-color: #00d4ff; color: #00d4ff; }
-
-/* Liste des conflits */
-.clist-page {
-    flex: 1;
-    overflow-y: auto; /* Scroll vertical si le contenu est trop long */
-    padding: 6px;
-}
-.clist-page::-webkit-scrollbar { width: 2px; }
-.clist-page::-webkit-scrollbar-thumb { background: #1a2535; }
-.ci {
-    padding: 8px 10px;
-    margin-bottom: 5px;
-    background: #080c10;
-    border-left: 3px solid transparent;
-    cursor: pointer;
-}
-.ci.high { border-left-color: #ff2d2d; }
-.ci.medium { border-left-color: #ff8c00; }
-.ci.low { border-left-color: #00ff88; }
-.cin { font-size: 12px; font-weight: 600; color: #e0eaf4; }
-.cim { display: flex; justify-content: space-between; margin-top: 2px; }
-.cir { font-size: 9px; color: #a8b8c8; font-family: 'Share Tech Mono', monospace; }
-.cil { font-size: 9px; font-family: 'Share Tech Mono', monospace; }
-.ci.high .cil { color: #ff2d2d; }
-.ci.medium .cil { color: #ff8c00; }
-.ci.low .cil { color: #00ff88; }
-
-.filter-row {
-    display: flex;
-    gap: 4px;
-    padding: 5px 6px;
-    background: #0d1117;
-    border-bottom: 1px solid #1a2535;
-    flex-shrink: 0;
-}
-.fbtn {
-    padding: 3px 8px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    border: 1px solid #1a2535;
-    background: #080c10;
-    color: #a8b8c8;
-    cursor: pointer;
-}
-.fbtn.active { border-color: #00d4ff; color: #00d4ff; }
-
-/* Grille d'indicateurs */
-.igrid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
-    padding: 6px;
-    background: #0d1117;
-    border-bottom: 1px solid #1a2535;
-    flex-shrink: 0;
-}
-.icard {
-    background: #080c10;
-    border: 1px solid #1a2535;
-    padding: 5px;
-    text-align: center;
-}
-.ival { font-family: 'Share Tech Mono', monospace; font-size: 16px; font-weight: 700; }
-.ilbl { font-size: 7px; letter-spacing: 1px; color: #a8b8c8; }
-
-/* Feed */
-.feed-page {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
-}
-.feed-toolbar {
-    display: flex;
-    gap: 4px;
-    padding: 5px 6px;
-    background: #0d1117;
-    border-bottom: 1px solid #1a2535;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-}
-.feed-search {
-    flex: 1;
-    min-width: 120px;
-    background: #080c10;
-    border: 1px solid #1a2535;
-    color: #e0eaf4;
-    padding: 4px 7px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    outline: none;
-}
-.feed-search:focus { border-color: #00d4ff; }
-.feed-search::placeholder { color: #3a4a5a; }
-.expbtn {
-    padding: 3px 7px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    border: 1px solid;
-    cursor: pointer;
-    background: transparent;
-}
-.expbtn.csv { border-color: #00d4ff; color: #00d4ff; }
-.expbtn.json { border-color: #00ff88; color: #00ff88; }
-.expbtn.pdf { border-color: #ff2d2d; color: #ff2d2d; }
-.expbtn.hot { border-color: #ff2d2d; color: #ff2d2d; }
-.expbtn.all { border-color: #a8b8c8; color: #a8b8c8; }
-.nfeed {
-    flex: 1;
-    overflow-y: auto;
-    padding: 5px;
-}
-.nfeed::-webkit-scrollbar { width: 2px; }
-.nfeed::-webkit-scrollbar-thumb { background: #1a2535; }
-.ni {
-    padding: 7px 9px;
-    margin-bottom: 5px;
-    background: #080c10;
-    border: 1px solid #1a2535;
-    border-top: 2px solid #00d4ff;
-    cursor: pointer;
-}
-.nt { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: #00d4ff; margin-bottom: 2px; }
-.nx { font-size: 10px; color: #a8b8c8; line-height: 1.4; }
-.ntag {
-    display: inline-block;
-    margin-top: 3px;
-    padding: 1px 5px;
-    font-size: 8px;
-    font-family: 'Share Tech Mono', monospace;
-    border: 1px solid;
-}
-.th { color: #ff2d2d; border-color: #ff2d2d; background: rgba(255, 45, 45, 0.08); }
-.tm { color: #ff8c00; border-color: #ff8c00; background: rgba(255, 140, 0, 0.08); }
-
-/* Briefing */
-.brief-page {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-}
-.brief-page::-webkit-scrollbar { width: 2px; }
-.brief-card {
-    background: #080c10;
-    border: 1px solid #1a2535;
-    padding: 10px;
-    margin-bottom: 8px;
-}
-.brief-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: #ff8c00;
-    margin-bottom: 6px;
-}
-.brief-content {
-    font-size: 10px;
-    color: #a8b8c8;
-    line-height: 1.7;
-    white-space: pre-line; /* Permet de conserver les sauts de ligne */
-}
-.brief-actions {
-    display: flex;
-    gap: 5px;
-    margin-top: 8px;
-    flex-wrap: wrap;
-}
-.baction {
-    padding: 3px 8px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    border: 1px solid;
-    cursor: pointer;
-    background: transparent;
-}
-.baction.pdf { border-color: #ff2d2d; color: #ff2d2d; }
-.baction.csv { border-color: #00d4ff; color: #00d4ff; }
-
-/* Logs */
-.log-screen {
-    max-height: 120px;
-    overflow-y: auto;
-    margin-top: 5px;
-}
-.log-entry {
-    padding: 3px 6px;
-    margin-bottom: 2px;
-    background: #080c10;
-    border-left: 3px solid #1a2535;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-}
-.log-entry.ok { border-left-color: #00ff88; color: #00ff88; }
-.log-entry.err { border-left-color: #ff2d2d; color: #ff2d2d; }
-.log-entry.warn { border-left-color: #ff8c00; color: #ff8c00; }
-
-/* OSINT */
-.osint-page {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-}
-.osint-page::-webkit-scrollbar { width: 2px; }
-.oslbl {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: #00d4ff;
-    margin-bottom: 5px;
-}
-.osrow {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 8px;
-}
-.osinp {
-    flex: 1;
-    background: #080c10;
-    border: 1px solid #1a2535;
-    color: #e0eaf4;
-    padding: 6px 8px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    outline: none;
-}
-.osinp:focus { border-color: #00d4ff; }
-.osbtn {
-    background: rgba(0, 212, 255, 0.1);
-    border: 1px solid #00d4ff;
-    color: #00d4ff;
-    padding: 6px 10px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    cursor: pointer;
-}
-.oslinks {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    margin-bottom: 10px;
-}
-.oslink {
-    display: block;
-    background: #080c10;
-    border: 1px solid #1a2535;
-    color: #a8b8c8;
-    padding: 6px;
-    font-size: 9px;
-    font-family: 'Share Tech Mono', monospace;
-    text-decoration: none;
-    text-align: center;
-}
-
-/* Trackers (AIR, NAVAL) */
-.tracker-page {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    padding: 20px;
-    overflow-y: auto;
-}
-.tracker-icon { font-size: 50px; }
-.tracker-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 14px;
-    letter-spacing: 3px;
-    color: #ff8c00;
-    text-align: center;
-}
-.tracker-title.naval { color: #00ff88; }
-.tracker-desc {
-    font-size: 11px;
-    color: #a8b8c8;
-    text-align: center;
-    line-height: 1.6;
-}
-.tracker-links {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-}
-.tracker-btn {
-    padding: 10px;
-    background: rgba(255, 140, 0, 0.1);
-    border: 1px solid #ff8c00;
-    color: #ff8c00;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-decoration: none;
-    display: block;
-    text-align: center;
-}
-.tracker-btn.naval { border-color: #00ff88; color: #00ff88; background: rgba(0, 255, 136, 0.1); }
-
-/* Finance */
-.finance-page {
-    flex: 1;
-    overflow-y: auto;
-    padding: 6px;
-}
-.finance-page::-webkit-scrollbar { width: 2px; }
-.fsection {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    letter-spacing: 3px;
-    color: #00d4ff;
-    padding: 5px 0;
-    margin: 6px 0 4px;
-    border-bottom: 1px solid #1a2535;
-}
-.fgrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    margin-bottom: 8px;
-}
-.fcard {
-    background: #080c10;
-    border: 1px solid #1a2535;
-    padding: 8px 10px;
-}
-.fname {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 8px;
-    color: #a8b8c8;
-    letter-spacing: 1px;
-    margin-bottom: 3px;
-}
-.fprice {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 15px;
-    font-weight: 700;
-    color: #e0eaf4;
-}
-.fchange {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    margin-top: 1px;
-}
-.fchange.up { color: #00ff88; }
-.fchange.down { color: #ff2d2d; }
-.fchange.flat { color: #ff8c00; }
-.fupdate {
-    font-size: 7px;
-    color: #3a4a5a;
-    font-family: 'Share Tech Mono', monospace;
-    margin-top: 2px;
-}
-.fname2 { font-size: 9px; color: #a8b8c8; margin-top: 1px; }
-
-/* Pop-up de détails (dov) */
-.dov {
-    position: fixed;
-    bottom: 60px; /* Laisse de la place pour la barre de navigation */
-    left: 8px;
-    right: 8px;
-    background: #0d1117;
-    border: 1px solid #00d4ff;
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-    z-index: 1000;
-    display: none;
-    max-height: 70vh;
-    overflow-y: auto;
-    border-radius: 2px;
-}
-.dh {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 10px;
-    border-bottom: 1px solid #1a2535;
-    position: sticky;
-    top: 0;
-    background: #0d1117;
-}
-.dt { font-size: 11px; font-weight: 700; color: #e0eaf4; letter-spacing: 1px; }
-.dc { background: none; border: none; color: #a8b8c8; cursor: pointer; font-size: 16px; padding: 2px 6px; }
-.db { padding: 8px 10px; }
-.dr {
-    display: flex;
-    justify-content: space-between;
-    padding: 3px 0;
-    border-bottom: 1px solid rgba(26, 37, 53, 0.5);
-    font-size: 10px;
-    font-family: 'Share Tech Mono', monospace;
-}
-.dk { color: #a8b8c8; }
-.dv { color: #e0eaf4; font-weight: 600; }
-.vh { color: #ff2d2d; }
-.vm { color: #ff8c00; }
-.vl { color: #00ff88; }
-.dlt { font-size: 8px; letter-spacing: 2px; color: #00d4ff; margin: 7px 0 4px; }
-.dlg { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
-.dl {
-    display: block;
-    padding: 4px 6px;
-    background: #080c10;
-    border: 1px solid #1a2535;
-    color: #a8b8c8;
-    text-decoration: none;
-    font-size: 8px;
-    font-family: 'Share Tech Mono', monospace;
-    text-align: center;
-}
-
-/* Barre de navigation en bas */
-.bottom-nav {
-    display: flex;
-    background: #0d1117;
-    border-top: 1px solid #1a2535;
-    height: 52px; /* Hauteur fixe pour la barre */
-    z-index: 9000; /* Assure qu'elle est au-dessus des autres éléments */
-    position: fixed; /* Fixée en bas */
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%; /* Assure qu'elle prend toute la largeur */
-}
-.bnav {
-    flex: 1; /* Chaque bouton prend une part égale de l'espace */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1px;
-    cursor: pointer;
-    border: none; /* Supprime la bordure par défaut */
-    background: transparent;
-    color: #a8b8c8;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 7px;
-    letter-spacing: 0.5px;
-    padding: 4px 2px;
-    border-top: 2px solid transparent; /* Bordure supérieure pour l'état actif */
-    transition: all 0.2s;
-}
-.bnav.active {
-    color: #00d4ff;
-    border-top-color: #00d4ff;
-    background: rgba(0, 212, 255, 0.05);
-}
-.bnav.active.air { color: #ff8c00; border-top-color: #ff8c00; }
-.bnav.active.naval { color: #00ff88; border-top-color: #00ff88; }
-.bnav-icon { font-size: 18px; line-height: 1; }
-
-/* Styles Leaflet (carte) */
-.leaflet-container { background: #080c10 !important; }
-.leaflet-popup-content-wrapper {
-    background: #0d1117 !important;
-    border: 1px solid #00d4ff !important;
-    border-radius: 0 !important;
-    color: #e0eaf4 !important;
-    font-family: 'Rajdhani', sans-serif !important;
-}
-.leaflet-popup-tip { background: #0d1117 !important; }
-
-/* Styles Marker Cluster */
-.marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
-    background: rgba(255, 45, 45, 0.2) !important;
-}
-.marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
-    background: rgba(255, 45, 45, 0.5) !important;
-    color: #fff !important;
-    font-family: 'Share Tech Mono', monospace !important;
-    font-size: 10px !important;
-}
+/* LEAFLET */
+.leaflet-container{background:#080c10!important;}
+.leaflet-popup-content-wrapper{background:#0d1117!important;border:1px solid #00d4ff!important;border-radius:0!important;color:#e0eaf4!important;font-family:'Rajdhani',sans-serif!important;}
+.leaflet-popup-tip{background:#0d1117!important;}
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(255,45,45,0.2)!important;}
+.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{background:rgba(255,45,45,0.5)!important;color:#fff!important;font-family:'Share Tech Mono',monospace!important;font-size:10px!important;}
 </style>
 </head>
 <body>
+
 <div class="offline-bar" id="offline-bar">⚠ MODE HORS LIGNE</div>
 <div class="defcon-alert" id="defcon-alert"></div>
+
 <header>
   <div style="display:flex;align-items:center;">
     <div class="dot"></div>
@@ -717,454 +83,83 @@ header {
     <div id="clock"></div>
   </div>
 </header>
-<div class="notif-bar" id="notif-bar">
-  <span id="notif-text">🚨 ALERTE</span>
-  <span class="notif-close" onclick="document.getElementById('notif-bar').classList.remove('show')">✕</span>
-</div>
 
 <div class="content">
-
-<!-- CARTE -->
-<div class="tab-page active" id="page-map">
-  <div class="map-controls">
-    <button class="mcbtn active" onclick="filterMap('all',this)">ALL</button>
-    <button class="mcbtn high" onclick="filterMap('high',this)">🔴 HIGH</button>
-    <button class="mcbtn medium" onclick="filterMap('medium',this)">🟠 MED</button>
-    <button class="mcbtn low" onclick="filterMap('low',this)">🟢 LOW</button>
-    <button class="mcbtn heat" onclick="toggleHeatmap()">🌡️ HEAT</button>
-  </div>
-  <div class="region-row">
-    <button class="rbtn" onclick="zoomRegion('world')">🌍 MONDE</button>
-    <button class="rbtn" onclick="zoomRegion('europe')">🇪🇺 EU</button>
-    <button class="rbtn" onclick="zoomRegion('middleeast')">🕌 ME</button>
-    <button class="rbtn" onclick="zoomRegion('africa')">🌍 AF</button>
-    <button class="rbtn" onclick="zoomRegion('asia')">🌏 AS</button>
-    <button class="rbtn" onclick="zoomRegion('americas')">🌎 AM</button>
-  </div>
-  <!-- C'est ici que la carte Leaflet sera rendue par le JavaScript -->
-  <div id="map"></div>
+  <div class="tab-page active" id="map"><div id="map"></div></div>
+  <div class="tab-page" id="conflicts"><div style="flex:1;background:#0a0f18;color:#fff;display:flex;align-items:center;justify-content:center;">Liste des conflits</div></div>
+  <div class="tab-page" id="feed"><div style="flex:1;background:#0a0f18;color:#fff;display:flex;align-items:center;justify-content:center;">Feed en temps réel</div></div>
+  <div class="tab-page" id="brief"><div style="flex:1;background:#0a0f18;color:#fff;display:flex;align-items:center;justify-content:center;">Briefing militaire</div></div>
+  <div class="tab-page" id="air"><div style="flex:1;background:#0a0f18;color:#fff;display:flex;align-items:center;justify-content:center;">Données aériennes</div></div>
+  <div class="tab-page" id="naval"><div style="flex:1;background:#0a0f18;color:#fff;display:flex;align-items:center;justify-content:center;">Données navales</div></div>
+  <div class="tab-page" id="osint"><div style="flex:1;background:#0a0f18;color:#fff;display:flex;align-items:center;justify-content:center;">OSINT</div></div>
+  <div class="tab-page" id="finance"><div style="flex:1;background:#0a0f18;color:#fff;display:flex;align-items:center;justify-content:center;">Marchés financiers</div></div>
 </div>
 
-<!-- CONFLITS -->
-<div class="tab-page" id="page-conflicts">
-  <div class="igrid" id="igrid"></div>
-  <div class="filter-row">
-    <button class="fbtn active" onclick="filterList('all',this)">TOUS</button>
-    <button class="fbtn" style="border-color:#ff2d2d;color:#ff2d2d;" onclick="filterList('high',this)">🔴 HIGH</button>
-    <button class="fbtn" style="border-color:#ff8c00;color:#ff8c00;" onclick="filterList('medium',this)">🟠 MED</button>
-    <button class="fbtn" style="border-color:#00ff88;color:#00ff88;" onclick="filterList('low',this)">🟢 LOW</button>
-  </div>
-  <div class="clist-page" id="clist"></div>
-</div>
+<nav class="bottom-nav">
+  <button class="bnav active" id="bnav-map" onclick="showPage('map')"><span class="bnav-icon">🗺</span>CARTE</button>
+  <button class="bnav" id="bnav-conflicts" onclick="showPage('conflicts')"><span class="bnav-icon">⚔</span>CONFLITS</button>
+  <button class="bnav" id="bnav-feed" onclick="showPage('feed')"><span class="bnav-icon">📡</span>FEED</button>
+  <button class="bnav" id="bnav-brief" onclick="showPage('brief')"><span class="bnav-icon">📋</span>BRIEF</button>
+  <button class="bnav" id="bnav-finance" onclick="showPage('finance')"><span class="bnav-icon">📈</span>MARCHÉS</button>
+  <button class="bnav" id="bnav-osint" onclick="showPage('osint')"><span class="bnav-icon">🔍</span>OSINT</button>
+  <button class="bnav" id="bnav-air" onclick="showPage('air')"><span class="bnav-icon">✈</span>AIR</button>
+  <button class="bnav" id="bnav-naval" onclick="showPage('naval')"><span class="bnav-icon">⚓</span>NAVAL</button>
+</nav>
 
-<!-- FEED -->
-<div class="tab-page" id="page-feed">
-  <div class="feed-page">
-    <div class="feed-toolbar">
-      <input type="text" class="feed-search" id="feed-search" placeholder="🔍 Rechercher...">
-      <button class="expbtn hot" onclick="filterNews('hot')">🚨</button>
-      <button class="expbtn all" onclick="filterNews('all')">ALL</button>
-      <button class="expbtn csv" onclick="exportCSV()">CSV</button>
-      <button class="expbtn json" onclick="exportJSON()">JSON</button>
-      <button class="expbtn pdf" onclick="exportPDF()">PDF</button>
-    </div>
-    <div class="nfeed" id="nfeed">
-      <div style="padding:20px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#00d4ff;text-align:center;">CONNECTING...</div>
-    </div>
-  </div>
-</div>
-
-<!-- BRIEFING -->
-<div class="tab-page" id="page-brief">
-  <div class="brief-page">
-    <div class="brief-card">
-      <div class="brief-title">📋 BRIEFING QUOTIDIEN</div>
-      <div class="brief-content" id="brief-daily">Génération...</div>
-      <div class="brief-actions">
-        <button class="baction pdf" onclick="exportBriefPDF('daily')">⬇ PDF</button>
-        <button class="baction csv" onclick="exportBriefCSV()">⬇ CSV</button>
-      </div>
-    </div>
-    <div class="brief-card">
-      <div class="brief-title">📊 CONFLITS ACTIFS</div>
-      <div class="brief-content" id="brief-conflicts">Chargement...</div>
-      <div class="brief-actions">
-        <button class="baction pdf" onclick="exportBriefPDF('conflicts')">⬇ PDF</button>
-      </div>
-    </div>
-    <div class="brief-card">
-      <div class="brief-title">🔴 HIGH RISK</div>
-      <div class="brief-content" id="brief-high">Chargement...</div>
-    </div>
-    <div class="brief-card">
-      <div class="brief-title">⚙ LOGS SYSTÈME</div>
-      <div class="log-screen" id="log-screen"></div>
-    </div>
-  </div>
-</div>
-
-<!-- OSINT -->
-<div class="tab-page" id="page-osint">
-  <div class="osint-page">
-    <div class="oslbl">OSINT SEARCH</div>
-    <div class="osrow">
-      <input type="text" class="osinp" id="oi" placeholder="Cible, IP, nom...">
-      <button class="osbtn" id="ob">GO</button>
-    </div>
-    <div class="oslinks">
-      <a class="oslink" href="https://osintframework.com" target="_blank">OSINT FW</a>
-      <a class="oslink" href="https://shodan.io" target="_blank">SHODAN</a>
-      <a class="oslink" href="https://www.virustotal.com" target="_blank">VIRUSTOTAL</a>
-      <a class="oslink" href="https://censys.io" target="_blank">CENSYS</a>
-      <a class="oslink" href="https://urlscan.io" target="_blank">URLSCAN</a>
-      <a class="oslink" href="https://intelx.io" target="_blank">INTEL X</a>
-      <a class="oslink" href="https://www.whois.com" target="_blank">WHOIS</a>
-      <a class="oslink" href="https://hunter.io" target="_blank">HUNTER</a>
-      <a class="oslink" href="https://web.archive.org" target="_blank">WAYBACK</a>
-      <a class="oslink" href="https://www.maltego.com" target="_blank">MALTEGO</a>
-      <a class="oslink" href="https://www.bellingcat.com" target="_blank">BELLINGCAT</a>
-      <a class="oslink" href="https://reliefweb.int" target="_blank">RELIEFWEB</a>
-    </div>
-  </div>
-</div>
-
-<!-- AIR -->
-<div class="tab-page" id="page-air">
-  <div class="tracker-page">
-    <div class="tracker-icon">✈</div>
-    <div class="tracker-title">AIR TRACKER</div>
-    <div class="tracker-desc">Vols militaires mondiaux en temps réel via ADS-B Exchange.</div>
-    <div class="tracker-links">
-      <a class="tracker-btn" href="https://globe.adsbexchange.com/?mil=1" target="_blank">ACCÉDER AU TRACKER</a>
-    </div>
-  </div>
-</div>
-
-<!-- NAVAL -->
-<div class="tab-page" id="page-naval">
-  <div class="tracker-page">
-    <div class="tracker-icon naval">🚢</div>
-    <div class="tracker-title naval">NAVAL TRACKER</div>
-    <div class="tracker-desc">Position des navires mondiaux en temps réel via Vesselfinder.</div>
-    <div class="tracker-links">
-      <a class="tracker-btn naval" href="https://www.vesselfinder.com/fr/ships_webcam" target="_blank">ACCÉDER AU TRACKER</a>
-    </div>
-  </div>
-</div>
-
-<!-- FINANCE -->
-<div class="tab-page" id="page-finance">
-  <div class="finance-page">
-    <div class="fsection">INDICES</div>
-    <div class="fgrid">
-      <div class="fcard">
-        <div class="fname">DOW JONES</div>
-        <div class="fprice">38,500.00</div>
-        <div class="fchange up">+0.50%</div>
-        <div class="fupdate">Mis à jour il y a 1 min</div>
-      </div>
-      <div class="fcard">
-        <div class="fname">NASDAQ</div>
-        <div class="fprice">15,800.00</div>
-        <div class="fchange down">-0.25%</div>
-        <div class="fupdate">Mis à jour il y a 1 min</div>
-      </div>
-      <div class="fcard">
-        <div class="fname">S&P 500</div>
-        <div class="fprice">5,000.00</div>
-        <div class="fchange flat">0.00%</div>
-        <div class="fupdate">Mis à jour il y a 1 min</div>
-      </div>
-      <div class="fcard">
-        <div class="fname">FTSE 100</div>
-        <div class="fprice">7,800.00</div>
-        <div class="fchange up">+0.10%</div>
-        <div class="fupdate">Mis à jour il y a 1 min</div>
-      </div>
-    </div>
-    <div class="fsection">CRYPTO</div>
-    <div class="fgrid">
-      <div class="fcard">
-        <div class="fname">BITCOIN</div>
-        <div class="fprice">65,000.00</div>
-        <div class="fchange up">+2.00%</div>
-        <div class="fupdate">Mis à jour il y a 1 min</div>
-      </div>
-      <div class="fcard">
-        <div class="fname">ETHEREUM</div>
-        <div class="fprice">3,200.00</div>
-        <div class="fchange down">-1.50%</div>
-        <div class="fupdate">Mis à jour il y a 1 min</div>
-      </div>
-    </div>
-    <div class="fsection">MATIÈRES PREMIÈRES</div>
-    <div class="fgrid">
-      <div class="fcard">
-        <div class="fname">OR</div>
-        <div class="fprice">2,300.00</div>
-        <div class="fchange up">+0.80%</div>
-        <div class="fupdate">Mis à jour il y a 1 min</div>
-      </div>
-      <div class="fcard">
-        <div class="fname">PÉTROLE (WTI)</div>
-        <div class="fprice">80.00</div>
-        <div class="fchange down">-0.40%</div>
-        <div class="fupdate">Mis à jour il y a 1 min</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div>
-
-<!-- Barre de navigation en bas -->
-<div class="bottom-nav">
-  <button class="bnav active" onclick="showPage('page-map')">
-    <div class="bnav-icon">🗺️</div>
-    MAP
-  </button>
-  <button class="bnav" onclick="showPage('page-conflicts')">
-    <div class="bnav-icon">💥</div>
-    CONFLICTS
-  </button>
-  <button class="bnav" onclick="showPage('page-feed')">
-    <div class="bnav-icon">📰</div>
-    FEED
-  </button>
-  <button class="bnav" onclick="showPage('page-brief')">
-    <div class="bnav-icon">📋</div>
-    BRIEF
-  </button>
-  <button class="bnav" onclick="showPage('page-osint')">
-    <div class="bnav-icon">🔎</div>
-    OSINT
-  </button>
-  <button class="bnav" onclick="showPage('page-air')">
-    <div class="bnav-icon">✈️</div>
-    AIR
-  </button>
-  <button class="bnav" onclick="showPage('page-naval')">
-    <div class="bnav-icon">🚢</div>
-    NAVAL
-  </button>
-  <button class="bnav" onclick="showPage('page-finance')">
-    <div class="bnav-icon">💰</div>
-    FINANCE
-  </button>
-</div>
-
-<!-- *** SECTION JAVASCRIPT (ESSENTIELLE POUR LA FONCTIONNALITÉ) *** -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 <script>
-// Variable globale pour la carte Leaflet
-let map;
-let isHeatmapActive = false; // Pour suivre l'état de la heatmap
-
-// --- Fonctions pour gérer l'affichage des pages ---
-function showPage(pageId) {
-    // Désactiver tous les boutons de navigation
-    document.querySelectorAll('.bnav').forEach(btn => btn.classList.remove('active'));
-    // Activer le bouton cliqué
-    const clickedButton = document.querySelector(`.bnav[onclick="showPage('${pageId}')"]`);
-    if (clickedButton) {
-        clickedButton.classList.add('active');
-        // Gérer les classes spécifiques pour les icônes (air, naval)
-        if (pageId === 'page-air') {
-            clickedButton.classList.add('air');
-            clickedButton.classList.remove('naval'); // S'assurer qu'on enlève l'autre si besoin
-        } else if (pageId === 'page-naval') {
-            clickedButton.classList.add('naval');
-            clickedButton.classList.remove('air'); // S'assurer qu'on enlève l'autre si besoin
-        } else {
-            clickedButton.classList.remove('air', 'naval');
-        }
-    }
-
-    // Cacher toutes les pages
-    document.querySelectorAll('.tab-page').forEach(page => page.classList.remove('active'));
-    // Afficher la page demandée
-    document.getElementById(pageId).classList.add('active');
-
-    // Si la page est la carte, s'assurer qu'elle est redimensionnée
-    if (pageId === 'page-map' && map) {
-        // Petit délai pour s'assurer que le DOM est prêt et que la carte peut être redimensionnée correctement
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 100);
-    }
+// Tabs
+function showPage(id){
+  document.querySelectorAll('.tab-page').forEach(el=>el.classList.remove('active'));
+  document.querySelector('#'+id).classList.add('active');
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('#bnav-'+id).classList.add('active');
 }
 
-// --- Initialisation de la carte Leaflet ---
-function initMap() {
-    const mapElement = document.getElementById('map');
-    if (!mapElement) {
-        console.error("L'élément #map n'a pas été trouvé.");
-        return;
-    }
+// Clock
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock,1000);
+updateClock();
 
-    // Initialiser la carte Leaflet
-    // Coordonnées initiales (centre du monde) et niveau de zoom
-    map = L.map('map').setView([20, 0], 2);
-
-    // Ajouter une couche de tuiles (OpenStreetMap par défaut)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
-    // --- Exemple d'ajout de marqueurs (à remplacer par vos données réelles) ---
-    // L.marker([51.5, -0.09]).addTo(map)
-    //     .bindPopup('<b>Londres</b><br>Conflit de niveau moyen.')
-    //     .openPopup();
-    // L.marker([34.0522, -118.2437]).addTo(map)
-    //     .bindPopup('<b>Los Angeles</b><br>Aucun conflit.')
-    //     .openPopup();
-    // L.marker([31.5, 74.35]).addTo(map) // Lahore
-    //     .bindPopup('<b>Lahore</b><br>Conflit de niveau élevé.')
-    //     .openPopup();
-
-    // --- Gestion des clusters de marqueurs (si vous avez beaucoup de points) ---
-    // let markers = L.markerClusterGroup();
-    // markers.addLayer(L.marker([51.5, -0.09]));
-    // markers.addLayer(L.marker([34.0522, -118.2437]));
-    // markers.addLayer(L.marker([31.5, 74.35]));
-    // map.addLayer(markers);
-
-    // Assurez-vous que la carte est visible après son initialisation
-    // La fonction invalidateSize est appelée dans showPage pour s'assurer que la carte prend la bonne taille
+// DEFCON alert
+function showDefcon(level){
+  const defcon=document.getElementById('defcon');
+  const alert=document.getElementById('defcon-alert');
+  defcon.className=''; defcon.classList.add('defcon'+level);
+  defcon.textContent='DEFCON '+level;
+  alert.textContent='⚠ Niveau DEFCON '+level+' activé !';
+  alert.classList.add('show');
+  setTimeout(()=>{alert.classList.remove('show');},4000);
 }
 
-// --- Fonctions pour les filtres de carte (exemples) ---
-function filterMap(level, button) {
-    document.querySelectorAll('.mcbtn').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-    console.log(`Filtrage de la carte sur : ${level}`);
-    // Ici, vous ajouteriez la logique pour filtrer les marqueurs sur la carte
-    // Par exemple, masquer/afficher des couches ou des marqueurs spécifiques.
-}
+// MAP
+const map=L.map('map').setView([20,0],2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
 
-function toggleHeatmap() {
-    isHeatmapActive = !isHeatmapActive; // Inverse l'état de la heatmap
-    const button = document.querySelector('.mcbtn.heat');
-    if (isHeatmapActive) {
-        button.classList.add('active'); // Ou une autre classe pour indiquer l'activation
-        console.log("Heatmap activée.");
-        // --- Logique pour ajouter la heatmap à la carte ---
-        // Ceci est un exemple et nécessite une librairie comme Leaflet.heat
-        // Si vous avez des données de points, vous pourriez les collecter et les passer à Leaflet.heat
-        // Exemple :
-        // if (typeof heatLayer !== 'undefined') map.removeLayer(heatLayer); // Supprimer l'ancienne si elle existe
-        // const points = [[lat1, lon1, intensity1], [lat2, lon2, intensity2], ...]; // Vos données
-        // heatLayer = L.heatLayer(points).addTo(map);
-    } else {
-        button.classList.remove('active');
-        console.log("Heatmap désactivée.");
-        // --- Logique pour retirer la heatmap de la carte ---
-        // if (typeof heatLayer !== 'undefined') map.removeLayer(heatLayer);
-    }
-}
+// Clusters
+const markers=L.markerClusterGroup();
+const sampleData=[
+  {lat:48.8566,lon:2.3522,name:"Paris"},
+  {lat:40.7128,lon:-74.006,name:"New York"},
+  {lat:35.6895,lon:139.6917,name:"Tokyo"},
+  {lat:-33.8688,lon:151.2093,name:"Sydney"}
+];
+sampleData.forEach(d=>markers.addLayer(L.marker([d.lat,d.lon]).bindPopup(d.name)));
+map.addLayer(markers);
 
-// --- Fonctions pour les filtres de liste (exemples) ---
-function filterList(level, button) {
-    document.querySelectorAll('.fbtn').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-    console.log(`Filtrage de la liste sur : ${level}`);
-    // Logique pour filtrer la liste des conflits affichée dans #clist
-}
+// Heatmap
+const heatData=sampleData.map(d=>[d.lat,d.lon,0.5]);
+const heat=L.heatLayer(heatData,{radius:25,blur:15,maxZoom:17});
+map.addLayer(heat);
 
-// --- Fonctions pour le feed (exemples) ---
-function filterNews(type) {
-    console.log(`Filtrage des news sur : ${type}`);
-    // Logique pour filtrer les news affichées dans #nfeed
-}
-function exportCSV() { console.log("Export CSV"); }
-function exportJSON() { console.log("Export JSON"); }
-function exportPDF() { console.log("Export PDF"); }
-
-// --- Fonctions pour le briefing (exemples) ---
-function exportBriefPDF(type) { console.log(`Export PDF Briefing: ${type}`); }
-function exportBriefCSV() { console.log("Export CSV Briefing"); }
-
-// --- Fonctions pour OSINT (exemples) ---
-document.getElementById('ob').addEventListener('click', function() {
-    const query = document.getElementById('oi').value;
-    console.log(`OSINT Search for: ${query}`);
-    // Logique de recherche OSINT ici
-});
-
-// --- Fonctions pour zoomer sur une région (exemples) ---
-function zoomRegion(region) {
-    console.log(`Zoom sur la région : ${region}`);
-    if (!map) return; // Ne rien faire si la carte n'est pas initialisée
-
-    let center, zoom;
-    switch(region) {
-        case 'world':
-            center = [20, 0];
-            zoom = 2;
-            break;
-        case 'europe':
-            center = [54.5, 15];
-            zoom = 4;
-            break;
-        case 'middleeast':
-            center = [25, 45];
-            zoom = 5;
-            break;
-        case 'africa':
-            center = [0, 20];
-            zoom = 3;
-            break;
-        case 'asia':
-            center = [40, 105];
-            zoom = 3;
-            break;
-        case 'americas':
-            center = [30, -95]; // Centre approximatif pour Amérique du Nord et du Sud
-            zoom = 2;
-            break;
-        default:
-            return; // Région inconnue
-    }
-    map.setView(center, zoom, { animate: true });
-}
-
-// --- Initialisation au chargement de la page ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Afficher la page par défaut (MAP)
-    showPage('page-map');
-
-    // Initialiser la carte SEULEMENT si l'élément existe et si Leaflet est chargé
-    if (document.getElementById('map') && typeof L !== 'undefined') {
-        initMap();
-    } else if (!document.getElementById('map')) {
-        console.error("L'élément #map n'a pas été trouvé pour initialiser Leaflet.");
-    } else {
-        console.error("La librairie Leaflet (L) n'est pas chargée.");
-        // Afficher un message d'erreur à l'utilisateur si Leaflet n'est pas disponible
-        const mapContainer = document.getElementById('page-map');
-        if (mapContainer) {
-            mapContainer.innerHTML = '<div style="padding:20px;font-family:\'Share Tech Mono\',monospace;font-size:10px;color:#ff2d2d;text-align:center;">Erreur: La librairie de carte n\'a pas pu être chargée.</div>';
-        }
-    }
-
-    // Mettre à jour l'heure
-    updateClock();
-    setInterval(updateClock, 1000);
-});
-
-// --- Fonction pour mettre à jour l'horloge ---
-function updateClock() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const clockElement = document.getElementById('clock');
-    if (clockElement) {
-        clockElement.textContent = `${hours}:${minutes}:${seconds}`;
-    }
-}
-
+// Simuler offline
+window.addEventListener('offline',()=>{document.getElementById('offline-bar').classList.add('show');});
+window.addEventListener('online',()=>{document.getElementById('offline-bar').classList.remove('show');});
 </script>
-<!-- *** FIN DE LA SECTION JAVASCRIPT *** -->
 </body>
 </html>
