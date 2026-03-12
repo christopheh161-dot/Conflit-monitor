@@ -41,9 +41,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .notif-bar.show{display:flex;}
 .notif-close{margin-left:auto;cursor:pointer;font-size:12px;}
 .content{flex:1;overflow:hidden;position:relative;min-height:0;display:flex;flex-direction:column;}
-.tab-page{display:none;flex-direction:column;overflow:hidden;flex:1;min-height:0;}
+.tab-page{display:none;flex-direction:column;overflow:hidden;flex:1;min-height:0;max-height:calc(100vh - 96px);}
 .tab-page.active{display:flex;}
-#map{width:100%;height:calc(100vh - 200px);min-height:0;}
+#map{width:100%;height:calc(100vh - 160px);min-height:0;max-height:calc(100vh - 160px);}
 .map-controls{display:flex;gap:4px;padding:5px 6px;background:#0d1117;border-bottom:1px solid #1a2535;flex-wrap:wrap;flex-shrink:0;}
 .mcbtn{padding:3px 7px;font-family:'Share Tech Mono',monospace;font-size:8px;border:1px solid #1a2535;background:#080c10;color:#a8b8c8;cursor:pointer;}
 .mcbtn.active{border-color:#00d4ff;color:#00d4ff;}
