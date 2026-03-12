@@ -26,8 +26,14 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .logo{font-family:'Share Tech Mono',monospace;color:#00d4ff;font-size:14px;}
 .title{font-size:12px;font-weight:700;letter-spacing:3px;color:#e0eaf4;text-transform:uppercase;}
 .hc{display:flex;align-items:center;gap:10px;}
-#defcon{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;border:1px solid #ff2d2d;color:#ff2d2d;background:rgba(255,45,45,0.08);letter-spacing:2px;animation:dp 2s infinite;}
+#defcon{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;border:1px solid #ff2d2d;color:#ff2d2d;background:rgba(255,45,45,0.08);letter-spacing:2px;animation:dp 2s infinite;transition:all 0.5s;}
 @keyframes dp{0%,100%{box-shadow:0 0 10px rgba(255,45,45,0.2);}50%{box-shadow:0 0 20px rgba(255,45,45,0.5);}}
+.defcon1{border-color:#ff0000!important;color:#ff0000!important;background:rgba(255,0,0,0.2)!important;animation:dp1 0.5s infinite!important;}
+@keyframes dp1{0%,100%{box-shadow:0 0 20px rgba(255,0,0,0.8);}50%{box-shadow:0 0 40px rgba(255,0,0,1);}}
+.defcon2{border-color:#ff2d2d!important;color:#ff2d2d!important;background:rgba(255,45,45,0.15)!important;}
+.defcon3{border-color:#ff8c00!important;color:#ff8c00!important;background:rgba(255,140,0,0.1)!important;}
+.defcon4{border-color:#ffcc00!important;color:#ffcc00!important;background:rgba(255,204,0,0.08)!important;}
+.defcon5{border-color:#00ff88!important;color:#00ff88!important;background:rgba(0,255,136,0.08)!important;}
 .tbar{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:9px;}
 .ttrack{width:60px;height:4px;background:#1a2535;border-radius:3px;overflow:hidden;}
 .tfill{height:100%;background:linear-gradient(90deg,#00ff88,#ff8c00,#ff2d2d);transition:width 1s;}
@@ -120,7 +126,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .baction{padding:6px 12px;font-family:'Share Tech Mono',monospace;font-size:9px;border:1px solid;cursor:pointer;background:transparent;letter-spacing:1px;}
 .baction.pdf{border-color:#ff2d2d;color:#ff2d2d;}
 .baction.csv{border-color:#00d4ff;color:#00d4ff;}
-.baction.json{border-color:#00ff88;color:#00ff88;}
 .export-bar{display:flex;gap:5px;padding:8px;background:#0d1117;border-bottom:1px solid #1a2535;flex-shrink:0;flex-wrap:wrap;}
 .expbtn{padding:5px 10px;font-family:'Share Tech Mono',monospace;font-size:9px;border:1px solid;cursor:pointer;background:transparent;letter-spacing:1px;flex-shrink:0;}
 .expbtn.pdf{border-color:#ff2d2d;color:#ff2d2d;}
@@ -155,10 +160,14 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 .log-entry.ok{border-left-color:#00ff88;color:#00ff88;}
 .log-entry.err{border-left-color:#ff2d2d;color:#ff2d2d;}
 .log-entry.warn{border-left-color:#ff8c00;color:#ff8c00;}
+.defcon-alert{position:fixed;top:50px;left:0;right:0;z-index:9998;padding:10px;font-family:'Share Tech Mono',monospace;font-size:12px;text-align:center;display:none;letter-spacing:2px;}
+.defcon-alert.show{display:block;animation:fadeout 4s forwards;}
+@keyframes fadeout{0%{opacity:1;}80%{opacity:1;}100%{opacity:0;display:none;}}
 </style>
 </head>
 <body>
 <div class="offline-bar" id="offline-bar">⚠ MODE HORS LIGNE — Données en cache</div>
+<div class="defcon-alert" id="defcon-alert"></div>
 <header>
   <div class="hl">
     <div class="dot"></div>
@@ -177,8 +186,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 </header>
 <div class="app">
   <div class="screens">
-
-    <!-- CARTE -->
     <div class="screen active" id="screen-map">
       <div class="map-stats" id="gidx"></div>
       <div class="filter-bar">
@@ -205,8 +212,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
         <div class="twrap"><div class="tinn" id="ticker">...</div></div>
       </div>
     </div>
-
-    <!-- CONFLITS LIST -->
     <div class="screen" id="screen-conflicts">
       <div class="sh">ACTIVE THEATERS</div>
       <div class="filter-bar">
@@ -217,8 +222,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
       </div>
       <div class="clist-screen" id="clist"></div>
     </div>
-
-    <!-- NEWS FEED -->
     <div class="screen" id="screen-news">
       <div class="sh news">LIVE INTEL FEED</div>
       <div class="export-bar">
@@ -236,8 +239,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
         <div style="padding:20px;font-family:'Share Tech Mono',monospace;font-size:10px;color:#00d4ff;text-align:center;">CONNECTING TO FEEDS...</div>
       </div>
     </div>
-
-    <!-- BRIEFING -->
     <div class="screen" id="screen-brief">
       <div class="sh brief">BRIEFING AUTOMATIQUE</div>
       <div class="brief-screen" id="brief-content">
@@ -261,13 +262,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
           <div class="brief-content" id="brief-high">Chargement...</div>
         </div>
         <div class="brief-card">
-          <div class="brief-title">⚙ LOGS SYSTÈME / ACLED</div>
+          <div class="brief-title">⚙ LOGS SYSTÈME</div>
           <div class="log-screen" id="log-screen"></div>
         </div>
       </div>
     </div>
-
-    <!-- OSINT -->
     <div class="screen" id="screen-osint">
       <div class="sh osint">OSINT TOOLS</div>
       <div class="osint-screen">
@@ -294,8 +293,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
         </div>
       </div>
     </div>
-
-    <!-- AIR -->
     <div class="screen" id="screen-air">
       <div class="sh air">AIR TRACKER</div>
       <div class="tracker-screen">
@@ -309,8 +306,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
         </div>
       </div>
     </div>
-
-    <!-- NAVAL -->
     <div class="screen" id="screen-naval">
       <div class="sh naval">NAVAL TRACKER</div>
       <div class="tracker-screen">
@@ -324,35 +319,17 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
         </div>
       </div>
     </div>
-
   </div>
-
-  <!-- BOTTOM NAV -->
-  <div class="bnav">
-    <button class="bntab active" onclick="showScreen('map')">
-      <span class="bnicon">🗺</span>CARTE
-    </button>
-    <button class="bntab" onclick="showScreen('conflicts')">
-      <span class="bnicon">⚔</span>CONFLITS
-    </button>
-    <button class="bntab news" onclick="showScreen('news')">
-      <span class="bnicon">📡</span>FEED
-    </button>
-    <button class="bntab brief" onclick="showScreen('brief')">
-      <span class="bnicon">📋</span>BRIEF
-    </button>
-    <button class="bntab osint" onclick="showScreen('osint')">
-      <span class="bnicon">🔍</span>OSINT
-    </button>
-    <button class="bntab air" onclick="showScreen('air')">
-      <span class="bnicon">✈</span>AIR
-    </button>
-    <button class="bntab naval" onclick="showScreen('naval')">
-      <span class="bnicon">⚓</span>NAVAL
-    </button>
+   <div class="bnav">
+    <button class="bntab active" onclick="showScreen('map')"><span class="bnicon">🗺</span>CARTE</button>
+    <button class="bntab" onclick="showScreen('conflicts')"><span class="bnicon">⚔</span>CONFLITS</button>
+    <button class="bntab news" onclick="showScreen('news')"><span class="bnicon">📡</span>FEED</button>
+    <button class="bntab brief" onclick="showScreen('brief')"><span class="bnicon">📋</span>BRIEF</button>
+    <button class="bntab osint" onclick="showScreen('osint')"><span class="bnicon">🔍</span>OSINT</button>
+    <button class="bntab air" onclick="showScreen('air')"><span class="bnicon">✈</span>AIR</button>
+    <button class="bntab naval" onclick="showScreen('naval')"><span class="bnicon">⚓</span>NAVAL</button>
   </div>
 </div>
-
 <div class="dov" id="dov">
   <div class="dh">
     <div class="dt" id="dtitle"></div>
@@ -363,11 +340,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
 <script>
-// OFFLINE DETECTION
 window.addEventListener('online',function(){document.getElementById('offline-bar').classList.remove('show');addLog('ok','Connexion rétablie');});
 window.addEventListener('offline',function(){document.getElementById('offline-bar').classList.add('show');addLog('warn','Mode hors ligne activé');});
 
-// LOGS
 function addLog(type,msg){
   var el=document.createElement('div');
   el.className='log-entry '+type;
@@ -377,7 +352,40 @@ function addLog(type,msg){
   while(ls.children.length>50)ls.removeChild(ls.lastChild);
 }
 
-// NAVIGATION
+// DEFCON DYNAMIQUE
+var hotCount=0;
+var currentDefcon=4;
+function updateDefcon(){
+  var d=document.getElementById('defcon');
+  var level,label,cls;
+  if(hotCount>=15){level=1;label='DEFCON 1';cls='defcon1';}
+  else if(hotCount>=10){level=2;label='DEFCON 2';cls='defcon2';}
+  else if(hotCount>=5){level=3;label='DEFCON 3';cls='defcon3';}
+  else if(hotCount>=2){level=4;label='DEFCON 4';cls='defcon4';}
+  else{level=5;label='DEFCON 5';cls='defcon5';}
+  if(level!==currentDefcon){
+    var alert=document.getElementById('defcon-alert');
+    var prev=currentDefcon;
+    currentDefcon=level;
+    d.textContent=label;
+    d.className=cls;
+    var up=level<prev;
+    alert.textContent=(up?'⚠ ESCALADE — ':'✓ DÉSESCALADE — ')+label+(up?' — NIVEAU DE MENACE ÉLEVÉ':' — SITUATION STABILISÉE');
+    alert.style.background=up?'rgba(255,45,45,0.9)':'rgba(0,255,136,0.2)';
+    alert.style.color=up?'#fff':'#00ff88';
+    alert.style.border=up?'1px solid #ff2d2d':'1px solid #00ff88';
+    alert.classList.remove('show');
+    void alert.offsetWidth;
+    alert.classList.add('show');
+    addLog(up?'err':'ok','DEFCON changé: '+prev+' → '+level+' (HOT count: '+hotCount+')');
+  }
+  d.textContent=label;
+}
+// Décroissance progressive du hotCount
+setInterval(function(){
+  if(hotCount>0){hotCount=Math.max(0,hotCount-1);updateDefcon();}
+},5*60*1000);
+
 var currentScreen='map';
 function showScreen(name){
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
@@ -391,7 +399,6 @@ function showScreen(name){
   if(name==='brief'){generateBrief();}
 }
 
-// FILTER MAP
 var clusterGroup;
 var currentFilter='all';
 function filterMap(level,btn){
@@ -401,8 +408,6 @@ function filterMap(level,btn){
   clusterGroup.clearLayers();
   C.forEach(function(x){if(level==='all'||x.l===level)addMarker(x);});
 }
-
-// FILTER LIST
 function filterList(level,btn){
   document.querySelectorAll('#screen-conflicts .filter-bar .fbtn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
@@ -410,34 +415,67 @@ function filterList(level,btn){
     el.style.display=(level==='all'||el.dataset.level===level)?'':'none';
   });
 }
-
-// ZOOM REGION
 function zoomRegion(r){
   var regions={world:[25,10,2],europe:[52,15,4],middleeast:[28,42,4],africa:[5,20,3],asia:[30,100,3],americas:[15,-80,3]};
   var z=regions[r];
   if(z)map.flyTo([z[0],z[1]],z[2],{duration:1.5});
 }
 
-// CONFLICT DATA
+// 45+ CONFLITS ET TENSIONS DIPLOMATIQUES
 var C=[
-  {n:"Ukraine War",r:"Eastern Europe",c:[48.38,31.17],l:"high",k:"~500K+",s:"2022",a:"Russia/Ukraine/NATO",q:"Ukraine war",t:"War"},
-  {n:"Israel-Gaza",r:"Middle East",c:[31.05,34.85],l:"high",k:"~40K+",s:"2023",a:"Israel/Hamas",q:"Gaza conflict",t:"War"},
-  {n:"Sudan Civil War",r:"Africa",c:[15.50,32.56],l:"high",k:"~15K+",s:"2023",a:"SAF/RSF",q:"Sudan war",t:"Civil War"},
-  {n:"Myanmar War",r:"Southeast Asia",c:[19.76,96.08],l:"high",k:"~50K+",s:"2021",a:"Junta/Resistance",q:"Myanmar war",t:"Civil War"},
-  {n:"DR Congo",r:"Central Africa",c:[-4.04,21.76],l:"high",k:"~7M displaced",s:"1996",a:"M23/FARDC/Rwanda",q:"Congo conflict",t:"Civil War"},
-  {n:"Iran Tension",r:"Middle East",c:[35.69,51.39],l:"medium",k:"unknown",s:"Ongoing",a:"Iran/Israel/USA",q:"Iran tensions",t:"Tension"},
-  {n:"Yemen Conflict",r:"Middle East",c:[15.55,48.52],l:"medium",k:"~150K+",s:"2014",a:"Houthis/Saudi/UAE",q:"Yemen war",t:"War"},
-  {n:"Taiwan Strait",r:"East Asia",c:[23.70,120.96],l:"medium",k:"none",s:"Ongoing",a:"China/Taiwan/USA",q:"Taiwan strait",t:"Tension"},
-  {n:"Afghanistan",r:"Central Asia",c:[33.94,67.71],l:"medium",k:"unknown",s:"2021",a:"Taliban/IS-K",q:"Afghanistan",t:"Insurgency"},
-  {n:"South China Sea",r:"East Asia",c:[15.00,114.00],l:"medium",k:"none",s:"Ongoing",a:"China/Philippines/USA",q:"South China Sea",t:"Tension"},
-  {n:"North Korea",r:"East Asia",c:[40.34,127.51],l:"medium",k:"none",s:"Ongoing",a:"DPRK/USA/S.Korea",q:"North Korea missile",t:"Tension"},
-  {n:"Haiti Crisis",r:"Caribbean",c:[18.97,-72.29],l:"medium",k:"unknown",s:"2021",a:"Gangs/UN Mission",q:"Haiti crisis",t:"Crisis"},
-  {n:"Sahel",r:"West Africa",c:[17.57,-3.99],l:"low",k:"~10K+",s:"2012",a:"Jihadists/ECOWAS",q:"Sahel crisis",t:"Insurgency"},
-  {n:"Ethiopia",r:"East Africa",c:[14.03,38.32],l:"low",k:"~500K+",s:"2020",a:"Ethiopian Forces/TPLF",q:"Ethiopia Tigray",t:"Civil War"},
-  {n:"Kosovo",r:"Balkans",c:[42.60,20.90],l:"low",k:"none",s:"Ongoing",a:"Serbia/Kosovo/NATO",q:"Kosovo Serbia",t:"Tension"}
+// EUROPE
+  {n:"Ukraine War",r:"Eastern Europe",c:[48.38,31.17],l:"high",k:"~600K+",s:"2022",a:"Russia/Ukraine/NATO",q:"Ukraine war 2025",t:"War"},
+  {n:"Kosovo-Serbia",r:"Balkans",c:[42.60,20.90],l:"medium",k:"none",s:"Ongoing",a:"Serbia/Kosovo/NATO",q:"Kosovo Serbia tension",t:"Tension"},
+  {n:"Moldavie-Transnistrie",r:"Eastern Europe",c:[47.41,28.36],l:"low",k:"none",s:"1992",a:"Moldova/Russia/PMR",q:"Transnistria Moldova",t:"Tension"},
+  {n:"Géorgie-Russie",r:"Caucasus",c:[42.31,43.36],l:"low",k:"none",s:"2008",a:"Georgia/Russia/Abkhazia",q:"Georgia Russia tension",t:"Tension"},
+  {n:"Arménie-Azerbaïdjan",r:"Caucasus",c:[40.18,44.51],l:"medium",k:"~7K+",s:"2020",a:"Armenia/Azerbaijan",q:"Armenia Azerbaijan Karabakh",t:"Tension"},
+  // MOYEN-ORIENT
+  {n:"Israel-Gaza",r:"Middle East",c:[31.05,34.85],l:"high",k:"~50K+",s:"2023",a:"Israel/Hamas/Hezbollah",q:"Gaza war 2025",t:"War"},
+  {n:"Israel-Liban",r:"Middle East",c:[33.88,35.50],l:"high",k:"~3K+",s:"2024",a:"Israel/Hezbollah/Lebanon",q:"Israel Lebanon war 2024",t:"War"},
+  {n:"Syrie",r:"Middle East",c:[34.80,38.99],l:"high",k:"~500K+",s:"2011",a:"HTS/SDF/Turkey/Russia",q:"Syria war 2025",t:"Civil War"},
+  {n:"Yemen Conflict",r:"Middle East",c:[15.55,48.52],l:"high",k:"~150K+",s:"2014",a:"Houthis/Saudi/UAE/USA",q:"Yemen war Houthis 2025",t:"War"},
+  {n:"Iran-USA-Israel",r:"Middle East",c:[35.69,51.39],l:"high",k:"unknown",s:"Ongoing",a:"Iran/Israel/USA",q:"Iran Israel tension 2025",t:"Tension"},
+  {n:"Irak Insurgency",r:"Middle East",c:[33.22,43.68],l:"medium",k:"unknown",s:"2014",a:"ISIS/Iraq/USA",q:"Iraq ISIS insurgency",t:"Insurgency"},
+  {n:"Turquie-Kurdes",r:"Middle East",c:[37.00,40.00],l:"medium",k:"unknown",s:"1984",a:"Turkey/PKK/SDF",q:"Turkey Kurdish conflict",t:"Insurgency"},
+  // AFRIQUE
+  {n:"Sudan Civil War",r:"Africa",c:[15.50,32.56],l:"high",k:"~20K+",s:"2023",a:"SAF/RSF",q:"Sudan war 2025",t:"Civil War"},
+  {n:"DR Congo",r:"Central Africa",c:[-4.04,21.76],l:"high",k:"~7M displaced",s:"1996",a:"M23/FARDC/Rwanda",q:"Congo M23 war 2025",t:"Civil War"},
+  {n:"Sahel-Mali",r:"West Africa",c:[17.57,-3.99],l:"high",k:"~10K+",s:"2012",a:"Jihadists/Wagner/FAMA",q:"Mali Sahel jihadist 2025",t:"Insurgency"},
+  {n:"Burkina Faso",r:"West Africa",c:[12.36,-1.53],l:"high",k:"~5K+",s:"2015",a:"Jihadists/AES/Wagner",q:"Burkina Faso jihadist",t:"Insurgency"},
+  {n:"Niger",r:"West Africa",c:[17.61,8.08],l:"medium",k:"unknown",s:"2023",a:"Junta/Jihadists",q:"Niger coup jihadist",t:"Insurgency"},
+  {n:"Nigeria-Boko Haram",r:"West Africa",c:[10.45,11.36],l:"medium",k:"~35K+",s:"2009",a:"Nigeria/Boko Haram/ISWAP",q:"Nigeria Boko Haram",t:"Insurgency"},
+  {n:"Mozambique",r:"Southern Africa",c:[-13.25,35.00],l:"medium",k:"~4K+",s:"2017",a:"RENAMO/ISIS/Mozambique",q:"Mozambique Cabo Delgado",t:"Insurgency"},
+  {n:"Ethiopie-Amhara",r:"East Africa",c:[11.59,37.37],l:"medium",k:"unknown",s:"2023",a:"Amhara/Ethiopian Forces",q:"Ethiopia Amhara conflict 2025",t:"Civil War"},
+  {n:"Somalie",r:"East Africa",c:[5.15,46.20],l:"medium",k:"unknown",s:"1991",a:"Al-Shabaab/Somalia/AU",q:"Somalia Al-Shabaab",t:"Insurgency"},
+  {n:"Cameroun-Ambazonie",r:"Central Africa",c:[5.96,10.15],l:"low",k:"~6K+",s:"2017",a:"Cameroon/Amba Boys",q:"Cameroon Anglophone crisis",t:"Civil War"},
+  {n:"RCA",r:"Central Africa",c:[6.61,20.94],l:"low",k:"unknown",s:"2012",a:"Wagner/FACA/Milices",q:"Central Africa Republic conflict",t:"Civil War"},
+  // ASIE
+  {n:"Myanmar War",r:"Southeast Asia",c:[19.76,96.08],l:"high",k:"~50K+",s:"2021",a:"Junta/PDF/ARSA",q:"Myanmar civil war 2025",t:"Civil War"},
+  {n:"Afghanistan",r:"Central Asia",c:[33.94,67.71],l:"high",k:"unknown",s:"2021",a:"Taliban/IS-K/NRF",q:"Afghanistan Taliban ISIS 2025",t:"Insurgency"},
+  {n:"Taiwan Strait",r:"East Asia",c:[23.70,120.96],l:"high",k:"none",s:"Ongoing",a:"China/Taiwan/USA",q:"Taiwan China tension 2025",t:"Tension"},
+  {n:"Mer de Chine Sud",r:"East Asia",c:[15.00,114.00],l:"high",k:"none",s:"Ongoing",a:"China/Philippines/USA/Vietnam",q:"South China Sea 2025",t:"Tension"},
+  {n:"Corée du Nord",r:"East Asia",c:[40.34,127.51],l:"high",k:"none",s:"Ongoing",a:"DPRK/USA/S.Korea/Russia",q:"North Korea missile 2025",t:"Tension"},
+  {n:"Inde-Pakistan",r:"South Asia",c:[32.52,74.53],l:"medium",k:"none",s:"Ongoing",a:"India/Pakistan/Kashmir",q:"India Pakistan Kashmir tension",t:"Tension"},
+  {n:"Inde-Chine",r:"South Asia",c:[29.00,96.00],l:"medium",k:"none",s:"Ongoing",a:"India/China/LAC",q:"India China border tension",t:"Tension"},
+  {n:"Pakistan-Taliban",r:"South Asia",c:[33.72,73.04],l:"medium",k:"unknown",s:"2021",a:"Pakistan/TTP",q:"Pakistan TTP Taliban",t:"Insurgency"},
+  {n:"Baloutchistan",r:"South Asia",c:[27.00,65.00],l:"low",k:"unknown",s:"2004",a:"Pakistan/BLA",q:"Balochistan insurgency",t:"Insurgency"},
+  {n:"Philippines-Mindanao",r:"Southeast Asia",c:[7.87,124.84],l:"low",k:"unknown",s:"Ongoing",a:"Philippines/MILF/ISIS",q:"Philippines Mindanao conflict",t:"Insurgency"},
+  // AMÉRIQUES
+  {n:"Haïti",r:"Caribbean",c:[18.97,-72.29],l:"high",k:"unknown",s:"2021",a:"Gangs/Mission ONU/Kenya",q:"Haiti gangs crisis 2025",t:"Crisis"},
+  {n:"Colombie-ELN",r:"South America",c:[4.57,-74.30],l:"medium",k:"unknown",s:"1964",a:"Colombia/ELN/FARC",q:"Colombia ELN conflict 2025",t:"Insurgency"},
+  {n:"Venezuela-Guyana",r:"South America",c:[6.42,-66.58],l:"medium",k:"none",s:"2023",a:"Venezuela/Guyana/USA",q:"Venezuela Guyana Essequibo",t:"Tension"},
+  {n:"Mexique Cartels",r:"North America",c:[23.63,-102.55],l:"medium",k:"~30K+/an",s:"2006",a:"Cartels/Mexico/USA",q:"Mexico cartel war 2025",t:"Crisis"},
+  {n:"Équateur Criminalité",r:"South America",c:[-1.83,-78.18],l:"medium",k:"unknown",s:"2023",a:"Gangs/Ecuador",q:"Ecuador gang violence 2025",t:"Crisis"},
+  // TENSIONS DIPLOMATIQUES MAJEURES
+  {n:"USA-Chine",r:"Global",c:[35.00,135.00],l:"medium",k:"none",s:"Ongoing",a:"USA/China/Taiwan",q:"USA China trade war tension 2025",t:"Diplomatie"},
+  {n:"Russie-OTAN",r:"Europe",c:[55.75,37.62],l:"high",k:"none",s:"Ongoing",a:"Russia/NATO/EU",q:"Russia NATO tension 2025",t:"Diplomatie"},
+  {n:"Iran-Occident",r:"Middle East",c:[32.43,53.69],l:"high",k:"none",s:"Ongoing",a:"Iran/USA/EU/IAEA",q:"Iran nuclear deal 2025",t:"Diplomatie"},
+  {n:"Corée du Nord-Japon",r:"East Asia",c:[36.20,138.25],l:"medium",k:"none",s:"Ongoing",a:"DPRK/Japan/USA",q:"North Korea Japan tension",t:"Diplomatie"},
+  {n:"Turquie-Grèce",r:"Mediterranean",c:[39.00,26.00],l:"low",k:"none",s:"Ongoing",a:"Turkey/Greece/NATO",q:"Turkey Greece tension Aegean",t:"Diplomatie"},
+  {n:"Maroc-Algérie",r:"North Africa",c:[32.00,-2.00],l:"low",k:"none",s:"Ongoing",a:"Morocco/Algeria/Sahara",q:"Morocco Algeria tension",t:"Diplomatie"},
+  {n:"Sahara Occidental",r:"North Africa",c:[24.21,-12.89],l:"low",k:"unknown",s:"1975",a:"Morocco/Polisario/Algeria",q:"Western Sahara conflict",t:"Tension"}
 ];
 
-// MAP INIT
 var map=L.map('map',{zoomControl:false,worldCopyJump:true}).setView([25,35],2);
 L.control.zoom({position:'bottomright'}).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:18,subdomains:'abcd'}).addTo(map);
@@ -452,7 +490,9 @@ map.addLayer(clusterGroup);
 
 function addMarker(x){
   var col=x.l==='high'?'#ff2d2d':x.l==='medium'?'#ff8c00':'#00ff88';
-  var icon=L.divIcon({html:'<div style="width:14px;height:14px;border-radius:50%;background:'+col+';border:2px solid #fff;box-shadow:0 0 8px '+col+'"></div>',className:'',iconSize:[14,14],iconAnchor:[7,7]});
+  var size=x.t==='Diplomatie'?10:14;
+  var shape=x.t==='Diplomatie'?'border-radius:2px;':'border-radius:50%;';
+  var icon=L.divIcon({html:'<div style="width:'+size+'px;height:'+size+'px;'+shape+'background:'+col+';border:2px solid #fff;box-shadow:0 0 8px '+col+'"></div>',className:'',iconSize:[size,size],iconAnchor:[size/2,size/2]});
   var marker=L.marker(x.c,{icon:icon});
   marker.on('click',function(){showD(x);});
   clusterGroup.addLayer(marker);
@@ -463,7 +503,6 @@ window.addEventListener('load',function(){
   setTimeout(function(){map.invalidateSize();},800);
 });
 
-// STATS
 var sc=0,hi=0,mi=0,li=0;
 C.forEach(function(x){
   var pts=x.l==='high'?3:x.l==='medium'?2:1;
@@ -473,7 +512,7 @@ C.forEach(function(x){
   var el=document.createElement('div');
   el.className='ci '+x.l;
   el.dataset.level=x.l;
-  el.innerHTML='<div class="cin">'+x.n+'</div><div class="cim"><span class="cir">'+x.r+'</span><span class="cil">'+x.l.toUpperCase()+'</span></div>';
+  el.innerHTML='<div class="cin">'+x.n+'</div><div class="cim"><span class="cir">'+x.r+' — '+x.t+'</span><span class="cil">'+x.l.toUpperCase()+'</span></div>';
   el.onclick=function(){showScreen('map');setTimeout(function(){map.flyTo(x.c,5,{duration:1.2});showD(x);},300);};
   document.getElementById('clist').appendChild(el);
 });
@@ -481,22 +520,51 @@ C.forEach(function(x){
 var pct=Math.round((sc/(C.length*3))*100);
 document.getElementById('tf').style.width=pct+'%';
 document.getElementById('tp').textContent=pct+'%';
-document.getElementById('defcon').textContent=sc>=36?'DEFCON 2':sc>=28?'DEFCON 3':'DEFCON 4';
 document.getElementById('gidx').innerHTML=
   '<div class="ms"><div class="msv" style="color:#ff2d2d">'+hi+'</div><div class="msl">HIGH</div></div>'+
   '<div class="ms"><div class="msv" style="color:#ff8c00">'+mi+'</div><div class="msl">MEDIUM</div></div>'+
   '<div class="ms"><div class="msv" style="color:#00ff88">'+li+'</div><div class="msl">LOW</div></div>'+
-  '<div class="ms"><div class="msv" style="color:#00d4ff">'+sc+'</div><div class="msl">SCORE</div></div>';
-document.getElementById('ticker').textContent=C.map(function(x){return '['+x.l.toUpperCase()+'] '+x.n+' — '+x.r;}).join('   |   ');
+  '<div class="ms"><div class="msv" style="color:#00d4ff">'+C.length+'</div><div class="msl">ZONES</div></div>';
+document.getElementById('ticker').textContent=C.map(function(x){return '['+x.l.toUpperCase()+']['+x.t+'] '+x.n+' — '+x.r;}).join('   |   ');
 
-// CLOCK
+updateDefcon();
 setInterval(function(){
   document.getElementById('clock').textContent=new Date().toLocaleTimeString('fr-FR',{timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit',second:'2-digit'});
 },1000);
-addLog('ok','GCM initialisé — '+C.length+' théâtres chargés');
-addLog('warn','ACLED API — En attente de clé API');
-</script>
-<script>
+
+addLog('ok','GCM initialisé — '+C.length+' zones chargées');
+
+// GDELT
+var gdeltMarkers=L.layerGroup();
+map.addLayer(gdeltMarkers);
+function fetchGDELT(){
+  var gdeltUrl='https://api.gdeltproject.org/api/v2/geo/geo?query=war+conflict+attack+explosion&mode=pointdata&maxrecords=50&format=json';
+  var proxies=['https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest=','https://thingproxy.freeboard.io/fetch/'];
+  var idx=0;
+  function tryNext(){
+    if(idx>=proxies.length){addLog('err','GDELT — tous proxies inaccessibles');return;}
+    var url=proxies[idx]+encodeURIComponent(gdeltUrl);idx++;
+    fetch(url).then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(data){
+      gdeltMarkers.clearLayers();
+      if(!data||!data.features){tryNext();return;}
+      data.features.forEach(function(f){
+        if(!f.geometry||!f.geometry.coordinates)return;
+        var lon=f.geometry.coordinates[0],lat=f.geometry.coordinates[1];
+        var title=f.properties&&f.properties.name?f.properties.name:'Incident';
+        var icon=L.divIcon({html:'<div style="width:8px;height:8px;border-radius:50%;background:#ff8c00;border:1px solid #fff;box-shadow:0 0 6px #ff8c00;opacity:0.8;"></div>',className:'',iconSize:[8,8],iconAnchor:[4,4]});
+        var marker=L.marker([lat,lon],{icon:icon});
+        marker.bindPopup('<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:#e0eaf4;background:#0d1117;padding:5px;">🟠 GDELT<br>'+title+'</div>');
+        gdeltMarkers.addLayer(marker);
+      });
+      addLog('ok','GDELT — '+data.features.length+' incidents chargés');
+    }).catch(function(){tryNext();});
+  }
+  tryNext();
+}
+fetchGDELT();
+setInterval(fetchGDELT,15*60*1000);
+
 function showD(x){
   document.getElementById('dtitle').textContent=x.n.toUpperCase();
   var vc=x.l==='high'?'dv vh':x.l==='medium'?'dv vm':'dv vl';
@@ -526,163 +594,96 @@ document.getElementById('ob').onclick=function(){
 };
 document.getElementById('oi').onkeydown=function(e){if(e.key==='Enter')document.getElementById('ob').click();};
 
-// EXPORT CSV
 function exportCSV(){
-  var rows=[['HEURE','SOURCE','TITRE','TYPE']];
-  var items=document.querySelectorAll('#nfeed .ni');
-  items.forEach(function(item){
-    var time=item.querySelector('.nt')?item.querySelector('.nt').textContent:'';
-    var text=item.querySelector('.nx')?item.querySelector('.nx').textContent:'';
-    var tag=item.querySelector('.ntag')?item.querySelector('.ntag').textContent:'';
-    rows.push([time,text,tag]);
+  var rows=[['HEURE','TEXTE','HOT']];
+  document.querySelectorAll('#nfeed .ni').forEach(function(item){
+    rows.push([item.querySelector('.nt')?item.querySelector('.nt').textContent:'',item.querySelector('.nx')?item.querySelector('.nx').textContent:'',item.querySelector('.th')?'OUI':'NON']);
   });
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-  var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
-  a.href=url;a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.csv';
-  a.click();
-  addLog('ok','Export CSV généré — '+items.length+' entrées');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  addLog('ok','Export CSV généré');
 }
-
-// EXPORT JSON
 function exportJSON(){
   var data=[];
-  var items=document.querySelectorAll('#nfeed .ni');
-  items.forEach(function(item){
-    data.push({
-      time:item.querySelector('.nt')?item.querySelector('.nt').textContent:'',
-      text:item.querySelector('.nx')?item.querySelector('.nx').textContent:'',
-      hot:item.querySelector('.th')!==null
-    });
+  document.querySelectorAll('#nfeed .ni').forEach(function(item){
+    data.push({time:item.querySelector('.nt')?item.querySelector('.nt').textContent:'',text:item.querySelector('.nx')?item.querySelector('.nx').textContent:'',hot:item.querySelector('.th')!==null});
   });
-  var blob=new Blob([JSON.stringify({exported:new Date().toISOString(),count:data.length,items:data},null,2)],{type:'application/json'});
-  var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
-  a.href=url;a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  addLog('ok','Export JSON généré — '+data.length+' entrées');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({exported:new Date().toISOString(),count:data.length,items:data},null,2)],{type:'application/json'}));
+  a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  addLog('ok','Export JSON — '+data.length+' entrées');
 }
-
-// EXPORT PDF FEED
 function exportPDF(){
   try{
     var doc=new window.jspdf.jsPDF();
-    doc.setFillColor(8,12,16);
-    doc.rect(0,0,210,297,'F');
-    doc.setTextColor(0,212,255);
-    doc.setFontSize(16);
-    doc.text('GLOBAL CONFLICT MONITOR',105,20,{align:'center'});
-    doc.setFontSize(10);
-    doc.setTextColor(168,184,200);
-    doc.text('LIVE INTEL FEED — '+new Date().toLocaleString('fr-FR'),105,28,{align:'center'});
-    doc.setDrawColor(26,37,53);
-    doc.line(10,32,200,32);
+    doc.setFillColor(8,12,16);doc.rect(0,0,210,297,'F');
+    doc.setTextColor(0,212,255);doc.setFontSize(16);doc.text('GLOBAL CONFLICT MONITOR',105,20,{align:'center'});
+    doc.setFontSize(10);doc.setTextColor(168,184,200);doc.text('LIVE INTEL FEED — '+new Date().toLocaleString('fr-FR'),105,28,{align:'center'});
+    doc.setDrawColor(26,37,53);doc.line(10,32,200,32);
     var y=40;
-    var items=document.querySelectorAll('#nfeed .ni');
-    items.forEach(function(item,i){
+    document.querySelectorAll('#nfeed .ni').forEach(function(item,i){
       if(i>=20)return;
       if(y>270){doc.addPage();doc.setFillColor(8,12,16);doc.rect(0,0,210,297,'F');y=20;}
       var time=item.querySelector('.nt')?item.querySelector('.nt').textContent:'';
       var text=item.querySelector('.nx')?item.querySelector('.nx').textContent:'';
-      var hot=item.querySelector('.th')!==null;
-      if(hot){doc.setTextColor(255,45,45);}else{doc.setTextColor(0,212,255);}
-      doc.setFontSize(8);
-      doc.text(time,10,y);
-      doc.setTextColor(224,234,244);
-      doc.setFontSize(9);
-      var lines=doc.splitTextToSize(text,180);
-      doc.text(lines,10,y+5);
-      y+=5+(lines.length*5)+4;
-      doc.setDrawColor(26,37,53);
-      doc.line(10,y,200,y);
-      y+=3;
+      if(item.querySelector('.th')){doc.setTextColor(255,45,45);}else{doc.setTextColor(0,212,255);}
+      doc.setFontSize(8);doc.text(time,10,y);
+      doc.setTextColor(224,234,244);doc.setFontSize(9);
+      var lines=doc.splitTextToSize(text,180);doc.text(lines,10,y+5);
+      y+=5+(lines.length*5)+4;doc.setDrawColor(26,37,53);doc.line(10,y,200,y);y+=3;
     });
     doc.save('gcm-feed-'+new Date().toISOString().slice(0,10)+'.pdf');
     addLog('ok','Export PDF généré');
-  }catch(e){addLog('err','Erreur PDF: '+e.message);}
+  }catch(e){addLog('err','PDF: '+e.message);}
 }
 
-// FILTER NEWS
 var showHotOnly=false;
 function filterNews(type){
   showHotOnly=(type==='hot');
   document.querySelectorAll('#nfeed .ni').forEach(function(item){
-    if(showHotOnly){
-      item.style.display=item.querySelector('.th')?'':'none';
-    }else{
-      item.style.display='';
-    }
+    item.style.display=showHotOnly?(item.querySelector('.th')?'':'none'):'';
   });
 }
-</script>
-<script>
-// BRIEFING AUTOMATIQUE
+
 function generateBrief(){
   var now=new Date();
   var dateStr=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   var timeStr=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-
-  // Briefing quotidien
   var highList=C.filter(function(x){return x.l==='high';});
   var medList=C.filter(function(x){return x.l==='medium';});
   var lowList=C.filter(function(x){return x.l==='low';});
-  var briefText=
-    '📅 '+dateStr+' — '+timeStr+'\n\n'+
-    '🔴 MENACES CRITIQUES ('+highList.length+') :\n'+
-    highList.map(function(x){return '• '+x.n+' ['+x.t+'] — '+x.r;}).join('\n')+'\n\n'+
-    '🟠 MENACES MOYENNES ('+medList.length+') :\n'+
-    medList.map(function(x){return '• '+x.n+' ['+x.t+'] — '+x.r;}).join('\n')+'\n\n'+
-    '🟢 MENACES FAIBLES ('+lowList.length+') :\n'+
-    lowList.map(function(x){return '• '+x.n+' ['+x.t+'] — '+x.r;}).join('\n')+'\n\n'+
-    '📊 SCORE INSTABILITÉ GLOBAL : '+sc+'/'+C.length*3+' ('+pct+'%)\n'+
-    '🛡 NIVEAU : '+document.getElementById('defcon').textContent;
   document.getElementById('brief-daily').style.whiteSpace='pre-line';
-  document.getElementById('brief-daily').textContent=briefText;
-
-  // Résumé conflits terrestres uniquement
+  document.getElementById('brief-daily').textContent=
+    '📅 '+dateStr+' — '+timeStr+'\n'+
+    '🛡 NIVEAU: DEFCON '+currentDefcon+' | HOT ALERTS: '+hotCount+'\n\n'+
+    '🔴 MENACES CRITIQUES ('+highList.length+') :\n'+highList.map(function(x){return '• '+x.n+' ['+x.t+'] — '+x.r;}).join('\n')+'\n\n'+
+    '🟠 MENACES MOYENNES ('+medList.length+') :\n'+medList.map(function(x){return '• '+x.n+' ['+x.t+'] — '+x.r;}).join('\n')+'\n\n'+
+    '🟢 MENACES FAIBLES ('+lowList.length+') :\n'+lowList.map(function(x){return '• '+x.n+' ['+x.t+'] — '+x.r;}).join('\n')+'\n\n'+
+    '📊 TOTAL ZONES: '+C.length+' | SCORE: '+sc+'/'+C.length*3+' ('+pct+'%)';
   var terrestres=C.filter(function(x){return x.t==='War'||x.t==='Civil War'||x.t==='Insurgency'||x.t==='Crisis';});
-  var terText='CONFLITS TERRESTRES ACTIFS ('+terrestres.length+') :\n\n'+
-    terrestres.map(function(x){
-      return '▶ '+x.n+'\n  Type: '+x.t+' | Région: '+x.r+'\n  Victimes: '+x.k+' | Depuis: '+x.s+'\n  Acteurs: '+x.a;
-    }).join('\n\n')+
-    '\n\n⚠ Note: Trackers Air (FlightRadar) et Naval (MarineTraffic) disponibles dans les onglets dédiés.'+
-    '\n⏳ ACLED API: En attente de clé — données temps réel non disponibles.';
   document.getElementById('brief-conflicts').style.whiteSpace='pre-line';
-  document.getElementById('brief-conflicts').textContent=terText;
-
-  // HIGH risk uniquement
-  var highText=highList.map(function(x){
-    return '🔴 '+x.n.toUpperCase()+'\n  Région: '+x.r+'\n  Type: '+x.t+'\n  Victimes: '+x.k+'\n  Depuis: '+x.s+'\n  Acteurs: '+x.a;
-  }).join('\n\n');
+  document.getElementById('brief-conflicts').textContent=
+    'CONFLITS ACTIFS ('+terrestres.length+') :\n\n'+
+    terrestres.map(function(x){return '▶ '+x.n+'\n  Type: '+x.t+' | Région: '+x.r+'\n  Victimes: '+x.k+' | Depuis: '+x.s+'\n  Acteurs: '+x.a;}).join('\n\n')+
+    '\n\n✅ GDELT: Incidents temps réel actifs sur la carte (🟠)';
   document.getElementById('brief-high').style.whiteSpace='pre-line';
-  document.getElementById('brief-high').textContent=highText;
-
+  document.getElementById('brief-high').textContent=
+    highList.map(function(x){return '🔴 '+x.n.toUpperCase()+'\n  Région: '+x.r+'\n  Type: '+x.t+'\n  Victimes: '+x.k+'\n  Depuis: '+x.s+'\n  Acteurs: '+x.a;}).join('\n\n');
   addLog('ok','Briefing généré — '+now.toLocaleTimeString('fr-FR'));
 }
 
-// EXPORT BRIEFING PDF
 function exportBriefPDF(type){
   try{
     var doc=new window.jspdf.jsPDF();
-    doc.setFillColor(8,12,16);
-    doc.rect(0,0,210,297,'F');
-    doc.setTextColor(0,212,255);
-    doc.setFontSize(18);
-    doc.text('GLOBAL CONFLICT MONITOR',105,18,{align:'center'});
-    doc.setFontSize(11);
-    doc.setTextColor(255,140,0);
-    doc.text(type==='daily'?'BRIEFING QUOTIDIEN':'RÉSUMÉ CONFLITS TERRESTRES',105,27,{align:'center'});
-    doc.setFontSize(9);
-    doc.setTextColor(168,184,200);
-    doc.text('Généré le '+new Date().toLocaleString('fr-FR'),105,34,{align:'center'});
-    doc.setDrawColor(0,212,255);
-    doc.line(10,38,200,38);
-    var content=type==='daily'?
-      document.getElementById('brief-daily').textContent:
-      document.getElementById('brief-conflicts').textContent;
-    doc.setTextColor(224,234,244);
-    doc.setFontSize(9);
+    doc.setFillColor(8,12,16);doc.rect(0,0,210,297,'F');
+    doc.setTextColor(0,212,255);doc.setFontSize(18);doc.text('GLOBAL CONFLICT MONITOR',105,18,{align:'center'});
+    doc.setFontSize(11);doc.setTextColor(255,140,0);
+    doc.text(type==='daily'?'BRIEFING QUOTIDIEN':'RÉSUMÉ CONFLITS',105,27,{align:'center'});
+    doc.setFontSize(9);doc.setTextColor(168,184,200);doc.text('Généré le '+new Date().toLocaleString('fr-FR'),105,34,{align:'center'});
+    doc.setDrawColor(0,212,255);doc.line(10,38,200,38);
+    var content=type==='daily'?document.getElementById('brief-daily').textContent:document.getElementById('brief-conflicts').textContent;
     var lines=doc.splitTextToSize(content,185);
     var y=46;
     lines.forEach(function(line){
@@ -692,159 +693,72 @@ function exportBriefPDF(type){
       else if(line.startsWith('🟢')){doc.setTextColor(0,255,136);}
       else if(line.startsWith('📅')||line.startsWith('📊')){doc.setTextColor(0,212,255);}
       else{doc.setTextColor(224,234,244);}
-      doc.text(line,10,y);
-      y+=5;
+      doc.text(line,10,y);y+=5;
     });
-    doc.setTextColor(58,74,90);
-    doc.setFontSize(7);
-    doc.text('GCM — Global Conflict Monitor — OSINT Dashboard',105,290,{align:'center'});
+    doc.setTextColor(58,74,90);doc.setFontSize(7);doc.text('GCM — Global Conflict Monitor',105,290,{align:'center'});
     doc.save('gcm-briefing-'+type+'-'+new Date().toISOString().slice(0,10)+'.pdf');
     addLog('ok','Briefing PDF exporté');
-  }catch(e){addLog('err','Erreur PDF briefing: '+e.message);}
+  }catch(e){addLog('err','PDF: '+e.message);}
 }
-
-// EXPORT BRIEFING CSV
 function exportBriefCSV(){
   var rows=[['NOM','REGION','TYPE','NIVEAU','VICTIMES','DEPUIS','ACTEURS']];
-  C.forEach(function(x){
-    rows.push([x.n,x.r,x.t,x.l,x.k,x.s,x.a]);
-  });
+  C.forEach(function(x){rows.push([x.n,x.r,x.t,x.l,x.k,x.s,x.a]);});
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-  var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
-  a.href=url;a.download='gcm-conflits-'+new Date().toISOString().slice(0,10)+'.csv';
-  a.click();
-  addLog('ok','CSV conflits exporté — '+C.length+' entrées');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='gcm-conflits-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  addLog('ok','CSV conflits exporté');
 }
 
-// NOTIFICATIONS PWA
 var notifEnabled=false;
 function requestNotif(){
-  if(!('Notification' in window)){
-    document.getElementById('notif-req').innerHTML='<span style="color:#ff2d2d;font-family:Share Tech Mono,monospace;font-size:10px;">Notifications non supportées</span>';
-    addLog('err','Notifications non supportées par ce navigateur');
-    return;
-  }
+  if(!('Notification' in window)){document.getElementById('notif-req').innerHTML='<span style="color:#ff2d2d;font-family:Share Tech Mono,monospace;font-size:10px;">Non supporté</span>';return;}
   Notification.requestPermission().then(function(perm){
     if(perm==='granted'){
       notifEnabled=true;
       document.getElementById('notif-req').style.display='none';
-      sendNotif('🛡 GCM ACTIVÉ','Surveillance des conflits mondiaux en cours...');
-      addLog('ok','Notifications push activées');
-    }else{
-      document.getElementById('notif-req').innerHTML='<span style="color:#ff2d2d;font-family:Share Tech Mono,monospace;font-size:10px;">Permission refusée</span>';
-      addLog('warn','Permission notifications refusée');
-    }
+      new Notification('🛡 GCM ACTIVÉ',{body:'Surveillance des conflits mondiaux active.'});
+      addLog('ok','Notifications activées');
+    }else{addLog('warn','Notifications refusées');}
   });
 }
 
-function sendNotif(title,body){
-  if(notifEnabled&&Notification.permission==='granted'){
-    new Notification(title,{body:body,icon:'https://raw.githubusercontent.com/google/material-design-icons/master/png/action/gps_fixed/materialicons/48dp/2x/baseline_gps_fixed_black_48dp.png'});
-  }
-  var bar=document.getElementById('notif-bar');
-  document.getElementById('notif-text').textContent='🚨 '+body;
-  bar.classList.add('show');
-  setTimeout(function(){bar.classList.remove('show');},8000);
-}
-
 function checkHotNews(title){
-  var hot=!!(title.match(/war|guerre|conflit|conflict|attack|attaque|militaire|military|mort|killed|missile|bomb|strike|frappe|Ukraine|Gaza|Russia|Russie|Sudan|Myanmar|Congo|escalade|nuclear/i));
+  var hot=!!(title.match(/war|guerre|conflit|conflict|attack|attaque|militaire|military|mort|killed|missile|bomb|strike|frappe|Ukraine|Gaza|Russia|Russie|Sudan|Myanmar|Congo|escalade|nuclear|Houthis|Hamas|Hezbollah|DEFCON|alert|alerte/i));
   if(hot){
-    sendNotif('🚨 ALERTE GCM',title.substring(0,80));
-    addLog('warn','HOT ALERT: '+title.substring(0,60));
+    hotCount++;
+    updateDefcon();
+    if(notifEnabled&&Notification.permission==='granted'){new Notification('🚨 ALERTE GCM',{body:title.substring(0,80)});}
+    var bar=document.getElementById('notif-bar');
+    document.getElementById('notif-text').textContent='🚨 '+title.substring(0,80);
+    bar.classList.add('show');
+    setTimeout(function(){bar.classList.remove('show');},8000);
   }
   return hot;
 }
 
-// BRIEFING AUTOMATIQUE QUOTIDIEN
 var lastBriefDate='';
 function checkDailyBrief(){
   var today=new Date().toLocaleDateString('fr-FR');
-  if(today!==lastBriefDate){
-    lastBriefDate=today;
-    addLog('ok','Briefing quotidien automatique déclenché');
-    if(notifEnabled&&Notification.permission==='granted'){
-      new Notification('📋 GCM — Briefing Quotidien',{body:'Votre résumé quotidien des conflits mondiaux est disponible.',icon:'https://raw.githubusercontent.com/google/material-design-icons/master/png/action/gps_fixed/materialicons/48dp/2x/baseline_gps_fixed_black_48dp.png'});
-    }
-  }
+  if(today!==lastBriefDate){lastBriefDate=today;addLog('ok','Briefing quotidien déclenché');}
 }
 setInterval(checkDailyBrief,60000);
 checkDailyBrief();
-</script>
-<script>
-// SERVICE WORKER PWA
+
 if('serviceWorker' in navigator){
   var swCode=`
-const CACHE='gcm-v2';
-const ASSETS=[
-  '/Conflit-monitor/mobile.html',
-  '/Conflit-monitor/manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
-];
-self.addEventListener('install',function(e){
-  e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(ASSETS);}));
-  self.skipWaiting();
-});
-self.addEventListener('activate',function(e){
-  e.waitUntil(caches.keys().then(function(keys){
-    return Promise.all(keys.filter(function(k){return k!==CACHE;}).map(function(k){return caches.delete(k);}));
-  }));
-  self.clients.claim();
-});
-self.addEventListener('fetch',function(e){
-  e.respondWith(
-    caches.match(e.request).then(function(cached){
-      if(cached)return cached;
-      return fetch(e.request).then(function(response){
-        if(!response||response.status!==200||response.type==='opaque')return response;
-        var clone=response.clone();
-        caches.open(CACHE).then(function(c){c.put(e.request,clone);});
-        return response;
-      }).catch(function(){return cached;});
-    })
-  );
-});
-self.addEventListener('push',function(e){
-  var data=e.data?e.data.json():{title:'GCM Alert',body:'Nouvelle alerte détectée'};
-  e.waitUntil(self.registration.showNotification(data.title,{body:data.body,icon:'/Conflit-monitor/icon-192.png'}));
-});
+const CACHE='gcm-v4';
+const ASSETS=['/Conflit-monitor/mobile.html','/Conflit-monitor/manifest.json'];
+self.addEventListener('install',function(e){e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(ASSETS);}));self.skipWaiting();});
+self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(keys){return Promise.all(keys.filter(function(k){return k!==CACHE;}).map(function(k){return caches.delete(k);}));}));self.clients.claim();});
+self.addEventListener('fetch',function(e){e.respondWith(caches.match(e.request).then(function(cached){if(cached)return cached;return fetch(e.request).then(function(r){if(!r||r.status!==200||r.type==='opaque')return r;var c=r.clone();caches.open(CACHE).then(function(cache){cache.put(e.request,c);});return r;}).catch(function(){return cached;});}));});
 `;
   var blob=new Blob([swCode],{type:'application/javascript'});
-  var swUrl=URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl,{scope:'/Conflit-monitor/'})
-  .then(function(reg){
-    addLog('ok','Service Worker enregistré — Cache actif');
-    reg.addEventListener('updatefound',function(){
-      addLog('ok','Mise à jour PWA disponible — Rechargement...');
-      setTimeout(function(){window.location.reload();},3000);
-    });
-  })
-  .catch(function(err){
-    addLog('warn','Service Worker limité sur GitHub Pages: '+err.message);
-  });
-
-  navigator.serviceWorker.addEventListener('controllerchange',function(){
-    addLog('ok','PWA mise à jour automatiquement');
-    window.location.reload();
-  });
+  navigator.serviceWorker.register(URL.createObjectURL(blob),{scope:'/Conflit-monitor/'})
+  .then(function(reg){addLog('ok','Service Worker actif');})
+  .catch(function(err){addLog('warn','SW: '+err.message);});
 }
 
-// MISE A JOUR AUTOMATIQUE PWA
-setInterval(function(){
-  if(navigator.serviceWorker.controller){
-    navigator.serviceWorker.controller.postMessage('CHECK_UPDATE');
-    addLog('ok','Vérification mise à jour PWA...');
-  }
-},30*60*1000);
-</script>
-<script>
 var sources=[
   {name:'France24',url:'https://www.france24.com/fr/rss',flag:'FR'},
   {name:'RFI',url:'https://www.rfi.fr/fr/rss-actualite-internationale',flag:'FR'},
@@ -866,7 +780,6 @@ function addNews(time,text,hot,url){
   if(first&&first.style&&first.style.textAlign==='center')f.innerHTML='';
   var el=document.createElement('div');
   el.className='ni';
-  el.dataset.hot=hot?'1':'0';
   if(url)el.onclick=function(){window.open(url,'_blank');};
   el.innerHTML='<div class="nt">'+time+'</div><div class="nx">'+text+'</div><span class="ntag '+(hot?'th':'tm')+'">'+(hot?'🚨 HOT':'ℹ INFO')+(url?' ↗':'')+'</span>';
   if(showHotOnly&&!hot)el.style.display='none';
@@ -875,29 +788,12 @@ function addNews(time,text,hot,url){
 }
 
 function fetchFeed(src){
-  fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(src.url))
-  .then(function(r){if(!r.ok)throw 0;return r.text();})
-  .then(function(txt){
-    var xml=new DOMParser().parseFromString(txt,'text/xml');
-    var items=xml.querySelectorAll('item');
-    var n=0;
-    items.forEach(function(item){
-      if(n>=3)return;
-      var title=(item.querySelector('title')||{textContent:''}).textContent.trim();
-      var link=(item.querySelector('link')||{textContent:''}).textContent.trim();
-      var pub=(item.querySelector('pubDate')||{textContent:''}).textContent;
-      if(!title||title.length<5)return;
-      var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
-      var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
-      var hot=checkHotNews(title);
-      addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
-      n++;
-    });
-    addLog('ok','Feed '+src.name+' chargé');
-  })
-  .catch(function(){
-    fetch('https://corsproxy.io/?'+encodeURIComponent(src.url))
-    .then(function(r){if(!r.ok)throw 0;return r.text();})
+var proxies=['https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest=','https://thingproxy.freeboard.io/fetch/','https://proxy.cors.sh/'];
+  var idx=0;
+  function tryNext(){
+    if(idx>=proxies.length){addLog('err','Feed '+src.name+' inaccessible');return;}
+    var url=proxies[idx]+encodeURIComponent(src.url);idx++;
+    fetch(url).then(function(r){if(!r.ok)throw 0;return r.text();})
     .then(function(txt){
       var xml=new DOMParser().parseFromString(txt,'text/xml');
       var items=xml.querySelectorAll('item');
@@ -910,22 +806,16 @@ function fetchFeed(src){
         if(!title||title.length<5)return;
         var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
         var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
-        var hot=checkHotNews(title);
-        addNews(ts,'['+src.flag+']['+src.name+'] '+title,hot,link);
+        addNews(ts,'['+src.flag+']['+src.name+'] '+title,checkHotNews(title),link);
         n++;
       });
-      addLog('ok','Feed '+src.name+' chargé via proxy2');
-    })
-    .catch(function(){
-      addLog('err','Feed '+src.name+' inaccessible');
-    });
-  });
+      addLog('ok','Feed '+src.name+' chargé');
+    }).catch(function(){tryNext();});
+  }
+  tryNext();
 }
 
-function fetchAll(){
-  sources.forEach(function(s){fetchFeed(s);});
-}
-
+function fetchAll(){sources.forEach(function(s){fetchFeed(s);});}
 setTimeout(fetchAll,1000);
 setInterval(fetchAll,15*60*1000);
 </script>
