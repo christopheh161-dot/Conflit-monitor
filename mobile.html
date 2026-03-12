@@ -538,24 +538,26 @@ addLog('ok','GCM initialisé — '+C.length+' zones chargées');
 var gdeltMarkers=L.layerGroup();
 map.addLayer(gdeltMarkers);
 function fetchGDELT(){
-  var url='https://api.reliefweb.int/v1/disasters?appname=gcm-osint&limit=50&fields[include][]=name&fields[include][]=country&fields[include][]=date&fields[include][]=type&fields[include][]=status&filter[field]=status&filter[value]=ongoing';
-  fetch(url)
-  .then(function(r){if(!r.ok)throw 0;return r.json();})
+  var url='https://api.reliefweb.int/v1/disasters?appname=gcm-osint&limit=50&fields[include][]=name&fields[include][]=country&fields[include][]=date&fields[include][]=type&fields[include][]=status';
+  fetch(url,{headers:{'Accept':'application/json'}})
+  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
   .then(function(data){
     gdeltMarkers.clearLayers();
-    if(!data||!data.data){addLog('warn','ReliefWeb — pas de données');return;}
+    if(!data||!data.data||!data.data.length){addLog('warn','ReliefWeb — pas de données');return;}
     var coords={
       'Afghanistan':[33.93,67.71],'Syria':[34.80,38.99],'Yemen':[15.55,48.52],
       'Sudan':[15.50,32.56],'Ukraine':[48.38,31.17],'Somalia':[5.15,46.20],
-      'DR Congo':[-4.04,21.76],'Myanmar':[19.76,96.08],'Ethiopia':[9.15,40.49],
-      'Nigeria':[9.08,8.67],'Mali':[17.57,-3.99],'Niger':[17.61,8.08],
-      'Burkina Faso':[12.36,-1.53],'Mozambique':[-18.67,35.53],'Haiti':[18.97,-72.29],
-      'Central African Republic':[6.61,20.94],'Colombia':[4.57,-74.30],
-      'Iraq':[33.22,43.68],'Libya':[26.33,17.23],'Palestine':[31.95,35.23],
-      'Israel':[31.05,34.85],'Pakistan':[30.37,69.34],'Bangladesh':[23.68,90.35],
-      'Philippines':[12.87,121.77],'Mexico':[23.63,-102.55],'Venezuela':[6.42,-66.58],
-      'Lebanon':[33.88,35.50],'Georgia':[42.31,43.36],'Armenia':[40.07,45.03],
-      'Cameroon':[5.96,10.15],'Chad':[15.45,18.73],'South Sudan':[6.87,31.57]
+      'Democratic Republic of the Congo':[-4.04,21.76],'Myanmar':[19.76,96.08],
+      'Ethiopia':[9.15,40.49],'Nigeria':[9.08,8.67],'Mali':[17.57,-3.99],
+      'Niger':[17.61,8.08],'Burkina Faso':[12.36,-1.53],'Mozambique':[-18.67,35.53],
+      'Haiti':[18.97,-72.29],'Central African Republic':[6.61,20.94],
+      'Colombia':[4.57,-74.30],'Iraq':[33.22,43.68],'Libya':[26.33,17.23],
+      'occupied Palestinian territory':[31.95,35.23],'Israel':[31.05,34.85],
+      'Pakistan':[30.37,69.34],'Philippines':[12.87,121.77],
+      'Mexico':[23.63,-102.55],'Lebanon':[33.88,35.50],
+      'Cameroon':[5.96,10.15],'Chad':[15.45,18.73],'South Sudan':[6.87,31.57],
+      'Bangladesh':[23.68,90.35],'Venezuela':[6.42,-66.58],'Ecuador':[-1.83,-78.18],
+      'Turkey':[38.96,35.24],'Georgia':[42.31,43.36],'Armenia':[40.07,45.03]
     };
     var n=0;
     data.data.forEach(function(d){
@@ -583,11 +585,9 @@ function fetchGDELT(){
       gdeltMarkers.addLayer(marker);
       n++;
     });
-    addLog('ok','ReliefWeb — '+n+' crises actives chargées');
+    addLog('ok','ReliefWeb — '+n+' crises chargées');
   })
-  .catch(function(e){
-    addLog('err','ReliefWeb inaccessible: '+e.message);
-  });
+  .catch(function(e){addLog('err','ReliefWeb: '+e.message);});
 }
 fetchGDELT();
 setInterval(fetchGDELT,30*60*1000);
