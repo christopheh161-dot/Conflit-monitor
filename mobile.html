@@ -674,17 +674,14 @@ function fetchQuote(item){
     return;
   }
 
-  // INDICES via Twelve Data → converti EUR
-  var tdMap={
-    SPX:'SPX:INDEX',DJI:'DJIA:INDEX',NDX:'NDX:INDEX',
-    CAC:'CAC40:INDEX',DAX:'DAX:INDEX',NKY:'NI225:INDEX'
-  };
-  if(tdMap[item.sym]){
-    fetch('https://api.twelvedata.com/price?symbol='+encodeURIComponent(tdMap[item.sym])+'&apikey='+TD_KEY)
+  // INDICES via Deno proxy → converti EUR
+  var denoIdx=['SPX','DJI','NDX','CAC','DAX','NKY'];
+  if(denoIdx.indexOf(item.sym)>-1){
+    fetch('https://whole-squirrel-85.christopheh161.deno.net/?s='+item.sym)
     .then(function(r){return r.json();})
     .then(function(d){
-      if(!d.price||d.status==='error')throw 0;
-      setPrice(item.s,parseFloat(d.price)*eurUsdRate,null);
+      if(!d.price||d.error)throw 0;
+      setPrice(item.s,parseFloat(d.price)*eurUsdRate,parseFloat(d.chg));
     }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
