@@ -16,7 +16,6 @@
 html,body{width:100%;height:100%;background:#080c10;color:#a8b8c8;font-family:'Rajdhani',sans-serif;overflow:hidden;}
 body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,0.01) 2px,rgba(0,212,255,0.01) 4px);pointer-events:none;z-index:9999;}
 body{display:flex;flex-direction:column;height:100vh;}
-/* HEADER */
 header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:48px;background:#0d1117;border-bottom:1px solid #1a2535;flex-shrink:0;z-index:100;}
 .dot{width:8px;height:8px;border-radius:50%;background:#00ff88;box-shadow:0 0 6px #00ff88;animation:blink 1.5s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
@@ -33,7 +32,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .defcon5{border-color:#00ff88!important;color:#00ff88!important;background:rgba(0,255,136,0.08)!important;}
 #clock{font-family:'Share Tech Mono',monospace;font-size:11px;color:#00d4ff;}
 .hstat{font-family:'Share Tech Mono',monospace;font-size:9px;color:#a8b8c8;border:1px solid #1a2535;padding:3px 8px;}
-/* TABS */
+.defcon-alert{position:fixed;top:48px;left:0;right:0;z-index:9998;padding:10px;font-family:'Share Tech Mono',monospace;font-size:11px;text-align:center;display:none;letter-spacing:2px;pointer-events:none;}
+.defcon-alert.show{display:block;animation:fadeout 4s forwards;}
+@keyframes fadeout{0%{opacity:1;}80%{opacity:1;}100%{opacity:0;}}
+.notif-bar{display:none;padding:6px 20px;background:rgba(255,45,45,0.1);border-bottom:1px solid #ff2d2d;font-family:'Share Tech Mono',monospace;font-size:10px;color:#ff2d2d;align-items:center;gap:10px;flex-shrink:0;}
+.notif-bar.show{display:flex;}
 .tabs{display:flex;background:#0d1117;border-bottom:1px solid #1a2535;flex-shrink:0;overflow-x:auto;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{padding:10px 18px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:#a8b8c8;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s;background:transparent;border-top:none;border-left:none;border-right:none;}
@@ -41,17 +44,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .tab.active{color:#00d4ff;border-bottom-color:#00d4ff;background:rgba(0,212,255,0.05);}
 .tab.active.air{color:#ff8c00;border-bottom-color:#ff8c00;}
 .tab.active.naval{color:#00ff88;border-bottom-color:#00ff88;}
-/* LAYOUT */
 .main{flex:1;display:flex;overflow:hidden;min-height:0;}
 .tab-content{display:none;flex:1;overflow:hidden;}
 .tab-content.active{display:flex;}
-/* NOTIFICATIONS */
-.defcon-alert{position:fixed;top:48px;left:0;right:0;z-index:9998;padding:10px;font-family:'Share
-.defcon-alert.show{display:block;animation:fadeout 4s forwards;}
-@keyframes fadeout{0%{opacity:1;}80%{opacity:1;}100%{opacity:0;}}
-.notif-bar{display:none;padding:6px 20px;background:rgba(255,45,45,0.1);border-bottom:1px solid #ff2d2d;font-family:'Share Tech Mono',monospace;font-size:10px;color:#ff2d2d;align-items:center;gap:10px;flex-shrink:0;}
-.notif-bar.show{display:flex;}
-/* MAP PAGE */
 .map-layout{display:flex;flex:1;overflow:hidden;}
 .map-sidebar{width:280px;background:#0d1117;border-right:1px solid #1a2535;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
 .map-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
@@ -79,12 +74,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .cir{font-size:8px;color:#a8b8c8;font-family:'Share Tech Mono',monospace;}
 .cil{font-size:8px;font-family:'Share Tech Mono',monospace;}
 .ci.high .cil{color:#ff2d2d;}.ci.medium .cil{color:#ff8c00;}.ci.low .cil{color:#00ff88;}
-/* STATS BAR */
 .stats-bar{display:flex;gap:10px;padding:6px 10px;background:#0d1117;border-top:1px solid #1a2535;flex-shrink:0;}
 .stat{text-align:center;}
 .stat-val{font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:700;}
 .stat-lbl{font-size:7px;letter-spacing:1px;color:#a8b8c8;}
-/* CONFLICTS PAGE */
 .conflicts-layout{display:flex;flex:1;overflow:hidden;}
 .conflicts-main{flex:1;overflow-y:auto;padding:15px;}
 .conflicts-main::-webkit-scrollbar{width:3px;}
@@ -105,7 +98,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .ccard.high .ccard-level{color:#ff2d2d;border-color:#ff2d2d;}
 .ccard.medium .ccard-level{color:#ff8c00;border-color:#ff8c00;}
 .ccard.low .ccard-level{color:#00ff88;border-color:#00ff88;}
-/* FEED PAGE */
 .feed-layout{display:flex;flex:1;overflow:hidden;}
 .feed-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .feed-toolbar{display:flex;gap:8px;padding:8px 12px;background:#0d1117;border-bottom:1px solid #1a2535;flex-shrink:0;flex-wrap:wrap;align-items:center;}
@@ -136,7 +128,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .fsb-name{color:#a8b8c8;}
 .fsb-ok{color:#00ff88;font-size:8px;}
 .fsb-err{color:#ff2d2d;font-size:8px;}
-/* BRIEF PAGE */
 .brief-layout{display:flex;flex:1;overflow:hidden;}
 .brief-main{flex:1;overflow-y:auto;padding:15px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start;}
 .brief-main::-webkit-scrollbar{width:3px;}
@@ -154,7 +145,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .log-entry.ok{border-left-color:#00ff88;color:#00ff88;}
 .log-entry.err{border-left-color:#ff2d2d;color:#ff2d2d;}
 .log-entry.warn{border-left-color:#ff8c00;color:#ff8c00;}
-/* FINANCE PAGE */
 .finance-layout{flex:1;overflow-y:auto;padding:15px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;align-content:start;}
 .finance-layout::-webkit-scrollbar{width:3px;}
 .finance-layout::-webkit-scrollbar-thumb{background:#1a2535;}
@@ -168,7 +158,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .fupdate{font-size:7px;color:#3a4a5a;font-family:'Share Tech Mono',monospace;margin-top:3px;}
 .fname2{font-size:9px;color:#a8b8c8;margin-top:2px;}
 .fdiff{font-size:6px;color:#3a4a5a;font-family:'Share Tech Mono',monospace;margin-top:2px;}
-/* OSINT PAGE */
 .osint-layout{flex:1;overflow-y:auto;padding:20px;}
 .osint-layout::-webkit-scrollbar{width:3px;}
 .oslbl{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:#00d4ff;margin-bottom:8px;}
@@ -179,7 +168,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .oslinks{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;max-width:800px;}
 .oslink{display:block;background:#080c10;border:1px solid #1a2535;color:#a8b8c8;padding:8px 12px;font-size:10px;font-family:'Share Tech Mono',monospace;text-decoration:none;text-align:center;transition:all 0.2s;}
 .oslink:hover{border-color:#00d4ff;color:#00d4ff;}
-/* TRACKER PAGE */
 .tracker-layout{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:30px;}
 .tracker-icon{font-size:60px;}
 .tracker-title{font-family:'Share Tech Mono',monospace;font-size:18px;letter-spacing:4px;color:#ff8c00;}
@@ -190,7 +178,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .tracker-btn:hover{background:rgba(255,140,0,0.2);}
 .tracker-btn.naval{border-color:#00ff88;color:#00ff88;background:rgba(0,255,136,0.1);}
 .tracker-btn.naval:hover{background:rgba(0,255,136,0.2);}
-/* DETAIL OVERLAY */
 .dov{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:480px;max-width:95vw;background:#0d1117;border:1px solid #00d4ff;box-shadow:0 0 40px rgba(0,212,255,0.2);z-index:8000;display:none;max-height:80vh;overflow-y:auto;}
 .dh{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #1a2535;position:sticky;top:0;background:#0d1117;}
 .dt{font-size:13px;font-weight:700;color:#e0eaf4;letter-spacing:2px;}
@@ -204,7 +191,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .dl{display:block;padding:5px 8px;background:#080c10;border:1px solid #1a2535;color:#a8b8c8;text-decoration:none;font-size:9px;font-family:'Share Tech Mono',monospace;text-align:center;transition:all 0.2s;}
 .dl:hover{border-color:#00d4ff;color:#00d4ff;}
 .overlay-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:7999;display:none;}
-/* LEAFLET */
 .leaflet-container{background:#080c10!important;}
 .leaflet-popup-content-wrapper{background:#0d1117!important;border:1px solid #00d4ff!important;border-radius:0!important;color:#e0eaf4!important;font-family:'Rajdhani',sans-serif!important;}
 .leaflet-popup-tip{background:#0d1117!important;}
@@ -243,7 +229,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
   <button class="tab naval" id="tab-naval" onclick="showTab('naval')">⚓ NAVAL</button>
 </nav>
 <div class="main">
-<!-- CARTE -->
 <div class="tab-content active" id="content-map">
   <div class="map-layout">
     <div class="map-sidebar">
@@ -271,7 +256,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
     </div>
   </div>
 </div>
-<!-- CONFLITS -->
 <div class="tab-content" id="content-conflicts">
   <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
     <div class="filter-bar">
@@ -288,12 +272,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
     <div class="conflicts-main"><div class="cgrid" id="cgrid"></div></div>
   </div>
 </div>
-<!-- FEED -->
 <div class="tab-content" id="content-feed">
   <div class="feed-layout">
     <div class="feed-main">
       <div class="feed-toolbar">
-        <input type="text" class="feed-search" id="feed-search" placeholder="🔍 Rechercher dans le feed...">
+        <input type="text" class="feed-search" id="feed-search" placeholder="🔍 Rechercher...">
         <button class="expbtn hot" onclick="filterNews('hot')">🚨 HOT</button>
         <button class="expbtn all" onclick="filterNews('all')">ALL</button>
         <button class="expbtn csv" onclick="exportCSV()">⬇ CSV</button>
@@ -310,7 +293,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
     </div>
   </div>
 </div>
-<!-- BRIEFING -->
 <div class="tab-content" id="content-brief">
   <div class="brief-layout">
     <div class="brief-main">
@@ -340,19 +322,17 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
     </div>
   </div>
 </div>
-<!-- FINANCE -->
 <div class="tab-content" id="content-finance">
   <div class="finance-layout">
     <div class="fsection">📈 INDICES BOURSIERS</div>
-    <div id="stocks-grid" style="display:contents;"></div>
+    <div id="stocks-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;grid-column:1/-1;"></div>
     <div class="fsection">🛢 MATIÈRES PREMIÈRES</div>
-    <div id="commodities-grid" style="display:contents;"></div>
+    <div id="commodities-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;grid-column:1/-1;"></div>
     <div class="fsection">💱 DEVISES & CRYPTO</div>
-    <div id="forex-grid" style="display:contents;"></div>
+    <div id="forex-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;grid-column:1/-1;"></div>
     <div style="grid-column:1/-1;font-family:'Share Tech Mono',monospace;font-size:7px;color:#3a4a5a;padding:8px;text-align:center;">Deno Proxy • Binance • Frankfurter • CoinGecko • Prix en EUR • Indices différé 15min</div>
   </div>
 </div>
-<!-- OSINT -->
 <div class="tab-content" id="content-osint">
   <div class="osint-layout">
     <div class="oslbl">OSINT SEARCH ENGINE</div>
@@ -380,7 +360,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
     </div>
   </div>
 </div>
-<!-- AIR -->
 <div class="tab-content" id="content-air">
   <div class="tracker-layout">
     <div class="tracker-icon">✈</div>
@@ -393,7 +372,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
     </div>
   </div>
 </div>
-<!-- NAVAL -->
 <div class="tab-content" id="content-naval">
   <div class="tracker-layout">
     <div class="tracker-icon" style="color:#00ff88">⚓</div>
@@ -409,25 +387,14 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 </div>
 <div class="overlay-bg" id="overlay-bg" onclick="closeD()"></div>
 <div class="dov" id="dov">
-  <div class="dh">
-    <div class="dt" id="dtitle"></div>
-    <button class="dc" onclick="closeD()">✕</button>
-  </div>
+  <div class="dh"><div class="dt" id="dtitle"></div><button class="dc" onclick="closeD()">✕</button></div>
   <div class="db" id="dbody"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 <script>
-function addLog(type,msg){
-  var el=document.createElement('div');
-  el.className='log-entry '+type;
-  el.textContent='['+new Date().toLocaleTimeString('fr-FR')+'] '+msg;
-  var ls=document.getElementById('log-screen');
-  if(!ls)return;
-  ls.insertBefore(el,ls.firstChild);
-  while(ls.children.length>100)ls.removeChild(ls.lastChild);
-}
+function addLog(type,msg){var el=document.createElement('div');el.className='log-entry '+type;el.textContent='['+new Date().toLocaleTimeString('fr-FR')+'] '+msg;var ls=document.getElementById('log-screen');if(!ls)return;ls.insertBefore(el,ls.firstChild);while(ls.children.length>100)ls.removeChild(ls.lastChild);}
 
 var hotCount=0,currentDefcon=4;
 function updateDefcon(){
@@ -465,11 +432,7 @@ function showTab(name){
   if(name==='brief'){generateBrief();}
   if(name==='finance'){fetchFinance();}
 }
-
-function closeD(){
-  document.getElementById('dov').style.display='none';
-  document.getElementById('overlay-bg').style.display='none';
-}
+function closeD(){document.getElementById('dov').style.display='none';document.getElementById('overlay-bg').style.display='none';}
 
 var clusterGroup,heatLayer,heatEnabled=false;
 function filterMap(level,btn){
@@ -548,17 +511,11 @@ var C=[
 var map=L.map('map',{zoomControl:false,worldCopyJump:true}).setView([25,35],2);
 L.control.zoom({position:'bottomright'}).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'',maxZoom:18,subdomains:'abcd'}).addTo(map);
-clusterGroup=L.markerClusterGroup({maxClusterRadius:60,iconCreateFunction:function(cluster){
-  var count=cluster.getChildCount();
-  return L.divIcon({html:'<div style="background:rgba(255,45,45,0.7);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Share Tech Mono,monospace;font-size:12px;border:2px solid #ff2d2d;">'+count+'</div>',className:'',iconSize:[36,36]});
-}});
+clusterGroup=L.markerClusterGroup({maxClusterRadius:60,iconCreateFunction:function(cluster){var count=cluster.getChildCount();return L.divIcon({html:'<div style="background:rgba(255,45,45,0.7);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Share Tech Mono,monospace;font-size:12px;border:2px solid #ff2d2d;">'+count+'</div>',className:'',iconSize:[36,36]});}});
 map.addLayer(clusterGroup);
 
 var heatData=[];
-C.forEach(function(x){
-  var intensity=x.l==='high'?1.0:x.l==='medium'?0.6:0.3;
-  heatData.push([x.c[0],x.c[1],intensity]);
-});
+C.forEach(function(x){heatData.push([x.c[0],x.c[1],x.l==='high'?1.0:x.l==='medium'?0.6:0.3]);});
 heatLayer=L.heatLayer(heatData,{radius:40,blur:25,maxZoom:6,gradient:{0.3:'#00ff88',0.6:'#ff8c00',1.0:'#ff2d2d'}});
 
 function addMarker(x){
@@ -573,18 +530,14 @@ function addMarker(x){
 
 var sc=0,hi=0,mi=0,li=0;
 C.forEach(function(x){
-  var pts=x.l==='high'?3:x.l==='medium'?2:1;
   if(x.l==='high')hi++;else if(x.l==='medium')mi++;else li++;
-  sc+=pts;addMarker(x);
-
-  // Sidebar liste
+  sc+=x.l==='high'?3:x.l==='medium'?2:1;
+  addMarker(x);
   var el=document.createElement('div');
-  el.className='ci '+x.l;el.dataset.level=x.l;
+  el.className='ci '+x.l;
   el.innerHTML='<div class="cin">'+x.n+'</div><div class="cim"><span class="cir">'+x.r+'</span><span class="cil">'+x.l.toUpperCase()+'</span></div>';
   el.onclick=function(){showTab('map');setTimeout(function(){map.flyTo(x.c,5,{duration:1.2});showD(x);},300);};
   document.getElementById('clist').appendChild(el);
-
-  // Cards conflits
   var card=document.createElement('div');
   card.className='ccard '+x.l;card.dataset.level=x.l;card.dataset.type=x.t;
   card.innerHTML='<div class="ccard-name">'+x.n+'</div>'+
@@ -605,8 +558,7 @@ document.getElementById('igrid').innerHTML=
   '<div class="stat"><div class="stat-val" style="color:#00d4ff">'+C.length+'</div><div class="stat-lbl">ZONES</div></div>';
 document.getElementById('hstat-zones').textContent=C.length+' ZONES';
 
-var crisisMarkers=L.layerGroup();
-map.addLayer(crisisMarkers);
+var crisisMarkers=L.layerGroup();map.addLayer(crisisMarkers);
 var crises=[
   {n:"Gaza Airstrikes",c:[31.35,34.31]},{n:"Ukraine Frontline",c:[48.00,37.80]},
   {n:"Sudan RSF",c:[13.51,22.43]},{n:"Myanmar Junta",c:[21.97,96.08]},
@@ -629,9 +581,7 @@ crises.forEach(function(x){
 setTimeout(function(){map.invalidateSize();},200);
 updateDefcon();
 addLog('ok','GCM Desktop — '+C.length+' zones | '+crises.length+' crisis points');
-setInterval(function(){
-  document.getElementById('clock').textContent=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-},1000);
+setInterval(function(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});},1000);
 
 function showD(x){
   var vc=x.l==='high'?'dv vh':x.l==='medium'?'dv vm':'dv vl';
@@ -656,7 +606,6 @@ function showD(x){
   document.getElementById('dov').style.display='block';
   document.getElementById('overlay-bg').style.display='block';
 }
-// ========== FINANCE ==========
 var eurUsdRate=0.92;
 fetch('https://api.frankfurter.app/latest?from=USD&to=EUR')
 .then(function(r){return r.json();})
@@ -683,9 +632,8 @@ var financeData={
   ]
 };
 
-function makeCard(id,name,sym){
-  return '<div class="fcard"><div class="fname">'+sym+'</div><div class="fprice" id="fp-'+id+'">—</div><div class="fchange flat" id="fc-'+id+'">—</div><div class="fupdate" id="fu-'+id+'">...</div><div class="fname2">'+name+'</div><div class="fdiff">différé 15min</div></div>';
-}
+function makeCard(id,name,sym){return '<div class="fcard"><div class="fname">'+sym+'</div><div class="fprice" id="fp-'+id+'">—</div><div class="fchange flat" id="fc-'+id+'">—</div><div class="fupdate" id="fu-'+id+'">...</div><div class="fname2">'+name+'</div><div class="fdiff">différé 15min</div></div>';}
+
 function buildFinanceUI(){
   var sg='',cg='',fg='';
   financeData.stocks.forEach(function(x){sg+=makeCard(x.s,x.n,x.sym);});
@@ -706,19 +654,14 @@ function setPrice(id,price,change){
   if(fc){
     if(change!==null&&change!==undefined){
       var arrow=change>=0?'▲':'▼';
-      var cls=change>0?'up':change<0?'down':'flat';
       fc.textContent=arrow+' '+parseFloat(change).toFixed(2)+'%';
-      fc.className='fchange '+cls;
-    }else{
-      fc.textContent='● LIVE';fc.className='fchange up';
-    }
+      fc.className='fchange '+(change>0?'up':change<0?'down':'flat');
+    }else{fc.textContent='● LIVE';fc.className='fchange up';}
   }
   if(fu)fu.textContent=new Date().toLocaleTimeString('fr-FR');
 }
 
 function fetchQuote(item){
-  var TD_KEY='4b1034e2ecd744a6b3faa2ee34cb5858';
-  // CRYPTO via Binance
   if(item.sym==='BTC'||item.sym==='ETH'){
     fetch('https://api.binance.com/api/v3/ticker/24hr?symbol='+item.sym+'USDT')
     .then(function(r){return r.json();})
@@ -732,12 +675,7 @@ function fetchQuote(item){
     });
     return;
   }
-  // DEVISES via Frankfurter
-  var forexMap={
-    EURUSD:['EUR','USD'],GBPUSD:['GBP','USD'],
-    USDJPY:['USD','JPY'],USDCHF:['USD','CHF'],
-    USDCNY:['USD','CNY'],USDTRY:['USD','TRY']
-  };
+  var forexMap={EURUSD:['EUR','USD'],GBPUSD:['GBP','USD'],USDJPY:['USD','JPY'],USDCHF:['USD','CHF'],USDCNY:['USD','CNY'],USDTRY:['USD','TRY']};
   if(forexMap[item.sym]){
     fetch('https://api.frankfurter.app/latest?from='+forexMap[item.sym][0]+'&to='+forexMap[item.sym][1])
     .then(function(r){return r.json();})
@@ -748,11 +686,9 @@ function fetchQuote(item){
       if(fp)fp.textContent=parseFloat(d.rates[forexMap[item.sym][1]]).toFixed(4);
       if(fc){fc.textContent='● LIVE';fc.className='fchange up';}
       if(fu)fu.textContent=new Date().toLocaleTimeString('fr-FR');
-    })
-    .catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
+    }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
-  // OR via CoinGecko
   if(item.sym==='GOLD'){
     fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=eur&include_24hr_change=true')
     .then(function(r){return r.json();})
@@ -762,18 +698,13 @@ function fetchQuote(item){
     }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
     return;
   }
-  // MATIERES PREMIERES — prix indicatifs
-  var staticUSD={
-    SILVER:33.20,WTI:67.50,BRENT:71.20,
-    GAS:3.82,COPPER:4.05,PLAT:980,PALL:950
-  };
+  var staticUSD={SILVER:33.20,WTI:67.50,BRENT:71.20,GAS:3.82,COPPER:4.05,PLAT:980,PALL:950};
   if(staticUSD[item.sym]){
     setPrice(item.s,staticUSD[item.sym]*eurUsdRate,null);
     var fu=document.getElementById('fu-'+item.s);
     if(fu)fu.textContent='indicatif';
     return;
   }
-  // INDICES via Deno proxy
   var denoIdx=['SPX','DJI','NDX','CAC','DAX','NKY'];
   if(denoIdx.indexOf(item.sym)>-1){
     fetch('https://whole-squirrel-85.christopheh161.deno.net/?s='+item.sym)
@@ -795,14 +726,9 @@ function fetchFinance(){
 fetchFinance();
 setInterval(fetchFinance,25*60*1000);
 
-// ========== OSINT ==========
-document.getElementById('ob').onclick=function(){
-  var q=document.getElementById('oi').value.trim();
-  if(q)window.open('https://www.google.com/search?q='+encodeURIComponent(q+' osint'),'_blank');
-};
+document.getElementById('ob').onclick=function(){var q=document.getElementById('oi').value.trim();if(q)window.open('https://www.google.com/search?q='+encodeURIComponent(q+' osint'),'_blank');};
 document.getElementById('oi').onkeydown=function(e){if(e.key==='Enter')document.getElementById('ob').click();};
 
-// ========== FEED ==========
 document.getElementById('feed-search').addEventListener('input',function(){
   var q=this.value.toLowerCase().trim();
   document.querySelectorAll('#nfeed .ni').forEach(function(item){
@@ -821,30 +747,14 @@ function filterNews(type){
 
 function exportCSV(){
   var rows=[['HEURE','TEXTE','HOT']];
-  document.querySelectorAll('#nfeed .ni').forEach(function(item){
-    rows.push([
-      item.querySelector('.nt')?item.querySelector('.nt').textContent:'',
-      item.querySelector('.nx')?item.querySelector('.nx').textContent:'',
-      item.querySelector('.th')?'OUI':'NON'
-    ]);
-  });
+  document.querySelectorAll('#nfeed .ni').forEach(function(item){rows.push([item.querySelector('.nt')?item.querySelector('.nt').textContent:'',item.querySelector('.nx')?item.querySelector('.nx').textContent:'',item.querySelector('.th')?'OUI':'NON']);});
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
-  a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 function exportJSON(){
   var data=[];
-  document.querySelectorAll('#nfeed .ni').forEach(function(item){
-    data.push({
-      time:item.querySelector('.nt')?item.querySelector('.nt').textContent:'',
-      text:item.querySelector('.nx')?item.querySelector('.nx').textContent:'',
-      hot:item.querySelector('.th')!==null
-    });
-  });
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify({exported:new Date().toISOString(),items:data},null,2)],{type:'application/json'}));
-  a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  document.querySelectorAll('#nfeed .ni').forEach(function(item){data.push({time:item.querySelector('.nt')?item.querySelector('.nt').textContent:'',text:item.querySelector('.nx')?item.querySelector('.nx').textContent:'',hot:item.querySelector('.th')!==null});});
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({exported:new Date().toISOString(),items:data},null,2)],{type:'application/json'}));a.download='gcm-feed-'+new Date().toISOString().slice(0,10)+'.json';a.click();
 }
 function exportPDF(){
   try{
@@ -868,7 +778,6 @@ function exportPDF(){
   }catch(e){addLog('err','PDF: '+e.message);}
 }
 
-// ========== BRIEFING ==========
 function generateBrief(){
   var now=new Date();
   var highList=C.filter(function(x){return x.l==='high';});
@@ -882,10 +791,8 @@ function generateBrief(){
     '🟢 FAIBLES ('+lowList.length+') :\n'+lowList.map(function(x){return '• '+x.n;}).join('\n')+'\n\n'+
     '📊 '+C.length+' zones | '+pct+'% threat score';
   var terrestres=C.filter(function(x){return x.t==='War'||x.t==='Civil War'||x.t==='Insurgency'||x.t==='Crisis';});
-  document.getElementById('brief-conflicts').textContent=
-    terrestres.map(function(x){return '▶ '+x.n+'\n  '+x.t+' | '+x.r+'\n  Acteurs: '+x.a;}).join('\n\n');
-  document.getElementById('brief-high').textContent=
-    highList.map(function(x){return '🔴 '+x.n+'\n  '+x.r+' | Victimes: '+x.k;}).join('\n\n');
+  document.getElementById('brief-conflicts').textContent=terrestres.map(function(x){return '▶ '+x.n+'\n  '+x.t+' | '+x.r+'\n  Acteurs: '+x.a;}).join('\n\n');
+  document.getElementById('brief-high').textContent=highList.map(function(x){return '🔴 '+x.n+'\n  '+x.r+' | Victimes: '+x.k;}).join('\n\n');
   addLog('ok','Briefing généré');
 }
 generateBrief();
@@ -912,12 +819,9 @@ function exportBriefCSV(){
   var rows=[['NOM','REGION','TYPE','NIVEAU','VICTIMES','DEPUIS','ACTEURS']];
   C.forEach(function(x){rows.push([x.n,x.r,x.t,x.l,x.k,x.s,x.a]);});
   var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
-  a.download='gcm-conflits-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));a.download='gcm-conflits-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 
-// ========== NEWS RSS ==========
 function checkHotNews(title){
   var hot=!!(title.match(/war|guerre|conflit|conflict|attack|attaque|militaire|military|mort|killed|missile|bomb|strike|frappe|Ukraine|Gaza|Russia|Russie|Sudan|Myanmar|Congo|escalade|nuclear|Houthis|Hamas|Hezbollah|alert|alerte/i));
   if(hot){
@@ -951,10 +855,8 @@ var sources=[
   {name:'MEE',url:'https://www.middleeasteye.net/rss',flag:'EN'}
 ];
 
-// Sidebar sources
 sources.forEach(function(s){
-  var el=document.createElement('div');
-  el.className='fsb-src';
+  var el=document.createElement('div');el.className='fsb-src';
   el.innerHTML='<span class="fsb-name">['+s.flag+'] '+s.name+'</span><span class="fsb-ok" id="src-'+s.name+'">...</span>';
   document.getElementById('fsb-list').appendChild(el);
 });
@@ -980,15 +882,13 @@ function fetchFeed(src){
     if(idx>=proxies.length){
       var el=document.getElementById('src-'+src.name);
       if(el){el.textContent='✗';el.className='fsb-err';}
-      addLog('err',src.name+' inaccessible');
-      return;
+      addLog('err',src.name+' inaccessible');return;
     }
     var url=proxies[idx]+encodeURIComponent(src.url);idx++;
     fetch(url).then(function(r){if(!r.ok)throw 0;return r.text();})
     .then(function(txt){
       var xml=new DOMParser().parseFromString(txt,'text/xml');
-      var items=xml.querySelectorAll('item');
-      var n=0;
+      var items=xml.querySelectorAll('item');var n=0;
       items.forEach(function(item){
         if(n>=3)return;
         var title=(item.querySelector('title')||{textContent:''}).textContent.trim();
@@ -997,8 +897,7 @@ function fetchFeed(src){
         if(!title||title.length<5)return;
         var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
         var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
-        addNews(ts,'['+src.flag+']['+src.name+'] '+title,checkHotNews(title),link);
-        n++;
+        addNews(ts,'['+src.flag+']['+src.name+'] '+title,checkHotNews(title),link);n++;
       });
       var el=document.getElementById('src-'+src.name);
       if(el){el.textContent='✓';el.className='fsb-ok';}
