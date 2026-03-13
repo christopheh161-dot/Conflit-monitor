@@ -344,11 +344,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 <div class="tab-content" id="content-finance">
   <div class="finance-layout">
     <div class="fsection">📈 INDICES BOURSIERS</div>
-    <div id="stocks-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;grid-column:1/-1;"></div>
+    <div id="stocks-grid" style="display:contents;"></div>
     <div class="fsection">🛢 MATIÈRES PREMIÈRES</div>
-    <div id="commodities-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;grid-column:1/-1;"></div>
+    <div id="commodities-grid" style="display:contents;"></div>
     <div class="fsection">💱 DEVISES & CRYPTO</div>
-    <div id="forex-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;grid-column:1/-1;"></div>
+    <div id="forex-grid" style="display:contents;"></div>
     <div style="grid-column:1/-1;font-family:'Share Tech Mono',monospace;font-size:7px;color:#3a4a5a;padding:8px;text-align:center;">Deno Proxy • Binance • Frankfurter • CoinGecko • Prix en EUR • Indices différé 15min</div>
   </div>
 </div>
@@ -656,7 +656,6 @@ function showD(x){
   document.getElementById('dov').style.display='block';
   document.getElementById('overlay-bg').style.display='block';
 }
-<script>
 // ========== FINANCE ==========
 var eurUsdRate=0.92;
 fetch('https://api.frankfurter.app/latest?from=USD&to=EUR')
