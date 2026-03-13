@@ -1344,7 +1344,7 @@ function generateAIBrief(){
     'Start with today\'s date. Analyze tensions, links between conflicts and markets, escalation risks. '+
     'Be precise, factual and alarming if necessary. End with a short-term forecast. Reply in '+lang+' only.';
 
-  fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" AIzaSyAk8LS4ytbpCCN2uabzUIE-A3_xNVZqGro , {
+  fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" AIzaSyAk8LS4ytbpCCN2uabzUIE-A3_xNVZqGro, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:1000}})
