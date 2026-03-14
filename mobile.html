@@ -338,6 +338,299 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
   </div>
 </div>
 <!-- FINANCE -->
+<div class="tab-content" id="content-finance">
+  <div class="scroll-content" style="padding:0;">
+    <div class="finance-grid">
+      <div class="fsection">📈 INDICES BOURSIERS</div>
+      <div id="stocks-grid" style="display:contents;"></div>
+      <div class="fsection">🛢 MATIÈRES PREMIÈRES</div>
+      <div id="commodities-grid" style="display:contents;"></div>
+      <div class="fsection">💱 DEVISES & CRYPTO</div>
+      <div id="forex-grid" style="display:contents;"></div>
+      <div style="grid-column:1/-1;font-family:'Share Tech Mono',monospace;font-size:6px;color:#3a4a5a;padding:6px;text-align:center;">Deno • Binance • Frankfurter • CoinGecko • EUR</div>
+    </div>
+  </div>
+</div>
+<!-- ANALYSES -->
+<div class="tab-content" id="content-analyses">
+  <div class="scroll-content" style="padding:8px;">
+    <div class="chart-card">
+      <div class="chart-title">CONFLITS PAR RÉGION</div>
+      <div class="chart-filters" id="filter-region">
+        <button class="cf-btn active" onclick="filterChartRegion('all',this)">TOUS</button>
+        <button class="cf-btn" onclick="filterChartRegion('Europe',this)">EU</button>
+        <button class="cf-btn" onclick="filterChartRegion('Middle East',this)">ME</button>
+        <button class="cf-btn" onclick="filterChartRegion('Africa',this)">AF</button>
+        <button class="cf-btn" onclick="filterChartRegion('Asia',this)">AS</button>
+        <button class="cf-btn" onclick="filterChartRegion('Americas',this)">AM</button>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-region"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">RÉPARTITION HIGH / MED / LOW</div>
+      <div class="chart-filters">
+        <button class="cf-btn active" onclick="toggleChartLevel('high',this)" style="border-color:#ff2d2d;color:#ff2d2d;">🔴 HIGH</button>
+        <button class="cf-btn active" onclick="toggleChartLevel('medium',this)" style="border-color:#ff8c00;color:#ff8c00;">🟠 MED</button>
+        <button class="cf-btn active" onclick="toggleChartLevel('low',this)" style="border-color:#00ff88;color:#00ff88;">🟢 LOW</button>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-level"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">RÉPARTITION PAR TYPE</div>
+      <div class="chart-filters" id="filter-type">
+        <button class="cf-btn active" onclick="filterChartType('all',this)">TOUS</button>
+        <button class="cf-btn" onclick="filterChartType('War',this)">WAR</button>
+        <button class="cf-btn" onclick="filterChartType('Civil War',this)">CIVIL</button>
+        <button class="cf-btn" onclick="filterChartType('Insurgency',this)">INSURG.</button>
+        <button class="cf-btn" onclick="filterChartType('Tension',this)">TENSION</button>
+        <button class="cf-btn" onclick="filterChartType('Diplomatie',this)">DIPLO.</button>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-type"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">SCORE DE MENACE GLOBAL</div>
+      <div class="chart-filters">
+        <button class="cf-btn active" onclick="calcScore('weighted',this)">PONDÉRÉ</button>
+        <button class="cf-btn" onclick="calcScore('count',this)">NB CONFLITS</button>
+        <button class="cf-btn" onclick="calcScore('high',this)">HIGH ONLY</button>
+      </div>
+      <div class="threat-score">
+        <div class="threat-num" id="threat-num">0</div>
+        <div class="threat-lbl" id="threat-lbl">CALCUL...</div>
+        <div class="threat-bar"><div class="threat-fill" id="threat-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">📅 TIMELINE DES ÉVÉNEMENTS</div>
+      <div class="chart-filters">
+        <button class="cf-btn active" onclick="filterTimeline('all',this)">TOUS</button>
+        <button class="cf-btn" onclick="filterTimeline('hot',this)">🚨 HOT</button>
+        <button class="cf-btn" onclick="filterTimeline('conflict',this)">CONFLITS</button>
+        <button class="cf-btn" onclick="filterTimeline('market',this)">MARCHÉS</button>
+      </div>
+      <div id="timeline-list" style="margin-top:8px;max-height:300px;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+<!-- ALERTES -->
+<div class="tab-content" id="content-alerts">
+  <div class="scroll-content" style="padding:0;">
+    <div class="alert-section">
+      <div class="alert-title">🔔 ALERTES PERSONNALISÉES</div>
+      <div class="alert-count-bar">
+        <span id="alert-count">0 ZONE(S) SURVEILLÉE(S)</span>
+        <span id="alert-active-count" style="color:#00ff88;">0 ACTIVES</span>
+      </div>
+      <div id="alert-list"></div>
+    </div>
+  </div>
+</div>
+<!-- CYBER -->
+<div class="tab-content" id="content-cyber">
+  <div class="filter-bar">
+    <button class="fbtn active" onclick="filterCyber('all',this)">TOUS</button>
+    <button class="fbtn" onclick="filterCyber('APT',this)">APT</button>
+    <button class="fbtn" onclick="filterCyber('Ransomware',this)">RANSOM</button>
+    <button class="fbtn" onclick="filterCyber('DDoS',this)">DDoS</button>
+    <button class="fbtn" onclick="filterCyber('Espionage',this)">ESPION.</button>
+    <button class="fbtn" onclick="filterCyber('Vuln',this)">VULN.</button>
+  </div>
+  <div class="scroll-content"><div id="cyber-list"></div></div>
+</div>
+<!-- NUCLEAIRE -->
+<div class="tab-content" id="content-nuke">
+  <div class="filter-bar">
+    <button class="fbtn active" onclick="filterNuke('all',this)">TOUS</button>
+    <button class="fbtn" onclick="filterNuke('Test',this)">TEST</button>
+    <button class="fbtn" onclick="filterNuke('Incident',this)">INCIDENT</button>
+    <button class="fbtn" onclick="filterNuke('Diplomatie',this)">DIPLO.</button>
+    <button class="fbtn" onclick="filterNuke('Proliferation',this)">PROLIF.</button>
+  </div>
+  <div class="scroll-content"><div id="nuke-list"></div></div>
+</div>
+<!-- OSINT -->
+<div class="tab-content" id="content-osint">
+  <div class="osint-layout">
+    <div class="oslbl">OSINT SEARCH</div>
+    <div class="osrow">
+      <input type="text" class="osinp" id="oi" placeholder="Cible, IP, domaine...">
+      <button class="osbtn" id="ob">GO</button>
+    </div>
+    <div class="oslinks">
+      <a class="oslink" href="https://osintframework.com" target="_blank">🔧 FRAMEWORK</a>
+      <a class="oslink" href="https://shodan.io" target="_blank">🔍 SHODAN</a>
+      <a class="oslink" href="https://www.virustotal.com" target="_blank">🦠 VIRUSTOTAL</a>
+      <a class="oslink" href="https://censys.io" target="_blank">📡 CENSYS</a>
+      <a class="oslink" href="https://urlscan.io" target="_blank">🔗 URLSCAN</a>
+      <a class="oslink" href="https://intelx.io" target="_blank">🧠 INTEL X</a>
+      <a class="oslink" href="https://www.whois.com" target="_blank">📋 WHOIS</a>
+      <a class="oslink" href="https://hunter.io" target="_blank">📧 HUNTER</a>
+      <a class="oslink" href="https://web.archive.org" target="_blank">📚 WAYBACK</a>
+      <a class="oslink" href="https://www.bellingcat.com" target="_blank">🔎 BELLINGCAT</a>
+      <a class="oslink" href="https://reliefweb.int" target="_blank">🌐 RELIEFWEB</a>
+      <a class="oslink" href="https://acleddata.com" target="_blank">📊 ACLED</a>
+      <a class="oslink" href="https://liveuamap.com" target="_blank">🗺 LIVEUAMAP</a>
+      <a class="oslink" href="https://www.crisisgroup.org" target="_blank">⚠ CRISIS GRP</a>
+    </div>
+  </div>
+</div>
+<!-- AIR -->
+<div class="tab-content" id="content-air">
+  <div class="tracker-layout">
+    <div class="tracker-icon">✈</div>
+    <div class="tracker-title">AIR TRACKER</div>
+    <div class="tracker-links">
+      <a class="tracker-btn" href="https://globe.adsbexchange.com/?mil=1" target="_blank">✈ VOLS MILITAIRES</a>
+      <a class="tracker-btn" href="https://globe.adsbexchange.com/" target="_blank">✈ TOUS LES VOLS</a>
+      <a class="tracker-btn" href="https://www.flightradar24.com" target="_blank">✈ FLIGHTRADAR24</a>
+    </div>
+  </div>
+</div>
+<!-- NAVAL -->
+<div class="tab-content" id="content-naval">
+  <div class="tracker-layout">
+    <div class="tracker-icon" style="color:#00ff88">⚓</div>
+    <div class="tracker-title naval">NAVAL TRACKER</div>
+    <div class="tracker-links">
+      <a class="tracker-btn naval" href="https://www.marinetraffic.com" target="_blank">⚓ MARINETRAFFIC</a>
+      <a class="tracker-btn naval" href="https://www.vesselfinder.com" target="_blank">⚓ VESSELFINDER</a>
+      <a class="tracker-btn naval" href="https://www.chiefship.com" target="_blank">⚓ CHIEFSHIP</a>
+    </div>
+  </div>
+</div>
+</div>
+<div class="overlay-bg" id="overlay-bg" onclick="closeD()"></div>
+<div class="dov" id="dov">
+  <div class="dh"><div class="dt" id="dtitle"></div><button class="dc" onclick="closeD()">✕</button></div>
+  <div class="db" id="dbody"></div>
+</div>
+<nav class="bottom-nav">
+  <button class="bnav active" id="tab-map" onclick="showTab('map')"><span class="bnav-icon">🗺</span><span>CARTE</span></button>
+  <button class="bnav" id="tab-conflicts" onclick="showTab('conflicts')"><span class="bnav-icon">⚔</span><span>CONFLITS</span></button>
+  <button class="bnav" id="tab-feed" onclick="showTab('feed')"><span class="bnav-icon">📡</span><span>FEED</span></button>
+  <button class="bnav" id="tab-brief" onclick="showTab('brief')"><span class="bnav-icon">📋</span><span>BRIEF</span></button>
+  <button class="bnav" id="tab-finance" onclick="showTab('finance')"><span class="bnav-icon">📈</span><span>MARCHÉS</span></button>
+  <button class="bnav analyses" id="tab-analyses" onclick="showTab('analyses')"><span class="bnav-icon">📊</span><span>ANALYSES</span></button>
+  <button class="bnav" id="tab-alerts" onclick="showTab('alerts')"><span class="bnav-icon">🔔</span><span>ALERTES</span></button>
+  <button class="bnav cyber" id="tab-cyber" onclick="showTab('cyber')"><span class="bnav-icon">💻</span><span>CYBER</span></button>
+  <button class="bnav nuke" id="tab-nuke" onclick="showTab('nuke')"><span class="bnav-icon">☢</span><span>NUCL.</span></button>
+  <button class="bnav" id="tab-osint" onclick="showTab('osint')"><span class="bnav-icon">🔍</span><span>OSINT</span></button>
+  <button class="bnav air" id="tab-air" onclick="showTab('air')"><span class="bnav-icon">✈</span><span>AIR</span></button>
+  <button class="bnav naval" id="tab-naval" onclick="showTab('naval')"><span class="bnav-icon">⚓</span><span>NAVAL</span></button>
+</nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+<script>
+var GEMINI_KEY='AIzaSyBxpzxYIO1BogMn_p820Rfb1ZXYhsGHqdU';
+var OWM_KEY='130d874867fe4738b166228378fcdecf';
+var DENO_URL='https://whole-squirrel-85.christopheh161.deno.net';
+var currentLang='fr';
+var weatherCache={};
+var timelineEvents=[];
+var chartsBuilt=false;
+var chartRegion=null,chartLevel=null,chartType=null;
+var levelFilter={high:true,medium:true,low:true};
+var currentScoreMethod='weighted';
+
+var T={
+  fr:{
+    carte:'CARTE',conflits:'CONFLITS',feed:'FEED',brief:'BRIEF',marches:'MARCHÉS',
+    analyses:'ANALYSES',alertes:'ALERTES',cyber:'CYBER',nuke:'NUCL.',osint:'OSINT',air:'AIR',naval:'NAVAL',
+    offline:'⚠ MODE HORS LIGNE',tous:'TOUS',generer:'⚡ GÉNÉRER',
+    briefTitle:'🤖 RAPPORT IA — GEMINI',generating:'⏳ Gemini analyse les données...',
+    noNews:'Générez d\'abord le feed RSS puis appuyez sur Générer.',
+    alertTitle:'🔔 ALERTES PERSONNALISÉES',
+    cyberTitle:'💻 CYBER MENACES',nukeTitle:'☢ SURVEILLANCE NUCLÉAIRE',
+    region:'RÉGION',type:'TYPE',threat:'THREAT LEVEL',victims:'VICTIMES EST.',
+    since:'DEPUIS',actors:'ACTEURS',weather:'MÉTÉO',risk:'SCORE RISQUE'
+  },
+  en:{
+    carte:'MAP',conflits:'CONFLICTS',feed:'FEED',brief:'BRIEF',marches:'MARKETS',
+    analyses:'ANALYSIS',alertes:'ALERTS',cyber:'CYBER',nuke:'NUCL.',osint:'OSINT',air:'AIR',naval:'NAVAL',
+    offline:'⚠ OFFLINE MODE',tous:'ALL',generer:'⚡ GENERATE',
+    briefTitle:'🤖 AI REPORT — GEMINI',generating:'⏳ Gemini analyzing data...',
+    noNews:'Generate the RSS feed first then press Generate.',
+    alertTitle:'🔔 CUSTOM ALERTS',
+    cyberTitle:'💻 CYBER THREATS',nukeTitle:'☢ NUCLEAR MONITORING',
+    region:'REGION',type:'TYPE',threat:'THREAT LEVEL',victims:'EST. VICTIMS',
+    since:'SINCE',actors:'ACTORS',weather:'WEATHER',risk:'RISK SCORE'
+  }
+};
+
+function t(key){return T[currentLang][key]||key;}
+
+function toggleLang(){
+  currentLang=currentLang==='fr'?'en':'fr';
+  var btn=document.getElementById('lang-btn');
+  btn.textContent=currentLang==='fr'?'FR|EN':'EN|FR';
+  btn.className=currentLang==='en'?'en':'';
+  var navLabels=['carte','conflits','feed','brief','marches','analyses','alertes','cyber','nuke','osint','air','naval'];
+  var navIds=['map','conflicts','feed','brief','finance','analyses','alerts','cyber','nuke','osint','air','naval'];
+  navIds.forEach(function(id,i){
+    var el=document.getElementById('tab-'+id);
+    if(el)el.querySelector('span:last-child').textContent=t(navLabels[i]);
+  });
+  document.getElementById('offline-bar').textContent=t('offline');
+  if(chartsBuilt)buildCharts();
+  addLog('ok','Lang: '+currentLang.toUpperCase());
+}
+
+function addLog(type,msg){
+  var el=document.createElement('div');
+  el.className='log-entry '+type;
+  el.textContent='['+new Date().toLocaleTimeString('fr-FR')+'] '+msg;
+  var ls=document.getElementById('log-screen');
+  if(!ls)return;
+  ls.insertBefore(el,ls.firstChild);
+  while(ls.children.length>100)ls.removeChild(ls.lastChild);
+  addToTimeline(type,msg,'system');
+}
+
+function addToTimeline(type,text,category,source){
+  timelineEvents.unshift({time:new Date(),type:type,text:text,category:category||'system',source:source||'GCM'});
+  if(timelineEvents.length>200)timelineEvents.pop();
+}
+
+function renderTimeline(filter){
+  var list=document.getElementById('timeline-list');
+  if(!list)return;
+  var items=timelineEvents.filter(function(e){
+    if(filter==='all')return true;
+    if(filter==='hot')return e.type==='warn';
+    if(filter==='conflict')return e.category==='conflict';
+    if(filter==='market')return e.category==='market';
+    return true;
+  });
+  list.innerHTML=items.slice(0,50).map(function(e){
+    var col=e.type==='warn'?'#ff2d2d':e.type==='err'?'#ff8c00':'#00d4ff';
+    var diff=Math.floor((new Date()-e.time)/60000);
+    var ts=diff<1?'NOW':diff<60?diff+'min':Math.floor(diff/60)+'h';
+    return '<div class="timeline-item">'+
+      '<div><div class="tl-dot" style="background:'+col+';box-shadow:0 0 6px '+col+'"></div></div>'+
+      '<div style="flex:1"><div style="display:flex;justify-content:space-between"><span class="tl-text">'+e.text.substring(0,80)+'</span><span class="tl-time">'+ts+'</span></div>'+
+      '<div class="tl-src">['+e.source+']</div></div></div>';
+  }).join('');
+}
+
+function filterTimeline(filter,btn){
+  document.querySelectorAll('#content-analyses .chart-card:last-child .cf-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderTimeline(filter);
+}
+
+var hotCount=0,currentDefcon=4;
+function updateDefcon(){
+  var d=document.getElementById('defcon');
+  var level,label,cls;
+  if(hotCount>=15){level=1;label='DEFCON 1';cls='defcon1';}
+  else if(hotCount>=10){level=2;label='DEFCON 2';cls='defcon2';}
+  else if(hotCount>=5){level=3;label='DEFCON 3';cls='defcon3';}
+  else if(hotCount>=2){level=4;label='DEFCON 4';cls='defcon4';}
+  else{level=5;label='DEFCON 5';cls='defcon5';}
+  if(level!==currentDefcon){
+    var al=document.getElementById('defcon-alert');
+    var prev=currentDefcon;currentDefcon=level;
     var up=level<prev;
     al.textContent=(up?'⚠ ESCALADE — ':'✓ DÉSESCALADE — ')+label;
     al.style.background=up?'rgba(255,45,45,0.9)':'rgba(0,255,136,0.2)';
@@ -808,6 +1101,242 @@ function calcScore(method,btn){
 }
 
 // ===== CYBER DATA =====
+var cyberData=[
+  {title:'APT28 cible infrastructures OTAN',desc:'Le groupe russe Fancy Bear intensifie ses opérations contre les membres de l\'OTAN avec des spear-phishing ciblés.',tag:'APT',tagClass:'apt',date:'2025',actor:'Russie/GRU',target:'OTAN/UE'},
+  {title:'Ransomware LockBit 4.0 — nouvelles variantes',desc:'De nouvelles variantes de LockBit ciblent les hôpitaux et infrastructures critiques en Europe occidentale.',tag:'Ransomware',tagClass:'ransomware',date:'2025',actor:'LockBit Gang',target:'Santé/Infra'},
+  {title:'DDoS massif contre Taïwan',desc:'Attaques DDoS record contre les institutions gouvernementales et médias taïwanais, attribuées à des acteurs pro-Pékin.',tag:'DDoS',tagClass:'ddos',date:'2025',actor:'Chine (présumé)',target:'Taiwan Gov'},
+  {title:'Volt Typhoon — réseaux US compromis',desc:'Des backdoors persistantes découvertes dans des réseaux d\'infrastructures critiques américaines, attribuées à Volt Typhoon.',tag:'APT',tagClass:'apt',date:'2025',actor:'Chine/MSS',target:'USA Infra'},
+  {title:'Espionnage cyber — Corée du Nord',desc:'Lazarus Group vole 1.5Md$ en crypto via exploitation de bridges DeFi pour financer le programme nucléaire.',tag:'Espionage',tagClass:'espionage',date:'2025',actor:'DPRK/Lazarus',target:'Crypto/Finance'},
+  {title:'Vulnérabilité critique — systèmes SCADA',desc:'CVE-2025-XXXX : faille zero-day dans les systèmes de contrôle industriel Siemens, exploitée activement.',tag:'Vuln',tagClass:'vuln',date:'2025',actor:'Inconnu',target:'SCADA/ICS'},
+  {title:'Hacktivisme — Anonymous Sudan',desc:'Campagne DDoS coordonnée contre des médias occidentaux en représailles aux couvertures du conflit soudanais.',tag:'DDoS',tagClass:'ddos',date:'2025',actor:'Anonymous Sudan',target:'Médias'},
+  {title:'APT41 — double espionnage/cybercrime',desc:'Opérations hybrides ciblant simultanément des gouvernements asiatiques et des entreprises pharmaceutiques.',tag:'APT',tagClass:'apt',date:'2025',actor:'Chine/APT41',target:'Gov/Pharma'},
+  {title:'Cyberattaque Iran — infrastructures Israel',desc:'Tentatives d\'intrusion contre le réseau électrique israélien attribuées à des groupes liés aux Gardiens de la Révolution.',tag:'APT',tagClass:'apt',date:'2025',actor:'Iran/IRGC',target:'Israel Infra'},
+  {title:'Ransomware Black Basta — secteur énergie',desc:'Attaque contre des opérateurs énergétiques européens avec demande de rançon de 50M$.',tag:'Ransomware',tagClass:'ransomware',date:'2025',actor:'Black Basta',target:'Énergie/EU'}
+];
+
+function buildCyberList(filter){
+  var list=document.getElementById('cyber-list');
+  list.innerHTML='';
+  var data=filter&&filter!=='all'?cyberData.filter(function(x){return x.tag===filter;}):cyberData;
+  data.forEach(function(x){
+    var el=document.createElement('div');
+    el.className='cyber-item';
+    el.innerHTML='<div class="cyber-title">'+x.title+'</div>'+
+      '<div class="cyber-meta">'+x.date+' | ACTEUR: '+x.actor+' | CIBLE: '+x.target+'</div>'+
+      '<div class="cyber-desc">'+x.desc+'</div>'+
+      '<span class="cyber-tag '+x.tagClass+'">'+x.tag+'</span>';
+    list.appendChild(el);
+  });
+  addLog('ok','Cyber: '+data.length+' incidents');
+}
+
+function filterCyber(filter,btn){
+  document.querySelectorAll('#content-cyber .filter-bar .fbtn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  buildCyberList(filter==='all'?null:filter);
+}
+
+// ===== NUKE DATA =====
+var nukeData=[
+  {title:'Corée du Nord — test ICBM Hwasong-19',desc:'Tir balistique intercontinental détecté en mer du Japon, portée estimée 15000km. Condamnation unanime du Conseil de sécurité ONU.',type:'Test',date:'2025',country:'DPRK',level:'CRITIQUE'},
+  {title:'Iran — enrichissement 84% confirmé',desc:'L\'AIEA confirme la détection d\'uranium enrichi à 84% dans les installations de Fordow, seuil quasi-militaire.',type:'Proliferation',date:'2025',country:'Iran',level:'ÉLEVÉ'},
+  {title:'Russie — exercices nucléaires tactiques',desc:'Moscou annonce des exercices de forces nucléaires tactiques impliquant missiles Iskander-M en réponse aux livraisons d\'armes à l\'Ukraine.',type:'Diplomatie',date:'2025',country:'Russie',level:'MODÉRÉ'},
+  {title:'Pakistan — modernisation arsenal',desc:'Islamabad développe de nouvelles têtes nucléaires miniaturisées et augmente son stock estimé à 170 ogives.',type:'Proliferation',date:'2025',country:'Pakistan',level:'MODÉRÉ'},
+  {title:'USA-Russie — Nouveau START suspendu',desc:'La suspension du traité Nouveau START laisse les deux superpuissances sans cadre de contrôle des armements nucléaires.',type:'Diplomatie',date:'2024',country:'USA/Russie',level:'ÉLEVÉ'},
+  {title:'Incident Zaporizhzhia — niveau 2 INES',desc:'Incident classé niveau 2 sur l\'échelle INES à la centrale nucléaire ukrainienne de Zaporizhzhia occupée par la Russie.',type:'Incident',date:'2025',country:'Ukraine/Russie',level:'MODÉRÉ'},
+  {title:'Chine — expansion silo missiles DF-41',desc:'Images satellites révèlent la construction de 300+ nouveaux silos pour missiles balistiques intercontinentaux DF-41.',type:'Proliferation',date:'2025',country:'Chine',level:'ÉLEVÉ'},
+  {title:'Inde — test missile Agni-VI',desc:'New Delhi teste avec succès l\'Agni-VI, missile ICBM à portée intercontinentale capable de frapper n\'importe où en Chine.',type:'Test',date:'2025',country:'Inde',level:'MODÉRÉ'}
+];
+
+function buildNukeList(filter){
+  var list=document.getElementById('nuke-list');
+  list.innerHTML='';
+  var data=filter&&filter!=='all'?nukeData.filter(function(x){return x.type===filter;}):nukeData;
+  data.forEach(function(x){
+    var el=document.createElement('div');
+    el.className='nuke-item';
+    el.innerHTML='<div class="nuke-title">☢ '+x.title+'</div>'+
+      '<div class="nuke-meta">'+x.date+' | '+x.country+' | TYPE: '+x.type+'</div>'+
+      '<div class="nuke-desc">'+x.desc+'</div>'+
+      '<span class="nuke-level">'+x.level+'</span>';
+    list.appendChild(el);
+  });
+  addLog('ok','Nucléaire: '+data.length+' événements');
+}
+
+function filterNuke(filter,btn){
+  document.querySelectorAll('#content-nuke .filter-bar .fbtn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  buildNukeList(filter==='all'?null:filter);
+}
+// ===== FINANCE =====
+var eurUsdRate=0.92;
+fetch('https://api.frankfurter.app/latest?from=USD&to=EUR')
+.then(function(r){return r.json();})
+.then(function(d){eurUsdRate=d.rates.EUR;addLog('ok','EUR/USD: '+eurUsdRate);})
+.catch(function(){eurUsdRate=0.92;});
+
+var financeData={
+  stocks:[
+    {s:'SPX',n:'S&P 500',sym:'SPX'},{s:'DJI',n:'Dow Jones',sym:'DJI'},
+    {s:'NDX',n:'NASDAQ',sym:'NDX'},{s:'CAC',n:'CAC 40',sym:'CAC'},
+    {s:'DAX',n:'DAX',sym:'DAX'},{s:'NKY',n:'Nikkei 225',sym:'NKY'}
+  ],
+  commodities:[
+    {s:'GOLD',n:'Or (€)',sym:'GOLD'},{s:'SILVER',n:'Argent (€)',sym:'SILVER'},
+    {s:'WTI',n:'Pétrole WTI (€)',sym:'WTI'},{s:'BRENT',n:'Brent (€)',sym:'BRENT'},
+    {s:'GAS',n:'Gaz Naturel (€)',sym:'GAS'},{s:'COPPER',n:'Cuivre (€)',sym:'COPPER'},
+    {s:'PLAT',n:'Platine (€)',sym:'PLAT'},{s:'PALL',n:'Palladium (€)',sym:'PALL'}
+  ],
+  forex:[
+    {s:'EURUSD',n:'EUR/USD',sym:'EURUSD'},{s:'GBPUSD',n:'GBP/USD',sym:'GBPUSD'},
+    {s:'USDJPY',n:'USD/JPY',sym:'USDJPY'},{s:'USDCHF',n:'USD/CHF',sym:'USDCHF'},
+    {s:'USDCNY',n:'USD/CNY',sym:'USDCNY'},{s:'USDTRY',n:'USD/TRY',sym:'USDTRY'},
+    {s:'BTC',n:'Bitcoin (€)',sym:'BTC'},{s:'ETH',n:'Ethereum (€)',sym:'ETH'}
+  ]
+};
+
+var lastPrices={};
+function makeCard(id,name,sym){
+  return '<div class="fcard"><div class="fname">'+sym+'</div>'+
+    '<div class="fprice" id="fp-'+id+'">—</div>'+
+    '<div class="fchange flat" id="fc-'+id+'">—</div>'+
+    '<div class="fupdate" id="fu-'+id+'">...</div>'+
+    '<div class="fname2">'+name+'</div>'+
+    '<div class="fdiff">différé 15min</div></div>';
+}
+function buildFinanceUI(){
+  var sg='',cg='',fg='';
+  financeData.stocks.forEach(function(x){sg+=makeCard(x.s,x.n,x.sym);});
+  financeData.commodities.forEach(function(x){cg+=makeCard(x.s,x.n,x.sym);});
+  financeData.forex.forEach(function(x){fg+=makeCard(x.s,x.n,x.sym);});
+  document.getElementById('stocks-grid').innerHTML=sg;
+  document.getElementById('commodities-grid').innerHTML=cg;
+  document.getElementById('forex-grid').innerHTML=fg;
+}
+buildFinanceUI();
+
+function setPrice(id,price,change){
+  var dec=price>1000?2:price>10?3:price>1?4:6;
+  var fp=document.getElementById('fp-'+id);
+  var fc=document.getElementById('fc-'+id);
+  var fu=document.getElementById('fu-'+id);
+  if(fp)fp.textContent=parseFloat(price).toFixed(dec)+' €';
+  if(fc){
+    if(change!==null&&change!==undefined){
+      var arrow=change>=0?'▲':'▼';
+      fc.textContent=arrow+' '+parseFloat(change).toFixed(2)+'%';
+      fc.className='fchange '+(change>0?'up':change<0?'down':'flat');
+    }else{fc.textContent='● LIVE';fc.className='fchange up';}
+  }
+  if(fu)fu.textContent=new Date().toLocaleTimeString('fr-FR');
+  lastPrices[id]={price:price,change:change,time:new Date()};
+  addToTimeline('ok',id+': '+parseFloat(price).toFixed(2)+'€','market',id);
+}
+
+function fetchQuote(item){
+  if(item.sym==='BTC'||item.sym==='ETH'){
+    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol='+item.sym+'USDT')
+    .then(function(r){return r.json();})
+    .then(function(d){setPrice(item.s,parseFloat(d.lastPrice)*eurUsdRate,parseFloat(d.priceChangePercent));})
+    .catch(function(){
+      var cid=item.sym==='BTC'?'bitcoin':'ethereum';
+      fetch('https://api.coingecko.com/api/v3/simple/price?ids='+cid+'&vs_currencies=eur&include_24hr_change=true')
+      .then(function(r){return r.json();})
+      .then(function(d){setPrice(item.s,d[cid].eur,d[cid].eur_24h_change);})
+      .catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
+    });return;
+  }
+  var forexMap={EURUSD:['EUR','USD'],GBPUSD:['GBP','USD'],USDJPY:['USD','JPY'],USDCHF:['USD','CHF'],USDCNY:['USD','CNY'],USDTRY:['USD','TRY']};
+  if(forexMap[item.sym]){
+    fetch('https://api.frankfurter.app/latest?from='+forexMap[item.sym][0]+'&to='+forexMap[item.sym][1])
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var fp=document.getElementById('fp-'+item.s);
+      var fc=document.getElementById('fc-'+item.s);
+      var fu=document.getElementById('fu-'+item.s);
+      if(fp)fp.textContent=parseFloat(d.rates[forexMap[item.sym][1]]).toFixed(4);
+      if(fc){fc.textContent='● LIVE';fc.className='fchange up';}
+      if(fu)fu.textContent=new Date().toLocaleTimeString('fr-FR');
+      lastPrices[item.s]={price:d.rates[forexMap[item.sym][1]],change:0,time:new Date()};
+    }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
+    return;
+  }
+  if(item.sym==='GOLD'){
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether-gold&vs_currencies=eur&include_24hr_change=true')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d['tether-gold']&&d['tether-gold'].eur)setPrice(item.s,d['tether-gold'].eur,d['tether-gold'].eur_24h_change);
+    }).catch(function(){});return;
+  }
+  var staticUSD={SILVER:33.20,WTI:67.50,BRENT:71.20,GAS:3.82,COPPER:4.05,PLAT:980,PALL:950};
+  if(staticUSD[item.sym]){
+    setPrice(item.s,staticUSD[item.sym]*eurUsdRate,null);
+    var fu=document.getElementById('fu-'+item.s);
+    if(fu)fu.textContent='indicatif';return;
+  }
+  var denoIdx=['SPX','DJI','NDX','CAC','DAX','NKY'];
+  if(denoIdx.indexOf(item.sym)>-1){
+    fetch(DENO_URL+'/?s='+item.sym)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d.price||d.error)throw 0;
+      setPrice(item.s,parseFloat(d.price)*eurUsdRate,parseFloat(d.chg));
+    }).catch(function(){if(document.getElementById('fu-'+item.s))document.getElementById('fu-'+item.s).textContent='N/A';});
+    return;
+  }
+}
+function fetchFinance(){
+  var all=financeData.stocks.concat(financeData.commodities).concat(financeData.forex);
+  all.forEach(function(item,i){setTimeout(function(){fetchQuote(item);},i*300);});
+  addLog('ok','Marchés refresh');
+}
+fetchFinance();
+setInterval(fetchFinance,25*60*1000);
+
+// ===== BRIEF STATIQUE =====
+function generateBrief(){
+  var now=new Date();
+  var highList=C.filter(function(x){return x.l==='high';});
+  var medList=C.filter(function(x){return x.l==='medium';});
+  var lowList=C.filter(function(x){return x.l==='low';});
+  document.getElementById('brief-daily').textContent=
+    '📅 '+now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+'\n'+
+    '🛡 DEFCON '+currentDefcon+' | HOT: '+hotCount+'\n\n'+
+    '🔴 CRITIQUES ('+highList.length+') :\n'+highList.map(function(x){return '• '+x.n+' [RISK '+riskScores[x.n]+']';}).join('\n')+'\n\n'+
+    '🟠 MOYENNES ('+medList.length+') :\n'+medList.map(function(x){return '• '+x.n;}).join('\n')+'\n\n'+
+    '🟢 FAIBLES ('+lowList.length+') :\n'+lowList.map(function(x){return '• '+x.n;}).join('\n')+'\n\n'+
+    '📊 '+C.length+' zones | Score: '+pct+'%';
+  var terrestres=C.filter(function(x){return x.t==='War'||x.t==='Civil War'||x.t==='Insurgency'||x.t==='Crisis';});
+  document.getElementById('brief-conflicts').textContent=terrestres.map(function(x){return '▶ '+x.n+'\n  '+x.t+' | '+x.r+'\n  Acteurs: '+x.a;}).join('\n\n');
+  document.getElementById('brief-high').textContent=highList.map(function(x){return '🔴 '+x.n+'\n  '+x.r+' | Victimes: '+x.k+'\n  RISK: '+riskScores[x.n]+'/100';}).join('\n\n');
+}
+
+// ===== GEMINI AI BRIEF =====
+function generateAIBrief(){
+  var aiDiv=document.getElementById('brief-ai');
+  aiDiv.innerHTML='<div class="ai-generating">'+t('generating')+'</div>';
+  var newsItems=[];
+  document.querySelectorAll('#nfeed .ni').forEach(function(item){
+    var txt=item.querySelector('.nx')?item.querySelector('.nx').textContent:'';
+    if(txt)newsItems.push(txt.substring(0,150));
+  });
+  var highConflicts=C.filter(function(x){return x.l==='high';}).map(function(x){return x.n+' ('+x.r+', RISK:'+riskScores[x.n]+')';}).join(', ');
+  var marketSummary='';
+  Object.keys(lastPrices).slice(0,6).forEach(function(k){
+    var p=lastPrices[k];
+    if(p)marketSummary+=k+': '+parseFloat(p.price).toFixed(2)+'€'+(p.change?' ('+parseFloat(p.change).toFixed(1)+'%)':'')+' | ';
+  });
+  var lang=currentLang==='fr'?'français':'English';
+  var prompt=currentLang==='fr'?
+    'Tu es un analyste géopolitique expert. Génère un rapport narratif de situation mondiale en '+lang+' basé sur ces données.\n\n'+
+    'CONFLITS HIGH RISK: '+highConflicts+'\n\n'+
+    'DERNIÈRES NEWS ('+newsItems.length+' articles):\n'+newsItems.slice(0,15).join('\n')+'\n\n'+
+    'MARCHÉS: '+marketSummary+'\n\n'+
+    'Écris un rapport narratif de 3-4 paragraphes style journaliste de guerre/analyste géopolitique. '+
+    'Commence par la date du jour. Analyse les tensions, les liens entre conflits et marchés, les risques d\'escalade. '+
+    'Sois précis, factuel et alarmiste si nécessaire. Termine par une prévision à court terme. Réponse en '+lang+' uniquement.':
+    'You are an expert geopolitical analyst. Generate a narrative situation report in '+lang+' based on this data.\n\n'+
     'HIGH RISK CONFLICTS: '+highConflicts+'\n\n'+
     'LATEST NEWS ('+newsItems.length+' articles):\n'+newsItems.slice(0,15).join('\n')+'\n\n'+
     'MARKETS: '+marketSummary+'\n\n'+
