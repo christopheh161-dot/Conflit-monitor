@@ -308,10 +308,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 1
 <div class="tab-content" id="content-brief">
   <div class="scroll-content">
     <div class="brief-card">
-      <div class="brief-title">🤖 RAPPORT local — Phi-3.5 (ONNX)</div>
-      <div class="brief-content" id="brief-ai">Appuyez sur Générer pour créer un rapport narratif.</div>
+      <div class="brief-title">🤖 RAPPORT IA — GEMINI</div>
+      <div class="brief-content" id="brief-ai">Appuyez sur Générer pour créer un rapport personnalisé.</div>
       <div class="brief-actions">
-        <button class="baction ai" onclick="generateLocalBrief()">⚡ GÉNÉRER</button>
+        <button class="baction ai" onclick="generateAIBrief()">⚡ GÉNÉRER</button>
         <button class="baction pdf" onclick="exportBriefPDF('ai')">⬇ PDF</button>
       </div>
     </div>
@@ -538,7 +538,7 @@ var T={
     carte:'CARTE',conflits:'CONFLITS',feed:'FEED',brief:'BRIEF',marches:'MARCHÉS',
     analyses:'ANALYSES',alertes:'ALERTES',cyber:'CYBER',nuke:'NUCL.',osint:'OSINT',air:'AIR',naval:'NAVAL',
     offline:'⚠ MODE HORS LIGNE',tous:'TOUS',generer:'⚡ GÉNÉRER',
-    briefTitle:'🤖 RAPPORT IA — LOCAL',generating:'⏳ Gemini analyse les données...',
+    briefTitle:'🤖 RAPPORT IA — GEMINI',generating:'⏳ Gemini analyse les données...',
     noNews:'Générez d\'abord le feed RSS puis appuyez sur Générer.',
     alertTitle:'🔔 ALERTES PERSONNALISÉES',
     cyberTitle:'💻 CYBER MENACES',nukeTitle:'☢ SURVEILLANCE NUCLÉAIRE',
@@ -549,7 +549,7 @@ var T={
     carte:'MAP',conflits:'CONFLICTS',feed:'FEED',brief:'BRIEF',marches:'MARKETS',
     analyses:'ANALYSIS',alertes:'ALERTS',cyber:'CYBER',nuke:'NUCL.',osint:'OSINT',air:'AIR',naval:'NAVAL',
     offline:'⚠ OFFLINE MODE',tous:'ALL',generer:'⚡ GENERATE',
-    briefTitle:'🤖 AI REPORT',generating:'⏳ Gemini analyzing data...',
+    briefTitle:'🤖 AI REPORT — GEMINI',generating:'⏳ Gemini analyzing data...',
     noNews:'Generate the RSS feed first then press Generate.',
     alertTitle:'🔔 CUSTOM ALERTS',
     cyberTitle:'💻 CYBER THREATS',nukeTitle:'☢ NUCLEAR MONITORING',
@@ -1313,47 +1313,86 @@ function generateBrief(){
 }
 
 // ===== GEMINI AI BRIEF =====
-function generateLocalBrief() {
-  var aiDiv = document.getElementById('brief-ai');
-  aiDiv.innerHTML = '<div class="ai-generating">⏳ Analyse géopolitique locale...</div>';
-
-  var highConflicts = C.filter(x => x.l === 'high').map(x => x.n + ' (' + x.r + ')').join(', ') || 'Aucun conflit high risk détecté';
-
-  var newsItems = [];
-  document.querySelectorAll('#nfeed .ni .nx').forEach(item => {
-    var txt = item.textContent.trim();
-    if (txt) newsItems.push(txt);
+function generateAIBrief(){
+  var aiDiv=document.getElementById('brief-ai');
+  aiDiv.innerHTML='<div class="ai-generating">'+t('generating')+'</div>';
+  var newsItems=[];
+  document.querySelectorAll('#nfeed .ni').forEach(function(item){
+    var txt=item.querySelector('.nx')?item.querySelector('.nx').textContent:'';
+    if(txt)newsItems.push(txt.substring(0,150));
   });
+  var highConflicts=C.filter(function(x){return x.l==='high';}).map(function(x){return x.n+' ('+x.r+', RISK:'+riskScores[x.n]+')';}).join(', ');
+  var marketSummary='';
+  Object.keys(lastPrices).slice(0,6).forEach(function(k){
+    var p=lastPrices[k];
+    if(p)marketSummary+=k+': '+parseFloat(p.price).toFixed(2)+'€'+(p.change?' ('+parseFloat(p.change).toFixed(1)+'%)':'')+' | ';
+  });
+  var lang=currentLang==='fr'?'français':'English';
+  var prompt=currentLang==='fr'?
+    'Tu es un analyste géopolitique expert. Génère un rapport narratif de situation mondiale en '+lang+' basé sur ces données.\n\n'+
+    'CONFLITS HIGH RISK: '+highConflicts+'\n\n'+
+    'DERNIÈRES NEWS ('+newsItems.length+' articles):\n'+newsItems.slice(0,15).join('\n')+'\n\n'+
+    'MARCHÉS: '+marketSummary+'\n\n'+
+    'Écris un rapport narratif de 3-4 paragraphes style journaliste de guerre/analyste géopolitique. '+
+    'Commence par la date du jour. Analyse les tensions, les liens entre conflits et marchés, les risques d\'escalade. '+
+    'Sois précis, factuel et alarmiste si nécessaire. Termine par une prévision à court terme. Réponse en '+lang+' uniquement.':
+    'You are an expert geopolitical analyst. Generate a narrative situation report in '+lang+' based on this data.\n\n'+
+    'HIGH RISK CONFLICTS: '+highConflicts+'\n\n'+
+    'LATEST NEWS ('+newsItems.length+' articles):\n'+newsItems.slice(0,15).join('\n')+'\n\n'+
+    'MARKETS: '+marketSummary+'\n\n'+
+    'Write a narrative report of 3-4 paragraphs in the style of a war correspondent/geopolitical analyst. '+
+    'Start with today\'s date. Analyze tensions, links between conflicts and markets, escalation risks. '+
+    'Be precise, factual and alarming if necessary. End with a short-term forecast. Reply in '+lang+' only.';
 
-  var marketSummary = '';
-  Object.keys(lastPrices || {}).slice(0,6).forEach(k => {
-    if (lastPrices[k] && lastPrices[k].price) {
-      marketSummary += k + ': ' + parseFloat(lastPrices[k].price).toFixed(2) + '€' 
-                    + (lastPrices[k].change ? ' (' + parseFloat(lastPrices[k].change).toFixed(1) + '%)' : '') 
-                    + ' | ';
+  fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="AIzaSyAk8LS4ytbpCCN2uabzUIE-A3_xNVZqGro, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:1000}})
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts){
+      var text=d.candidates[0].content.parts[0].text;
+      aiDiv.textContent=text;
+      addLog('ok','Rapport IA généré ('+text.length+' caractères)');
+      addToTimeline('ok','Rapport IA Gemini généré','system','GEMINI');
+    }else{
+      aiDiv.textContent='❌ Erreur Gemini: '+JSON.stringify(d).substring(0,100);
+      addLog('err','Gemini: réponse invalide');
     }
+  })
+  .catch(function(e){
+    aiDiv.textContent='❌ Erreur connexion Gemini: '+e.message;
+    addLog('err','Gemini: '+e.message);
   });
-  marketSummary = marketSummary || 'Marchés indisponibles';
+}
 
-  var lang = currentLang === 'fr' ? 'français' : 'English';
-  var today = new Date().toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-  });
-
-  var report = 
-`${today.toUpperCase()}
-
-tu peux le modifier pour changer le style
-    const systemPrompt = `Tu es un analyste géopolitique expérimenté et journaliste de terrain. 
-Écris un rapport narratif de 3 à 5 paragraphes en français, ton percutant, factuel et alarmiste quand la situation le justifie.
-Commence par la date du jour en majuscules.
-Analyse les tensions, fais des liens logiques entre conflits et marchés, évalue les risques d'escalade.
-Utilise les données fournies et improvise des interprétations réalistes et plausibles.
-Termine par une prévision à court terme (30-90 jours). Réponse en français uniquement, sans mentionner que tu es une IA.`;
-
-  setTimeout(() => {
-    aiDiv.textContent = report;
-  }, 1400);
+function exportBriefPDF(type){
+  try{
+    var doc=new window.jspdf.jsPDF();
+    doc.setFillColor(8,12,16);doc.rect(0,0,210,297,'F');
+    doc.setTextColor(0,212,255);doc.setFontSize(14);doc.text('GLOBAL CONFLICT MONITOR',105,15,{align:'center'});
+    doc.setFontSize(9);doc.setTextColor(255,140,0);
+    var title=type==='ai'?'RAPPORT IA — GEMINI':type==='daily'?'BRIEFING QUOTIDIEN':'CONFLITS ACTIFS';
+    doc.text(title,105,22,{align:'center'});
+    doc.setDrawColor(0,212,255);doc.line(10,26,200,26);
+    var content=type==='ai'?document.getElementById('brief-ai').textContent:type==='daily'?document.getElementById('brief-daily').textContent:document.getElementById('brief-conflicts').textContent;
+    var lines=doc.splitTextToSize(content,185);var y=32;
+    lines.forEach(function(line){
+      if(y>280){doc.addPage();doc.setFillColor(8,12,16);doc.rect(0,0,210,297,'F');y=20;}
+      doc.setTextColor([224,234,244]);doc.setFontSize(8);doc.text(line,10,y);y+=4.5;
+    });
+    doc.save('gcm-brief-'+new Date().toISOString().slice(0,10)+'.pdf');
+    addLog('ok','PDF exporté');
+  }catch(e){addLog('err','PDF: '+e.message);}
+}
+function exportBriefCSV(){
+  var rows=[['NOM','REGION','TYPE','NIVEAU','VICTIMES','DEPUIS','ACTEURS','RISK']];
+  C.forEach(function(x){rows.push([x.n,x.r,x.t,x.l,x.k,x.s,x.a,riskScores[x.n]||'N/A']);});
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='gcm-conflits-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 // ===== NEWS RSS =====
 function checkHotNews(title){
