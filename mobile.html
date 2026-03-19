@@ -862,35 +862,50 @@ function showD(x){
 
 // ===== GDELT LIVE =====
 function fetchGDELT(){
-  document.getElementById('gdelt-bar').textContent='⟳ GDELT — chargement live...';
-  var proxies=['https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest='];
-  var url='https://api.gdeltproject.org/api/v2/doc/doc?query=conflict+war+attack&mode=artlist&maxrecords=25&format=json&timespan=1d';
+  document.getElementById('gdelt-bar').textContent='⟳ GDELT — chargement...';
+  var url='https://api.gdeltproject.org/api/v2/doc/doc?query=conflict+war+attack+military&mode=artlist&maxrecords=25&format=rss&timespan=1d&sort=DateDesc';
+  var proxies=['https://corsproxy.io/?','https://api.codetabs.com/v1/proxy?quest=','https://thingproxy.freeboard.io/fetch/'];
   var idx=0;
   function tryNext(){
-    if(idx>=proxies.length){document.getElementById('gdelt-bar').textContent='⚠ GDELT — utilisation données locales';addLog('warn','GDELT inaccessible');return;}
-    fetch(proxies[idx]+encodeURIComponent(url)).then(function(r){return r.json();})
-    .then(function(d){
-      if(!d.articles)throw 0;
-      gdeltEvents=d.articles;
+    if(idx>=proxies.length){
+      document.getElementById('gdelt-bar').textContent='⚠ GDELT — inaccessible depuis mobile';
+      addLog('warn','GDELT: tous proxies échoués');
+      return;
+    }
+    fetch(proxies[idx]+encodeURIComponent(url))
+    .then(function(r){if(!r.ok)throw 0;return r.text();})
+    .then(function(txt){
+      var xml=new DOMParser().parseFromString(txt,'text/xml');
+      var items=xml.querySelectorAll('item');
+      if(!items||items.length===0)throw new Error('no items');
+      gdeltEvents=[];
       gdeltLayer.clearLayers();
       var gl=document.getElementById('gdelt-list');
       gl.innerHTML='';
       var n=0;
-      d.articles.forEach(function(a){
+      items.forEach(function(item){
         if(n>=25)return;
+        var title=(item.querySelector('title')||{textContent:''}).textContent.trim();
+        var link=(item.querySelector('link')||{textContent:''}).textContent.trim();
+        var pub=(item.querySelector('pubDate')||{textContent:''}).textContent;
+        if(!title||title.length<5)return;
+        gdeltEvents.push({title:title,url:link});
+        var diff=pub?Math.floor((new Date()-new Date(pub))/60000):0;
+        var ts=diff<1?'NOW':diff<60?'-'+diff+'min':'-'+Math.floor(diff/60)+'h';
         var el=document.createElement('div');
         el.className='gdelt-card';
-        el.innerHTML='<div class="gdelt-title">'+a.title+'</div>'+
-          '<div class="gdelt-meta">📡 GDELT LIVE | '+a.domain+' | '+(a.seendate||'').substring(0,8)+'</div>';
-        el.onclick=function(){window.open(a.url,'_blank');};
+        el.innerHTML='<div class="gdelt-title">'+title+'</div>'+
+          '<div class="gdelt-meta">📡 GDELT LIVE | '+ts+'</div>';
+        el.onclick=function(){if(link)window.open(link,'_blank');};
         gl.appendChild(el);
-        if(checkHotNews(a.title))n++;else n++;
-        addToTimeline('ok',a.title.substring(0,80),'conflict','GDELT');
+        checkHotNews(title);
+        addToTimeline('ok',title.substring(0,80),'conflict','GDELT');
+        n++;
       });
-      document.getElementById('gdelt-bar').textContent='📡 GDELT LIVE — '+d.articles.length+' événements — '+new Date().toLocaleTimeString('fr-FR');
-      addLog('ok','GDELT: '+d.articles.length+' événements');
-      idx=99;
-    }).catch(function(){idx++;tryNext();});
+      document.getElementById('gdelt-bar').textContent='📡 GDELT LIVE — '+n+' événements — '+new Date().toLocaleTimeString('fr-FR');
+      addLog('ok','GDELT: '+n+' événements via '+proxies[idx-1||0]);
+    })
+    .catch(function(){idx++;tryNext();});
   }
   tryNext();
 }
